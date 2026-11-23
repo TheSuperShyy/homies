@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### CLIX holds both assets, and the approval notice is gone (the owner's AnyDesk screenshot, 12:24 Israel time), read only, 10:25 UTC
+- **CLIX's assigned assets: 2,** the HOMIES app and the WhatsApp account "הומי'ז ניהול ואחזקת מבנים", both full access. So the owner's assignment is confirmed.
+- **The yellow notice "someone else needs to approve" is no longer on CLIX's page,** and "Create a token" is there. So the other admin most likely approved the request.
+- **Told the owner:** Create a token → HOMIES → expiry Never → whatsapp_business_management and whatsapp_business_messaging → copy it at once (Meta shows it only once) into `HOMIES_WHATSAPP_TOKEN`, with the account's ID in `HOMIES_WHATSAPP_WABA_ID`. Then I check the token (read only) and submit the four templates for Meta's review.
+
 ### Only the system user token in `.env`? Yes (the owner, with `.env` open: "so only system user right"), answered, 10:23 UTC
 - **Two lines, both still empty:** `HOMIES_WHATSAPP_TOKEN` gets CLIX's token (no expiry) and `HOMIES_WHATSAPP_WABA_ID` gets their WhatsApp account's ID. `wa_templates.py --account homies` reads nothing else.
 - The temporary token is only for getting the templates in before the approval. Once CLIX's token exists, it is the one.
