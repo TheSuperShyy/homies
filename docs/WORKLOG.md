@@ -11,6 +11,12 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### Another way than the second admin? For the templates, yes (the owner: "is there other way to do it"), answered, 09:48 UTC
+- **A temporary token:** the HOMIES app's WhatsApp API Setup page gives a token of Yariv's own (24 hours, with the WhatsApp permissions), and Graph API Explorer gives one for about an hour. Either is enough to submit the four templates with `wa_templates.py --account homies`, so Meta's review can start now. If it too asks for another admin, the second way.
+- **No token at all:** the four created by hand in their WhatsApp Manager from `docs/features/11-whatsapp-bot/templates.md`.
+- **What neither replaces:** the system user token, which the bot needs on their number from the switch on. A temporary token lapses. So the second admin's approval is still owed before the switch, but no longer holds up the templates.
+- Turning the business's approval rule off is not offered: it is their security setting, and changing it would likely need the same second admin.
+
 ### Their WhatsApp account assigned to CLIX; the token still waits on another admin (the owner: "ok i assigned the whatsapp account to clix but what about the system user token"), answered, 09:45 UTC
 - **The assignment is the owner's word.** We can't read it until a token exists.
 - **The token:** still the request Yariv's account sent on 22 Nov. Only another admin of Homies' business can approve it, from their own account (Requests → "דרושה בדיקה"); Users → People shows who the admins are. It lapses 7 days after sending.
