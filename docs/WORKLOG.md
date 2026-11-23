@@ -11,6 +11,22 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### PREPARED, NOTHING SWITCHED: the move to Homies' own number (the owner: "so right now just prepare everything but dont disconnect everything"), 10:55 UTC
+- **Read with their token:**
+  - ManyChat is the only app subscribed to their WABA, with no override. Their HOMIES app has no webhook settings.
+  - The WABA is approved, in USD, business not verified.
+  - The number is already on the Cloud API, so no PIN is needed.
+- **The four templates are APPROVED on their account** (read about 10:50 UTC, some 20 minutes after submission).
+- **Chatwoot 4.16's `register_callback`, read on the server:** `POST /{waba}/subscribed_apps` with `subscribed_fields` messages and smb_message_echoes, then the phone-level override to `<chatwoot>/webhooks/whatsapp/<number>`. Registration with a PIN is only in `perform`.
+- **Built, dry run by default, nothing applied:**
+  - `scripts/switch_to_homies.py`:
+    - preflight: their token, number, templates and connected apps; inbox 1 now; Chatwoot's own validation of the move. It passed.
+    - `--apply`: refuses while ManyChat is connected unless `--manychat-is-off`. Then a snapshot (`local/`, no token), inbox 1 to their number with their token, `register_callback` and the template sync. On a failure, inbox 1 goes back in the same run.
+    - `--restore`: inbox 1 back with our token (checked by digest), their number's redirect cleared and their HOMIES app unsubscribed.
+  - `scripts/n8n_whatsapp_tohomies.py`: the two typing nodes to their number's id, with an n8n credential holding their token. The credential is made once at `--apply`, its id kept as `HOMIES_N8N_CRED_TYPING`. It has `--restore`. The gate on its dump is all green: 1,620 replies unchanged.
+  - The runbook: `docs/features/11-whatsapp-bot/switch-to-homies.md` (order, proof, rollback, Homies' items).
+- **Not touched:** ManyChat, their app, their WABA's subscriptions, inbox 1, n8n, the tool server.
+
 ### SUBMITTED 10:28 UTC: the four templates on Homies' own WhatsApp account (the owner: "done its called yarive meta system user token")
 - **The token:** the owner put it in `.env` as `YARIV_<ETA_SYSTEM_USER` (the M typed as "<"; new since the 22 Nov backup). `debug_token`, read only: SYSTEM_USER "CLIX", app HOMIES, valid, `expires_at` 0 (never), scopes whatsapp_business_management, whatsapp_business_messaging, whatsapp_business_manage_events and manage_app_solution. No target list, so it reaches whatever CLIX holds.
 - **Their account, read with it:**
