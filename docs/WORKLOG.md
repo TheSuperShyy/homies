@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### Homies' system user "CLIX" holds only the HOMIES app, and the token still waits on another admin (the owner's two AnyDesk screenshots, 11:37-11:38 Israel time), read only, 09:40 UTC
+- **System users:** "CLIX", Admin, in Homies' business. Its assigned assets: one, the HOMIES app, with full access. **Their WhatsApp account is not assigned to it,** so a token from it would reach no template and no number.
+- **Requests → "דרושה בדיקה":** the token request (HOMIES; whatsapp_business_management, whatsapp_business_messaging, whatsapp_business_manage_events, manage_app_solution), sent by Yariv Levi 18 hours earlier, valid 7 days, status sent. From Yariv's account it can only be cancelled. Meta: another admin has to approve it and has been told.
+- **Told the owner:**
+  - assign their WhatsApp account to CLIX with full control now;
+  - another admin of the business approves the request from their own account (Requests → "דרושה בדיקה"); don't cancel it;
+  - then generate the token on CLIX with no expiry, and put it and the WhatsApp account's ID into `.env`.
+- No ids from the screenshots are written here.
+
 ### LIVE 09:22:23 UTC: the phone line gets the chatbot's emergency line and the yes before a request (the owner: "ok apply the emergency and ticket rules to the phone line but what about the standing order rule on the chatbot")
 - **Read first:** the live incoming agent `10ae859a` equals the repo (prompt 15,310 characters, all 8 tools byte-equal). Snapshot: `local/vapi-inbound-live-23nov-before-emergency.json` (updatedAt 19 Nov 12:20:12 UTC).
 - **The prompt** (`docs/assistant/demo-inbound.md`, fence 15,310 → 15,724 characters):
