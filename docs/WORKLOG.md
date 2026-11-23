@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### Is the voice agent the same as the chatbot? A separate agent with nearly the same rules; two twins still owed (the owner: "ok is the voice agent the same as the chatbot?"), read only, 09:00 UTC
+- **Read live from Vapi (GET only):** the incoming agent `10ae859a`, last changed 19 Nov 12:20:12 UTC (card-only), on openai `gpt-5.6-sol`, prompt 15,310 characters, 8 tools. The debt agent `4bc03b57` was changed at the same minute. The chatbot runs on Gemini in n8n.
+- **Carried:** the chatbot's rules of 10 Nov, and the bank transfer and card-only rules of 19 Nov.
+- **Still owed, confirmed on live (both from 11 Nov):**
+  - **Emergencies:** its `notify_team` text still says an emergency gets the note and an urgent ticket (`open_request`, urgency emergency). Its prompt sends callers nowhere except gas and an urgent fault while the office is closed. The chatbot gives only the line, at any hour, with no ticket and no note.
+  - **A yes before a ticket:** nothing in its prompt or tools asks before `open_request`.
+  - **For the twin when asked:** a caller reaches this agent by phoning 077-6687949 and pressing 9, so "call 077-6687949" can't be copied over word for word.
+- **The debt agent:** a different job (it calls tenants who owe). It shares only the payment rules.
+- **The number:** callers reach the incoming agent on the office number, 077-6687949, then 9 (Omni's temporary shortcut, last confirmed 3 Nov). The WhatsApp switch doesn't touch the phone side.
+
 ### Is it the same number on the HOMIES app? Yes (the owner: "is the number the same on the app i sent you last night"), the screenshot looked at again, 08:43 UTC
 - **The 22 Nov 15:06 UTC screenshot** (the HOMIES app, WhatsApp use case, Configuration) shows, under their WhatsApp account "הומי'ז ניהול ואחזקת מבנים", **+972 77-668-7949, Registered**. That is the number above. The phone number ID is on it too; it is not written here.
 - On the same page: the callback URL and verify token are empty, "Remove subscription" is greyed out, "Subscribe webhooks" is off, and the payment step is ticked. So the app is not connected to the number's messages, as read on 22 Nov.
