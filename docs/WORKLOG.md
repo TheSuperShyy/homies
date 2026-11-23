@@ -11,6 +11,22 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### A guidebook PDF: connecting WhatsApp (Meta) to a chatbot (the owner: "create a documentation pdf file for me so that this wont happen again ... different scenarios like existing bot that needs to be replaced ... steps with screenshots and arrows in english like a guidebook"), 11:12 UTC
+- **Why the owner asked:** the Homies system-user token waited on the second admin. The owner asked why: two full admins in "הומי'ז ניהול ואחזקת מבנים" means Meta wants the other admin to approve a permanent token, the requester never can, and working inside Yariv's personal login made the request his.
+- **The file:** `local/meta-guide/Meta-WhatsApp-Setup-Guide.pdf`, 15 A4 pages, 2.5 MB, gitignored because the screenshots are the client's. Opened in File Explorer. The text (`guide_content.md`) was written here from CONTEXT, HANDOVER and this log. Layout and figures came from a helper agent, `build_guide.py` (fig/, guide.html, preview/), which rebuilds it in about a minute.
+- **Contents:**
+  1. the eight Homies incidents, with the lesson of each;
+  2. the pieces, as a drawn diagram;
+  3. the 9-row checklist for the client;
+  4. eleven steps: access (partner access first, never the client's login), the right portfolio, the app, the system user with BOTH assets, the permanent token, the second admin's approval, the card and its currency, verification and display name, templates (both WABAs), register/webhook/subscribe/`webhook_configuration`, and testing by delivered/read;
+  5. cases A to D: new number, WhatsApp Business app, replacing a bot (C1 in the client's WABA, C2 in the provider's), test number;
+  6. the cutover-day runbook;
+  7. the troubleshooting table;
+  8. the glossary.
+- **The figures:** ten. Nine are the owner's AnyDesk screenshots from 22-23 Nov plus Chatwoot's 24-hour banner, cropped, with orange numbered arrows and English translations of the Hebrew labels. Names, emails, ids and profile photos are blurred; Homies' public line stays visible. The tenth is the drawn diagram.
+  - Figure 5's caption says CLIX then held only the app, the step the guide warns about. That line was added here, then rebuilt.
+- **Checked:** the helper verified all 227 text blocks word for word and zoomed into every blur. Here, the 17-page draft was reviewed and the final page 7 was read.
+
 ### Does the switch affect the ManyChat bot? (the owner: "if we start the modification will the manychat bot affected?"), answered, 11:10 UTC
 - **The preparation:** no. Everything was read only, except the four templates added to their account. Those may show in ManyChat's template list, unused.
 - **The switch:**
