@@ -194,6 +194,16 @@ def _open_request(location):
     }
     if location == "full":
         props.update(LOCATION)
+        # 23 Nov (the owner: "ok apply the emergency and ticket rules to the phone line"): the chatbot's
+        # epochs 105-106 on the phone. Anything urgent that cannot wait is an emergency and never a ticket, so
+        # the incoming agent is no longer offered `emergency`. The debt agent keeps the four.
+        props["urgency"] = {
+            "type": "string",
+            "enum": ["low", "normal", "high"],
+            "description": "Infer this; never ask the caller for it. Anything urgent that cannot wait is an "
+                           "emergency and never a ticket, and neither is gas; a lift that is down with nobody "
+                           "inside is high.",
+        }
         # 30 Sep, inbound only, the owner: a gate-lock report got a ticket
         # offer and an address question, and nobody asked which gate or where.
         # The prompt now has Michael understand the fault first; this says the
@@ -257,12 +267,18 @@ def _open_request(location):
         # building finally arrives. Inbound only: the debt agent has no
         # notify_team, and a description naming a tool the assistant does
         # not carry is the 19 Aug failure (see the intake list below).
-        lead = ("A note (notify_team) does NOT open a ticket. If you already "
-                "called notify_team and the address only arrives afterwards — "
-                "which is what an emergency looks like, because the person "
-                "comes before the address — that is the moment to call this.\n"
+        # 23 Nov: the chatbot's epochs 105-106 (n8n_whatsapp_confirm.TOOL_EDITS) in phone words. An
+        # emergency is no longer a note first and a ticket once the address arrives: it is our line only.
+        lead = ("Never for an emergency, which is anything urgent that cannot wait: a person in danger or "
+                "hurt, someone trapped in a lift, fire, smoke, flooding, a big leak or water running in the "
+                "building, water near electricity. It gets our emergency line only, with no ticket and no "
+                "note, even when it is a fault in the common parts. A lift that is down with nobody inside is "
+                "a fault, not an emergency. Neither is gas a ticket.\n"
+                "Never without the caller's yes: before opening a ticket, ask them briefly whether to open "
+                "it, and call this only once they say yes. Someone who asked you in so many words to open one "
+                "has said yes. A note (notify_team) does NOT open a ticket.\n"
                 "A resident who wants to pay, asks how or where to pay, or wants a "
-                "payment arrangement gets a ticket too: type `payment`, their words, "
+                "payment arrangement gets a ticket too, once they say yes: type `payment`, their words, "
                 "their building and apartment. The note (notify_team, reason "
                 "payment) goes as well; both happen, either order.\n"
                 # 16 Sep, the client's review. The webhook verifies the address
@@ -307,11 +323,17 @@ def _open_request(location):
                 "it as reporter_phone. Someone who will not give a name or a number, "
                 "after hearing once that it is so the request is under their name, "
                 "still gets the ticket: name_declined or phone_declined true.\n")
+    # 23 Nov: on the incoming line a fault is the cue to ask, and the yes is the cue to call. The debt agent's
+    # sentence is unchanged, byte for byte.
+    when = ("Call once the caller has said yes: they asked outright for a request to be opened, or said yes "
+            "when you asked whether to open one. A maintenance issue raised on the call is your cue to ask, not "
+            "to call this. " if location == "full" else
+            "Call when the resident raises a maintenance issue during the call, asks "
+            "outright for a request to be opened, or accepts the offer of one. ")
     return _fn(
         "open_request",
-        lead +
-        "Call when the resident raises a maintenance issue during the call, asks "
-        "outright for a request to be opened, or accepts the offer of one. Wait for "
+        lead + when +
+        "Wait for "
         "the reference this returns before telling them a request was opened. Say "
         "nothing while it runs — the waiting line is spoken for you.",
         props,
@@ -519,6 +541,11 @@ INTAKE_NOTE_REASONS = [
     "bank_transfer",
 ]
 
+# 23 Nov: what notify_team offers the incoming agent. `emergency` stays in the list above, which the server's
+# allow-list and migration 030 mirror, but it is no longer offered: an emergency gets our line only and no note
+# (the chatbot's epoch 105, where neither tool offers `emergency` any more).
+INTAKE_NOTES_OFFERED = [r for r in INTAKE_NOTE_REASONS if r != "emergency"]
+
 # Six tools: four writes and two reads.
 #
 # THE READS ARRIVED LATE, AND THE GAP WAS VISIBLE FROM THE OUTSIDE.
@@ -549,7 +576,8 @@ INTAKE_TOOLS = [
         "Call when the call is going to end without a complete request — the line is "
         "too noisy to continue, or the caller is running out of time. Send whatever you "
         "did capture, however little. A call that produces nothing is the one outcome "
-        "that is not allowed.",
+        "that is not allowed, with one exception (23 Nov): an emergency or gas gets our line or the gas "
+        "company's only, and nothing is saved, not even this.",
         {
             "description": {
                 "type": "string",
@@ -659,19 +687,13 @@ INTAKE_TOOLS = [
         "but a card, call this again; asked only when the details will come, there is no new call and no new "
         "hand-over sentence: say plainly that you have no time for it, and that it is with a representative "
         "from collections.\n"
-        # 16 Sep, the client's review: no national numbers and no safety
-        # instructions from the bot. The note and the ticket are the whole
-        # response to an emergency, so they come first.
-        "Call it for a PERSON in a bad state, the moment you hear it, before "
-        "anything that can wait: "
-        "somebody shut in a lift, on a roof, in a stairwell or a car park; somebody "
-        "hurt, alone, frightened or panicking; anybody reporting fire, "
-        "flooding, or water near electricity. Reason `emergency`. Never for gas: a "
-        "gas report gets no note and no ticket, only the line about the gas company. "
-        "It does not open "
-        "the ticket and does not replace it: the ticket (open_request, urgency "
-        "emergency, as soon as you know where) and this both happen, and the "
-        "order between them does not matter.\n"
+        # 16 Sep, the client's review: no national numbers and no safety instructions from the bot.
+        # 23 Nov (the owner: "ok apply the emergency and ticket rules to the phone line"): the chatbot's
+        # epoch 105. An emergency was a note and an urgent ticket here; now it is our emergency line only.
+        "Never for an emergency, which is anything urgent that cannot wait: a person in danger or hurt, "
+        "someone trapped in a lift, fire, smoke, flooding, a big leak or water running in the building, water "
+        "near electricity. It gets our emergency line only, as the prompt says, with no note and no ticket. "
+        "Never for gas either: a gas report gets no note and no ticket, only the line about the gas company.\n"
         "Saying that you recorded something records nothing: only this call does, so "
         "it comes before any sentence about it. Do not ask them to confirm first; the "
         "ask itself is the reason to call.\n"
@@ -695,14 +717,14 @@ INTAKE_TOOLS = [
         {
             "reason": {
                 "type": "string",
-                "enum": INTAKE_NOTE_REASONS,
+                "enum": INTAKE_NOTES_OFFERED,
                 "description": (
                     "payment = paying dues, a payment arrangement, instalments, or paying by cheques, in cash or "
                     "another way but a card (department collections); "
                     "billing = a payment or a refund the record does not show, or a "
                     "document they need; move = "
                     "moving in or out, a change of tenant; contract = a contract; "
-                    "quote = a price quote; emergency = a person in danger; "
+                    "quote = a price quote; "
                     "caller_request = they asked for a person; bank_transfer = they want to pay by "
                     "bank transfer or ask for the account details (department collections); language = you and "
                     "the caller do not share a language; other = anything else "

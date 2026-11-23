@@ -382,6 +382,38 @@ phone-tree experience this system exists to replace.
 
 ---
 
+## 23 Nov — an emergency gets our line only, and a request opens only after a yes, as on WhatsApp
+
+The owner: *"ok apply the emergency and ticket rules to the phone line"*, after reading what this agent was behind
+on: the chatbot's epochs 105-109 (11-12 Nov). Fence 15,310 → 15,724 characters. Live 23 Nov, 09:22:23 UTC
+(`vapi_sync.py inbound --keep-voice --apply`; read back equal to the repo, the voice and the debt agent untouched).
+- **An emergency is anything urgent that cannot wait:** a person in danger or hurt, someone stuck in a lift, fire,
+  smoke, flooding, a big leak or water running in the building, water near electricity. It gets the owner's 12 Nov
+  standard in phone words, at any hour. It always holds three things: only the digital assistant; please call our
+  phone line urgently; the number, in words. There is no request, no note, no building question and no question
+  at the end. Pressed, the same three things in other words. A lift that is down with nobody inside stays a fault.
+- **Gone:** the urgent note at once, then the name, the address and an urgent request, and the office-hours Liquid
+  block (10 Nov), which gave the line only while the office was closed. `render_hours` leaves a prompt without it
+  as it is.
+- **Gas:** the gas company, then our line, word for word as on WhatsApp. Asked again, both again.
+- **A request only after the caller's yes:** Michael understands the fault first (what, where), then asks briefly
+  whether to open a request. An explicit ask is a yes. Water from the common parts and a payment request get the
+  same question. The name, address and flat come after the yes.
+- **Tools** (`scripts/vapi_tools.py`, this agent only; `DEBT_TOOLS` checked byte-equal before and after):
+  - open_request: never for an emergency or gas, never without the yes; urgency low/normal/high, a lift down with
+    nobody inside is high. The debt agent keeps its four values and its sentence.
+  - notify_team: no note for an emergency or gas. `emergency` is no longer offered (`INTAKE_NOTES_OFFERED`);
+    `INTAKE_NOTE_REASONS`, which the server's allow-list and migration 030 mirror, keeps it.
+  - save_partial_request: nothing is saved for an emergency or gas.
+- **The wrinkle:** a caller reaches this agent through 077-6687949 and 9, and the line sends them to 077-6687949.
+  Copied as the owner's standard. If the office menu has an option of its own for the hotline, it belongs in the
+  line.
+- **Checked with Claude only, no spend** (`scripts/voice_qa_emergency_yes.json`, `voice_qa.py bundle --candidate`,
+  four blind calls, each on its own player; run `local/voice-tests/2026-11-23-emergency-yes`). All four came back
+  as the rules say: gas word for word; a child stuck in the lift, the three things and nothing else, twice; a lift
+  down with nobody inside, the floor, the yes, then the request; an intercom with a "no", nothing opened. It checks
+  the text, not gpt-5.6-sol: a real call is the proof.
+
 ## 19 Nov, later — payment is by credit card; another way only when asked, to collections
 
 The owner: *"apply the card only rule to the voice agents as well"*, after WhatsApp's epochs 115-116 (Yariv: the link

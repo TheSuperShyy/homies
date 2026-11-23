@@ -8,6 +8,13 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 23 Nov, 09:22:23 UTC: the incoming phone agent gets the chatbot's emergency line and the yes before a request** (the owner: "ok apply the emergency and ticket rules to the phone line"; WORKLOG and CONTEXT 23 Nov).
+> - **What a caller gets:** an emergency (a person in danger or hurt, someone stuck in a lift, fire, smoke, flooding, a big leak, water near electricity), at any hour, hears only the digital assistant, please call our phone line urgently, and the number in words. No request, no note, no question. Gas gets the gas company, then our line. A fault opens a request only after the caller's yes.
+> - **Where:** `docs/assistant/demo-inbound.md`'s fence (15,724 characters) and `scripts/vapi_tools.py` (open_request, notify_team, save_partial_request; the incoming agent only). Read back equal to the repo. The voice, the first message and the debt agent `4bc03b57` (still 19 Nov 12:20:11 UTC) are untouched.
+> - **Checked:** four Claude-played calls, no spend, all as the rules say (gas, a child stuck in the lift, a lift down with nobody inside, an intercom with a "no"). Not yet heard on a real call.
+> - **Rollback:** `git revert` the code, then `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply` from Git Bash. The 19 Nov agent is saved in `local/vapi-inbound-live-23nov-before-emergency.json`.
+> - **Open:** a caller reaches this agent through 077-6687949 and 9, so the line sends them back to the same number. If the office menu has its own hotline option, it belongs in the line (told the owner).
+>
 > **LIVE 22 Nov 09:33:38 UTC: the reviewers' page (`/review/yariv`) carries Yariv's comments of 18-19 Nov** (the owner: "update it with the new feedbacks from yariv"; PR #19, `ee62637`; WORKLOG and CONTEXT 22 Nov).
 > - Bank transfer, the opener with a free field, and card only, each in his words with our answer.
 > - 2.2, 5.2, 6.2 and 6.3 are rewritten to what the bot does now. The "stale 6.2" noted on 12 Nov is closed.
@@ -410,7 +417,7 @@ appended to.
 >     - **The watch:** its new check flags 173670 as "a ticket opened with no yes from the resident".
 >     - No model run.
 >   - **The owner's check ran, 16:45-17:07 UTC:** every rule passed (the block above).
->   - **Owed: the incoming phone agent's twin.** It still opens an urgent ticket, and opens tickets without asking.
+>   - ~~Owed: the incoming phone agent's twin.~~ **Done 23 Nov, 09:22:23 UTC** (top block): it asks before a request and opens none for an emergency.
 >   - **Briefs:** `grok-emergency-line-test.md` (E1's yes, E5, H10) and `grok-tenant-tester.md` (C1, C3, R11, R13).
 >   - **Rollback:** `python scripts/n8n_whatsapp_confirm.py --restore` (the snapshot `local/n8n-whatsapp-live-11nov-before-confirm.json`, epoch 105 as it was), then `git revert` the repo side.
 >
@@ -422,7 +429,7 @@ appended to.
 >   - **Checked:** 12 new cases, 9 of them seen failing first on a v8 label without the code. The gate passes all 611 on the candidate and on live, and the replay changes no real reply or message. The pins moved for the prompt and three tools. No other patcher would write over it; the hotline patcher now refuses as superseded. No model run, as for epochs 103 and 104.
 >   - **The owner's checks after it:** smoke (173656) and gas (173684, 173693) came out right. Then the lift test (173705) hit the copy guard, and Yariv's leak (173670) got a ticket. Both are fixed by epoch 106 (top block).
 >   - **Briefs:** `grok-emergency-line-test.md` (E3, E4, H2, H5) and `grok-tenant-tester.md` (C8, R12, R13, R23) now expect no ticket.
->   - **Owed: the incoming phone agent's twin.** It still opens an urgent ticket and gives the line after hours only (`docs/assistant/demo-inbound.md`).
+>   - ~~Owed: the incoming phone agent's twin.~~ **Done 23 Nov, 09:22:23 UTC** (top block): an emergency gets the line only, at any hour, with no request.
 >   - **The test tickets stay:** the two runs opened 255-1440-26 to 255-1444-26, four of them urgent, in OXS too from the +63. Test tickets are never deleted.
 >   - **Rollback:** `python scripts/n8n_whatsapp_lineonly.py --restore` (the snapshot `local/n8n-whatsapp-live-11nov-before-lineonly.json`, which has line v1 in it), then `git revert` the repo side (prompt.md, the epoch, the covers, the pins, the gate's cases, the briefs).
 >
@@ -446,7 +453,7 @@ appended to.
 >   - **Checked:** the gate passes all 591 cases on the candidate and on live (13 new, seen failing first on a v7 label without the code). The replay changes 5 old replies, each an old line given with 077-6687949 that v6 cut and v7 keeps. No patcher would write over it; the hello patcher now refuses as superseded. No model run, as for epoch 103.
 >   - **A Grok brief for it:** `docs/features/11-whatsapp-bot/grok-emergency-line-test.md` (four conversations, about 10 messages, rules H1-H9, office hours). From the +63 its three tickets, two of them urgent, also open in Homies' OXS. **Run once by the owner, 14:02-14:16 UTC:** tickets 255-1440-26, 255-1441-26 (urgent) and 255-1442-26 (urgent); its orders to call are fixed by line v1 (the block above).
 >   - **Defect, open: the main Grok brief is stale on the hello since epoch 103.** `grok-tenant-tester.md` C1 step 1 still expects "👋 כאן הומי'ז. במה אפשר לעזור?" with two buttons, its R2 still says Michael names himself after the system's greeting, and the report example shows buttons. Since 12:02 UTC a bare hello gets "היי, <greeting> 👋 כאן מיכאל מהומי'ז. במה אוכל לעזור לך היום?" with no buttons, and the next reply does not say who he is. Fix C1, R2 and the example before the next full run; the emergency-line brief has no hello in it.
->   - **Owed: the incoming phone agent's twin.** It still gives the line after hours only (`docs/assistant/demo-inbound.md`). For gas it gives the gas company only, even when asked again (read live 23 Nov). A caller reaches it through 077-6687949 and 9, so the twin can't just say "call 077-6687949".
+>   - ~~Owed: the incoming phone agent's twin.~~ **Done 23 Nov, 09:22:23 UTC** (top block): the line at any hour, and gas gets the gas company, then the line. A caller reaches that agent through 077-6687949 and 9, so the line sends them back to the same number (open, in the top block).
 >   - **Stale now:** item 6.2 of the reply to Yariv (`local/yariv/2026-11-11-reply-to-9nov-review.txt`) and of the live reviewers' page (`/review/yariv`) describe the after-hours rule and ask about gas.
 >   - **Chatwoot:** an emergency's note goes to the Operations team. The hotline is a department of its own; its people need a team and logins for the note to reach them.
 >   - **Rollback:** `python scripts/n8n_whatsapp_hotline.py --restore` (the snapshot `local/n8n-whatsapp-live-11nov-before-hotline.json`), then `git revert` the repo side (prompt.md, the epoch, the pin, the gate's cases).

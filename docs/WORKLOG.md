@@ -11,6 +11,27 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### LIVE 09:22:23 UTC: the phone line gets the chatbot's emergency line and the yes before a request (the owner: "ok apply the emergency and ticket rules to the phone line but what about the standing order rule on the chatbot")
+- **Read first:** the live incoming agent `10ae859a` equals the repo (prompt 15,310 characters, all 8 tools byte-equal). Snapshot: `local/vapi-inbound-live-23nov-before-emergency.json` (updatedAt 19 Nov 12:20:12 UTC).
+- **The prompt** (`docs/assistant/demo-inbound.md`, fence 15,310 → 15,724 characters):
+  - **An emergency**, anything urgent that cannot wait, gets the owner's 12 Nov standard in phone words, at any hour: only the digital assistant; please call our phone line urgently; the number, in words. No request, no note, no building question, no question at the end. Pressed, the same three things. A lift down with nobody inside stays a fault.
+  - **Gone:** the urgent note first, the urgent request, and the office-hours Liquid block (the line came only while the office was closed).
+  - **Gas:** the gas company, then our line, word for word as on WhatsApp; asked again, both again.
+  - **A request only after the caller's yes:** the fault understood first (what, where), then a brief question whether to open it. An explicit ask is a yes. Water from the common parts and a payment request too. The name, address and flat after the yes.
+- **The tools** (`scripts/vapi_tools.py`, the incoming agent's only; `DEBT_TOOLS` byte-equal before and after):
+  - open_request: never for an emergency or gas, never without the yes; urgency low/normal/high, a lift down with nobody inside is high. The debt agent keeps its four values and its sentence.
+  - notify_team: no note for an emergency or gas; `emergency` no longer offered (`INTAKE_NOTES_OFFERED`). `INTAKE_NOTE_REASONS` keeps it, as the server's allow-list and migration 030 do.
+  - save_partial_request: nothing saved for an emergency or gas.
+- **Checked, Claude only, no spend:** `check_name_flow_test.py` 10/10. Four blind calls (`scripts/voice_qa_emergency_yes.json`, run `local/voice-tests/2026-11-23-emergency-yes`), all four as the rules say:
+  - gas (14:05): the gas company and our line word for word, no tool; asked again, both again;
+  - a child stuck in the lift (11:15): only the digital assistant, please call urgently, the number in words, in the feminine for her, no tool and no question; pressed, the same three things;
+  - the right-hand lift down with nobody inside (10:40): the floor asked, then "רוצה שאפתח על זה פנייה?", then the name, the building and the flat; open_request (elevator, high) only after the yes; the lift company said;
+  - the intercom with a "no" (16:20): what happens and whether the neighbours have it too, then "תרצי שאפתח פנייה על האינטרקום בכניסה?"; at her no, no request, a warm "בלי פנייה", and a status look at her flat's requests (found 0). Its "no open request on the intercom in the building" says more than a look by her flat found; that is get_request_status's wording, not this change, and is left.
+- **Live:** `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply`, 09:22:23 UTC. Read back: prompt (15,724) and tools equal to the repo; the voice, first message, model and effort, transcriber and the tools' server blocks equal to the snapshot; the office-hours block gone and the owner's standard in; the debt agent still at 19 Nov 12:20:11 UTC.
+- **Rollback:** `git revert` the code, then the same sync. The snapshot holds the 19 Nov agent.
+- **The standing order** (the owner's second question): the incoming line has no link tool, so it records every standing order. The chatbot and the debt agent send the link first.
+- **The wrinkle, for the owner:** a caller reaches this agent through 077-6687949 and 9, and the line sends them back to 077-6687949.
+
 ### On a debt call, "can I do a standing order?" (the owner: "i mean when we call for debt collection right what if a person ask can i do standing order what will happen"), read live, 09:19 UTC
 - **The debt agent `4bc03b57` equals the repo** (prompt 7,206 characters, `docs/features/10-debt-followup/prompt.md`). Its rule since 17 Nov (link first) and 19 Nov (card only):
   - a standing order is set up from the same payment link: the page it opens offers a standing order on a credit card;

@@ -1,0 +1,86 @@
+{
+ "_about": "23 Nov 2026, the owner: \"ok apply the emergency and ticket rules to the phone line\". The chatbot's epochs 105-109 on the incoming phone agent: anything urgent that cannot wait gets only our emergency line, at any hour, with no request, no note and no building question; gas gets the gas company and our line; a request opens only after the caller's yes. Four calls, the ones the change touches: a lift down with nobody inside (asked, then yes), someone stuck in a lift in office hours (the line only), gas in office hours (the gas company and the line), a broken intercom where the caller says no. Played by Claude on the candidate (voice_qa.py bundle --candidate --deck scripts/voice_qa_emergency_yes.json), no spend.",
+ "defaults": {
+  "_how": "What a tool returns when the scenario has no fixture for it. <ticket> is the scenario's `ticket`; <spoken> is its middle serial as Hebrew digit words, one word per digit (255-1530-26 -> אחת חמש שלוש אפס).",
+  "open_request": {
+   "_rule": "Bar Kochba (בר כוכבא, any spelling) with 23: opened. Without a number: need_number. Any other street: street_unknown. Without reporter_name: need_name.",
+   "opened": {"ok": true, "reference": "<ticket>", "reference_spoken": "<spoken>"},
+   "need_number": {"ok": true, "opened": false, "building_found": false, "reason": "need_number", "numbers_we_manage": ["23"]},
+   "street_unknown": {"ok": true, "opened": false, "building_found": false, "reason": "street_unknown"},
+   "need_name": {"ok": true, "opened": false, "reason": "need_name"}
+  },
+  "save_partial_request": {"ok": true, "reference": "<ticket>", "reference_spoken": "<spoken>", "partial": true},
+  "add_request_detail": {"ok": true, "reference": "<ticket>"},
+  "notify_team": {"ok": true, "team_notified": true},
+  "get_request_status": {"ok": true, "found": 0, "as_of": "live", "other_open": 0, "requests": []},
+  "get_balance": {"ok": true, "found": 0},
+  "get_service_info": {"ok": true, "found": false, "note": "No topic matched. Say you do not have that detail and offer the office; do not guess."},
+  "request_standing_order": {"ok": true, "recorded": true, "reference": "<ticket>", "reference_spoken": "<spoken>"}
+ },
+ "scenarios": [
+  {
+   "id": "in_lift_down_yes",
+   "agent": "inbound",
+   "title": "incoming call, office hours: a lift is down with nobody inside; asked whether to open a request, says yes",
+   "time": "10:40",
+   "weekday_he": "שלישי",
+   "ticket": "255-1611-26",
+   "caller": {
+    "persona": "אבי כהן, 52. Practical, a little impatient, short answers.",
+    "on_file": false,
+    "call_has_number": true,
+    "knows": "Lives at בר כוכבא 23, apartment 7. The building has two lifts. The right-hand one (הימנית) has been stopped on the third floor since the morning. Nobody is inside it.",
+    "wants": "The lift fixed.",
+    "tendencies": "Opens with 'המעלית הימנית אצלנו לא עובדת מהבוקר'. Says which floor only when asked. If asked whether to open a request, says yes. Gives his name and address when asked. Then thanks and hangs up."
+   }
+  },
+  {
+   "id": "in_lift_person_day",
+   "agent": "inbound",
+   "title": "incoming call, office hours: a neighbour's child is stuck in the lift, then what do I do",
+   "time": "11:15",
+   "weekday_he": "שני",
+   "ticket": "255-1612-26",
+   "caller": {
+    "persona": "מירב לוי, 38. Frightened, speaks fast.",
+    "on_file": false,
+    "call_has_number": true,
+    "knows": "Lives at בר כוכבא 23, apartment 4. The neighbour's boy, about ten, is stuck in the lift between the second and third floor. She can hear him through the door.",
+    "wants": "Someone to get the boy out now.",
+    "tendencies": "Opens with 'יש ילד תקוע במעלית אצלנו בבניין'. Speaks of herself in the feminine. Gives her address only if asked. After the answer asks 'אבל מה אני עושה עכשיו?'. Then thanks and hangs up."
+   }
+  },
+  {
+   "id": "in_gas_day",
+   "agent": "inbound",
+   "title": "incoming call, office hours: a smell of gas in the stairwell, then what should I do",
+   "time": "14:05",
+   "weekday_he": "רביעי",
+   "ticket": "255-1613-26",
+   "caller": {
+    "persona": "דוד אזולאי, 70. Calm, a little hard of hearing, polite.",
+    "on_file": false,
+    "call_has_number": true,
+    "knows": "Lives at בר כוכבא 23, apartment 2. There is a smell of gas in the stairwell on the ground floor since about an hour.",
+    "wants": "Someone to deal with the gas.",
+    "tendencies": "Opens with 'יש ריח של גז בחדר המדרגות'. After the answer asks 'אז מה אני צריך לעשות?'. Then thanks and hangs up."
+   }
+  },
+  {
+   "id": "in_intercom_no",
+   "agent": "inbound",
+   "title": "incoming call, office hours: the intercom is broken; asked whether to open a request, says no",
+   "time": "16:20",
+   "weekday_he": "ראשון",
+   "ticket": "255-1614-26",
+   "caller": {
+    "persona": "נועה פרץ, 29. Friendly, in a hurry.",
+    "on_file": false,
+    "call_has_number": true,
+    "knows": "Lives at בר כוכבא 23, apartment 11. The building's intercom at the entrance does not ring in her flat since yesterday. She has not checked with neighbours.",
+    "wants": "Only to know whether Homies already knows about it; she does not want to open anything now.",
+    "tendencies": "Opens with 'האינטרקום בכניסה לא עובד'. Speaks of herself in the feminine. If asked whether to open a request, says 'לא, תודה, רק רציתי לדעת אם אתם כבר יודעים על זה'. Then thanks and hangs up."
+   }
+  }
+ ]
+}
