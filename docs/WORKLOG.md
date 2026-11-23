@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### Does the switch affect the ManyChat bot? (the owner: "if we start the modification will the manychat bot affected?"), answered, 11:10 UTC
+- **The preparation:** no. Everything was read only, except the four templates added to their account. Those may show in ManyChat's template list, unused.
+- **The switch:**
+  - It adds our app beside ManyChat's. It does not remove ManyChat's subscription, and our token can't: `DELETE subscribed_apps` removes only the calling app.
+  - The number's redirect is set by our app, for our app. As Meta's overrides are understood (per app), ManyChat keeps getting its own copy of every message.
+  - So ManyChat is not cut off, but it would keep answering beside our bot. Hence its WhatsApp replies go off at that moment.
+  - If the override proved to apply to every app, ManyChat would simply stop getting messages after the step. It is being turned off then anyway, and `--restore` clears the redirect.
+
 ### PREPARED, NOTHING SWITCHED: the move to Homies' own number (the owner: "so right now just prepare everything but dont disconnect everything"), 10:55 UTC
 - **Read with their token:**
   - ManyChat is the only app subscribed to their WABA, with no override. Their HOMIES app has no webhook settings.
