@@ -11,6 +11,10 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### The 11/23 report again (in chat, `/reporter`, 00:24 Philippine time), 16:25 UTC
+- **The day is still 23 Nov.** Nothing has been done since 15:40 UTC, so this is the 14:40 report brought up to the end of that day.
+- **Given:** the same 8 done bullets, and 4 Will lines. The new Will line, from the readiness answer: Omnitelecom to ring one debtor at a time before real debt calls.
+
 ### Are the chatbot and the voice agent ready for production? Not fully (the owner asked), answered from HANDOVER, 14:45 UTC
 - **WhatsApp:** ready to switch. It waits on:
   - Homies: the time and who turns ManyChat's replies off; a person per department in Chatwoot; the OXS OK;
