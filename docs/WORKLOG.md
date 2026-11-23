@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### The WABA ID is back, found through the number's ID, and both dry runs are green (the owner's screenshot of the Phone Number ID: "is this it?"), 14:08 UTC
+- **It was the number's ID (…8637), not the account's.** It was enough, though: the number's `health_status` names its WhatsApp account (…0527), and that account's `phone_numbers` holds the number.
+  - Written to `HOMIES_WHATSAPP_WABA_ID`, after a backup (`local/env-backups/.env.before-homies-waba-back-2026-11-23T2207`).
+- **`switch_to_homies.py`, dry run:**
+  - the token never expires, and the number is CONNECTED, GREEN, name APPROVED;
+  - the four templates are APPROVED;
+  - their app: secret OK, own webhook none, so it would be set;
+  - `validates : True`, and the verify token matches;
+  - the only NOTE: ManyChat is still connected.
+- **`n8n_whatsapp_tohomies.py`, dry run:** both typing nodes would go to …637.
+- **Nothing more is needed from Meta for the switch.**
+
 ### Anything else needed besides the token, the app id and the secret? (the owner), answered, 13:25 UTC
 - **From Meta:** only the WhatsApp account ID back in `HOMIES_WHATSAPP_WABA_ID`. It was still empty at 13:25 UTC. Both scripts find their number through it: the switch, and the typing nodes.
 - **The token's reach, confirmed:** templates, sending, the WABA subscription, and the number's status and profile. The card, verification, people and any new token stay in their Meta. None is needed for the switch: the card is on, and verification comes later.

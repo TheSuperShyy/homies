@@ -68,10 +68,13 @@ appended to.
 >             - Checked: it opens their app, and their app's own webhook is empty.
 >             - It is needed, not a maybe: Meta's docs subscribe webhook fields at the app level (CONTEXT).
 >             - `switch_to_homies.py --apply` now sets it right after inbox 1 moves, and `--restore` removes it.
->           - **`HOMIES_WHATSAPP_WABA_ID` back in `.env`.**
->             - The owner's 13:15 UTC save put the app id over it, and the secret over the token. The token is back from their own line.
->             - Backup: `local/env-backups/.env.before-homies-app-secret-fix-2026-11-23T2119`.
->             - The ID (…0527) is on the HOMIES app's WhatsApp → API Setup page. Until it is back, the preflight stops at its first line.
+>           - ~~`HOMIES_WHATSAPP_WABA_ID` back in `.env`~~ **done 14:07 UTC.**
+>             - The owner's 13:15 UTC save had put the app id over it, and the secret over the token.
+>             - It was found again through the number's own `health_status`; the owner's screenshot gave the number's ID. Backups are in `local/env-backups/`.
+>             - **14:08 UTC, both dry runs green:**
+>               - `switch_to_homies.py`: validates, their app's own webhook would be set, and the verify token matches. ManyChat is the only NOTE.
+>               - `n8n_whatsapp_tohomies.py`: the typing nodes go to …637.
+>             - Nothing more is needed from Meta for the switch.
 >           - Their WhatsApp account's billing is set (USD), so no card is owed;
 >           - the wallet top-up ($30.31 left) and a higher cap.
 >     - **The approver (23 Nov):** People in "הומי'ז ניהול ואחזקת מבנים" lists two with full access, Yariv and one other admin (name kept out of the repo). A Hebrew how-to video for that admin is in `local/meta-approve-video/meta-approve-request-he.mp4`, and a voiced copy (the Ronit video's Cartesia "Ayala", Clix's key) is `meta-approve-request-he-voice.mp4`. `build.py [--voice]` rebuilds them.

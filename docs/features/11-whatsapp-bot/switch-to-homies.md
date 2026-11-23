@@ -60,8 +60,8 @@ read-only checks below have run. ManyChat still answers on Homies' number, and o
   - The app's webhook is needed: Meta's docs subscribe webhook fields at the app level, and the WABA subscription
     documents none of its own (read 23 Nov).
   - Step 2 sets it.
-- **`HOMIES_WHATSAPP_WABA_ID` is empty again.** At 13:15 UTC the app id was saved over it. The owner puts the
-  WhatsApp account ID (…0527) back, from the HOMIES app → WhatsApp → API Setup.
+- ~~`HOMIES_WHATSAPP_WABA_ID` empty again~~ **back since 14:07 UTC**, found through the number's own
+  `health_status`. Both dry runs are green (14:08 UTC), and nothing more is needed from Meta.
 - Who turns ManyChat's WhatsApp off at the switch, and when (the switch time).
 - At least one person per department signed in to Chatwoot. Today every mention reaches only the owner's login.
 - The OK for OXS tickets for every tenant. The mirror holds four test numbers today.

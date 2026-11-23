@@ -730,7 +730,7 @@ feature 21, "Connected on 3 Nov evening"). These hold from now on:
   - **Early too:** a card on their account (its currency chosen on purpose) and business verification.
   - **Waits for the switch:** subscribing an app to their WABA (`wa_subscribe.py`). Until then nothing of
     theirs comes to our side while ManyChat answers.
-  - **The token exists (23 Nov):** system user "CLIX" in Homies' business, app HOMIES, never expires, whatsapp_business_management and whatsapp_business_messaging, no business_management. It is in `.env` as `HOMIES_WHATSAPP_TOKEN`, with `HOMIES_WHATSAPP_WABA_ID`. The four templates went to Meta on it at 10:28 UTC.
+  - **The token exists (23 Nov):** system user "CLIX" in Homies' business, app HOMIES, never expires, whatsapp_business_management and whatsapp_business_messaging, no business_management. It is in `.env` as `HOMIES_WHATSAPP_TOKEN`, with `HOMIES_WHATSAPP_WABA_ID`. The four templates went to Meta on it at 10:28 UTC. Their app's `HOMIES_APP_ID` and `HOMIES_APP_SECRET` are there too (23 Nov), for the app's own webhook. The token can't list WhatsApp accounts, so a lost WABA ID is found through the number's `health_status`.
   - **How the switch to their number runs (prepared 23 Nov):** inbox 1 takes their number with their token, then
     Chatwoot's own `register_callback` subscribes their HOMIES app and points their number at Chatwoot. Then the
     typing nodes. No PIN, since the number is already on the Cloud API. ManyChat's WhatsApp goes off first, or both
