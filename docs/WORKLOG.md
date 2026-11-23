@@ -11,6 +11,10 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### Only the system user token in `.env`? Yes (the owner, with `.env` open: "so only system user right"), answered, 10:23 UTC
+- **Two lines, both still empty:** `HOMIES_WHATSAPP_TOKEN` gets CLIX's token (no expiry) and `HOMIES_WHATSAPP_WABA_ID` gets their WhatsApp account's ID. `wa_templates.py --account homies` reads nothing else.
+- The temporary token is only for getting the templates in before the approval. Once CLIX's token exists, it is the one.
+
 ### The approve-the-request video, voiced in the Ronit video's voice (the owner: "add a voice over on what we used in the ronit video"), 10:09 UTC
 - **"The Ronit video"** is the CRM guide in `D:\work\RONIT-AUTOMATION\local\onboarding` (read only). Its `make_voice_he.py` voices with Cartesia's stock Hebrew "Ayala" (Expert Narrator, `ebc02c0d`), sonic-3.6, on Clix's own key (`CARTESIA_API_KEY` in this repo's `.env`). Same here; never Homies' key (`CARTESIA_YARIV_API_KEY`).
 - **`build.py --voice`:** one spoken line per step, in the captions' plural, spelled for the voice ("ביזנס נקודה פייסבוק נקודה קום", "הוֹמִיז", "מטא"). Clips are cached in `voice-he/`. Each step lasts at least its line plus 0.25 s before and 0.75 s after, and a bouncing step runs in whole 0.4 s beats. 562 characters sent.
