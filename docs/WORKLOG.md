@@ -11,6 +11,10 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### ManyChat stays on until the owner says so (the owner: "after i do this dont turn off the manychat ok until i say so"), 14:20 UTC
+- Recorded in HANDOVER. After the app is published, nothing is switched and ManyChat is not touched until the owner's word in chat.
+- Publishing their app changes nothing for ManyChat: their app is not subscribed to their WhatsApp account; only ManyChat's is.
+
 ### Not yet: their app has to be published first (the owner's screenshot of the HOMIES app's WhatsApp setup page: "can we disconnet the manychat and implement ours or not yet?"), 14:15 UTC
 - **Meta's box on that page:** *"Apps will only be able to receive test webhooks sent from the app dashboard while the app is unpublished. No production data, including from app admins, developers or testers, will be delivered unless the app has been published."* Switching now would leave the number silent. Our dry runs couldn't see this, since the mode can't be read with the app secret.
 - **Read with the app secret:**

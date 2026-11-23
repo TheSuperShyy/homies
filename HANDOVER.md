@@ -78,6 +78,9 @@ appended to.
 >               - Meta's own box on its WhatsApp setup page (the owner's screenshot) says an unpublished app gets only test webhooks, no real messages.
 >               - Publishing doesn't touch ManyChat: App settings → Basic, then Publish. The category is not set and the icon is the default; the public privacy policy is set.
 >               - `switch_to_homies.py --apply` now needs `--app-is-published`. Runbook, "Still needed".
+>             - **THE OWNER, 23 Nov 14:20 UTC: "after i do this dont turn off the manychat ok until i say so".**
+>               - After the app is published, nothing is switched and ManyChat is not touched (no `--apply`, nothing in ManyChat, no `MANYCHAT_API_KEY` call that changes anything) until the owner says so in chat.
+>               - Publishing alone leaves ManyChat answering as before.
 >           - Their WhatsApp account's billing is set (USD), so no card is owed;
 >           - the wallet top-up ($30.31 left) and a higher cap.
 >     - **The approver (23 Nov):** People in "הומי'ז ניהול ואחזקת מבנים" lists two with full access, Yariv and one other admin (name kept out of the repo). A Hebrew how-to video for that admin is in `local/meta-approve-video/meta-approve-request-he.mp4`, and a voiced copy (the Ronit video's Cartesia "Ayala", Clix's key) is `meta-approve-request-he-voice.mp4`. `build.py [--voice]` rebuilds them.
