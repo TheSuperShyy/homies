@@ -11,6 +11,12 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### Their WhatsApp account assigned to CLIX; the token still waits on another admin (the owner: "ok i assigned the whatsapp account to clix but what about the system user token"), answered, 09:45 UTC
+- **The assignment is the owner's word.** We can't read it until a token exists.
+- **The token:** still the request Yariv's account sent on 22 Nov. Only another admin of Homies' business can approve it, from their own account (Requests → "דרושה בדיקה"); Users → People shows who the admins are. It lapses 7 days after sending.
+- **No new request is needed:** the request already has whatsapp_business_management and whatsapp_business_messaging. A system user's token reaches whatever the system user holds, so the WhatsApp account assigned now is covered.
+- **After the approval:** CLIX → "יצירת אסימון", HOMIES, expiry Never, copied once into `.env` with the WhatsApp account's ID. Then `wa_templates.py --account homies` (dry, then `--apply`) for the four.
+
 ### Homies' system user "CLIX" holds only the HOMIES app, and the token still waits on another admin (the owner's two AnyDesk screenshots, 11:37-11:38 Israel time), read only, 09:40 UTC
 - **System users:** "CLIX", Admin, in Homies' business. Its assigned assets: one, the HOMIES app, with full access. **Their WhatsApp account is not assigned to it,** so a token from it would reach no template and no number.
 - **Requests → "דרושה בדיקה":** the token request (HOMIES; whatsapp_business_management, whatsapp_business_messaging, whatsapp_business_manage_events, manage_app_solution), sent by Yariv Levi 18 hours earlier, valid 7 days, status sent. From Yariv's account it can only be cancelled. Meta: another admin has to approve it and has been told.
