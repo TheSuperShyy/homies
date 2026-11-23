@@ -15,7 +15,11 @@ conversation that produced it.
 - **"The Ronit video"** is the CRM guide in `D:\work\RONIT-AUTOMATION\local\onboarding` (read only). Its `make_voice_he.py` voices with Cartesia's stock Hebrew "Ayala" (Expert Narrator, `ebc02c0d`), sonic-3.6, on Clix's own key (`CARTESIA_API_KEY` in this repo's `.env`). Same here; never Homies' key (`CARTESIA_YARIV_API_KEY`).
 - **`build.py --voice`:** one spoken line per step, in the captions' plural, spelled for the voice ("ביזנס נקודה פייסבוק נקודה קום", "הוֹמִיז", "מטא"). Clips are cached in `voice-he/`. Each step lasts at least its line plus 0.25 s before and 0.75 s after, and a bouncing step runs in whole 0.4 s beats. 562 characters sent.
 - **Result:** `local/meta-approve-video/meta-approve-request-he-voice.mp4`, 51.5 s, 1.6 MB, H.264 and AAC. The silent copy stays beside it.
-- **The words checked** with the local speech-to-text (ivrit-ai whisper-large-v3-turbo): see the next entry.
+- **The words checked** with the local speech-to-text (ivrit-ai whisper-large-v3-turbo, 10:10 UTC). Every line is heard, in order, inside its step, with no overlap. The only differences are spellings of the same sound:
+  - "ואחזקת" written "והחזקת";
+  - "נפתחת הבקשה" written "נפתח את הבקשה", which is still the right instruction;
+  - "אסימון" after "יצירת" written "הסימון".
+  - Nothing rewritten. Opened in the owner's File Explorer.
 
 ### A Hebrew how-to video for Homies' other admin: approve Yariv's token request (the owner: "create a video for me fast that has the arrows and stuff with natural local native everyday hebrew words to guide how to accept the request"), 10:02 UTC
 - **Who approves:** the owner's screenshot of People in "הומי'ז ניהול ואחזקת מבנים" (…2992) shows two people with full access, Yariv and one other admin (name kept out of the repo). That other admin approves. In Yariv's view, "דרושה בדיקה" is empty, because his request sits under Sent.
