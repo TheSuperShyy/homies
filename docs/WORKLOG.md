@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### On a debt call, "can I do a standing order?" (the owner: "i mean when we call for debt collection right what if a person ask can i do standing order what will happen"), read live, 09:19 UTC
+- **The debt agent `4bc03b57` equals the repo** (prompt 7,206 characters, `docs/features/10-debt-followup/prompt.md`). Its rule since 17 Nov (link first) and 19 Nov (card only):
+  - a standing order is set up from the same payment link: the page it opens offers a standing order on a credit card;
+  - Michael offers to send the link to their WhatsApp; on a yes, `send_payment_link` sends it to the number on file;
+  - someone who would rather collections phoned them, wants a standing order from the bank, or whose link did not go: `request_standing_order` records it for collections. Never after a decline, and never when.
+- The same as the chatbot's rule. The incoming line has no link tool, so it records every standing order (answered at 09:10).
+
 ### The phone agent's rules against the updated chatbot (the owner: "i mean is the rules the same or similar to the new updated chatbot?"), read live again, 09:06 UTC
 - **The same:**
   - Michael from the service team, an honest digital assistant when asked, "I" only;
