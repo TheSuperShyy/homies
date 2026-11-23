@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### SUBMITTED 10:28 UTC: the four templates on Homies' own WhatsApp account (the owner: "done its called yarive meta system user token")
+- **The token:** the owner put it in `.env` as `YARIV_<ETA_SYSTEM_USER` (the M typed as "<"; new since the 22 Nov backup). `debug_token`, read only: SYSTEM_USER "CLIX", app HOMIES, valid, `expires_at` 0 (never), scopes whatsapp_business_management, whatsapp_business_messaging, whatsapp_business_manage_events and manage_app_solution. No target list, so it reaches whatever CLIX holds.
+- **Their account, read with it:**
+  - `owned_whatsapp_business_accounts` needs business_management, which the token lacks. So the WABA's id came from the number's `health_status`: WABA …0527, business …2992, app …6232.
+  - The number (…8637): +972 77…949, verified name "הומי'ז ניהול ואחזקת מבנים", name APPROVED, CONNECTED, CLOUD_API, quality GREEN.
+  - health_status LIMITED for the business only (141010, not verified). The number and the WABA are AVAILABLE.
+- **`.env`:** backup `local/env-backups/.env.before-homies-token-2026-11-23`, then a temp file and a rename. `HOMIES_WHATSAPP_TOKEN` = the same token, and `HOMIES_WHATSAPP_WABA_ID` = …0527; 158 settings. The owner's own line stays as typed: nothing reads `.env` in a shell, where "<" would break it.
+- **Templates:** `wa_templates.py --account homies list` showed one of theirs, `hyy_h_m_pnyytk_dyyn_rlwwntyt` (APPROVED, MARKETING). Then each of the four, dry and then `--apply`: `ticket_resolved_he` and `payment_link_he` (UTILITY), `homies_hello_he` and `homies_message_he` (MARKETING), the texts approved on our account. Read back: all four PENDING, 5 on the WABA.
+- The owner's go: "done", in answer to "I'll check the token without changing anything, then submit the four templates".
+
 ### CLIX holds both assets, and the approval notice is gone (the owner's AnyDesk screenshot, 12:24 Israel time), read only, 10:25 UTC
 - **CLIX's assigned assets: 2,** the HOMIES app and the WhatsApp account "הומי'ז ניהול ואחזקת מבנים", both full access. So the owner's assignment is confirmed.
 - **The yellow notice "someone else needs to approve" is no longer on CLIX's page,** and "Create a token" is there. So the other admin most likely approved the request.
