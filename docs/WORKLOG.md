@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### The 11/23 report (in chat, `/reporter`), 14:40 UTC
+- **Span:** 23 Nov, from the token questions at 08:15 UTC to the publish check at 14:30 UTC, both sessions' entries below. The 11/22 report covered 22 Nov up to 15:17 UTC.
+- **Given:** 8 done bullets and 3 Will lines.
+  - **Done:**
+    - the permanent access key;
+    - the approve video with a voice-over;
+    - the phone line's emergency and ask-before-a-request rules;
+    - the four automatic messages approved on Homies' account;
+    - the move prepared, with a minute or two of no replies;
+    - the app's own setting, now done by the move;
+    - the app published;
+    - the guide PDF, checked against the latest rules.
+  - **Will:** the move once Homies picks a time and turns their old bot's replies off; a person per team in the staff inbox plus the OXS OK; the AI account topped up.
+- **Left out on purpose:** Meta's charge for replies past 1,000 a month (money only as something to act on), the `.env` mix-up (fixed in minutes), and the Q&A entries with no change.
+
 ### Their app published (the owner: "ok its published check now"), checked as far as Meta lets us, 14:30 UTC
 - **The owner's screenshot before it:** the Publish page read "All required app settings are complete", with the WhatsApp use case listed. The owner then pressed Publish.
 - **Read with the app secret:**
