@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### Are the chatbot and the voice agent ready for production? Not fully (the owner asked), answered from HANDOVER, 14:45 UTC
+- **WhatsApp:** ready to switch. It waits on:
+  - Homies: the time and who turns ManyChat's replies off; a person per department in Chatwoot; the OXS OK;
+  - the owner: the wallet and cap, a screenshot showing the app published, and the go.
+- **The incoming phone agent:** reached only through 077-6687949 and press 9, Omni's temporary shortcut of 25 Oct. Real callers need a place in the office menu, which is Homies' and Omni's call. Its emergency line sends a caller back to the number they called (open since today). Today's rules have not been heard on a real call.
+- **The debt agent:** not for real debtors yet.
+  - List 2 dials two leads at once while 208 takes one call, so Omni should dial one at a time (WORKLOG 15 Nov).
+  - Omni's check 2, one lead with Ido, has not run.
+  - The owner's decision on the call list: OXS's 1,233 owing apartments, against our 147.
+  - The WhatsApp switch should come first, so payment links leave from Homies' number.
+  - Every lead needs the owner's go.
+
 ### The 11/23 report (in chat, `/reporter`), 14:40 UTC
 - **Span:** 23 Nov, from the token questions at 08:15 UTC to the publish check at 14:30 UTC, both sessions' entries below. The 11/22 report covered 22 Nov up to 15:17 UTC.
 - **Given:** 8 done bullets and 3 Will lines.
