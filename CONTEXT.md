@@ -723,6 +723,12 @@ feature 21, "Connected on 3 Nov evening"). These hold from now on:
   - **Early too:** a card on their account (its currency chosen on purpose) and business verification.
   - **Waits for the switch:** subscribing an app to their WABA (`wa_subscribe.py`). Until then nothing of
     theirs comes to our side while ManyChat answers.
+  - **What Homies' token reaches from here (23 Nov):** templates, sending, the WABA subscription, and the number's
+    status and profile. For that, the system user must hold their WhatsApp account with Full control (not only the
+    app), and the token must never expire.
+    - **Stays inside Homies' Meta:** the card, business verification, people and approvals, and any new token (their
+      business wants a second admin for each). So does the app's own webhook (callback URL, the `messages` field),
+      unless the app's secret is in `.env`.
 - **The closed-ticket message quotes only the report** (039, 10 Nov): `{{2}}` is the description before the
   first " | ", so what the bot adds to a ticket ("הדייר שוב שואל...") never reaches the tenant.
 - **Templates belong to the number's own WhatsApp account.** No template leaves UChat until it is

@@ -9,6 +9,20 @@ conversation that produced it.
 
 ---
 
+## 2026-11-23
+
+### Once the token is in, can we work on Homies' Meta from here? Mostly (the owner: "when we get the system user token ... we can remotely edit it without the need of doing remote desk control everytime"), answered, 08:15 UTC
+- **From here, with the token** (whatsapp_business_management and whatsapp_business_messaging), as long as the system user holds their WhatsApp account with Full control:
+  - templates: create, edit, delete, and their status;
+  - sending from their number;
+  - the WABA subscription at the switch (`wa_subscribe.py`, as on ours on 22 Nov);
+  - the number's status, quality and counts, and its business profile.
+- **Still inside Homies' Meta (AnyDesk, or someone at Homies):**
+  - the card and business verification;
+  - people and approvals: admins, system users, and any new token. Their business wants a second admin to approve each token, as on 22 Nov;
+  - the app's own settings in Meta for Developers: the app-level webhook (callback URL, verify token, the `messages` field) and the app secret. The switch most likely needs that once, since the WABA subscription carries no fields of its own. With the app's secret in `.env`, `POST /{app-id}/subscriptions` with an app token does it from here.
+- **Told the owner:** assign their WhatsApp account to the system user with Full control, not only the app; choose "Never" for the token's expiry, or a 60-day token sends us back through AnyDesk and the second admin.
+
 ## 2026-11-22
 
 ### The 11/22 report (in chat, `/reporter`), 16:25 UTC
