@@ -741,6 +741,13 @@ feature 21, "Connected on 3 Nov evening"). These hold from now on:
     - **Stays inside Homies' Meta:** the card, business verification, people and approvals, and any new token (their
       business wants a second admin for each). So does the app's own webhook (callback URL, the `messages` field),
       unless the app's secret is in `.env`.
+    - **That webhook is needed, not a maybe (Meta's docs, read 23 Nov):**
+      - Webhook fields are subscribed at the app level (App Dashboard → WhatsApp → Configuration). `subscribed_apps` documents no fields of its own, and their app has none.
+      - Not scripted yet. With `HOMIES_APP_SECRET`, it is one `POST /{app-id}/subscriptions` right after inbox 1 takes their number, since the callback has to verify against inbox 1.
+  - **Meta's prices since 1 Oct 2026 (read 23 Nov):**
+    - Replies inside the 24-hour window are free up to 1,000 a month per number, then charged.
+    - Utility templates are charged even inside the window.
+    - On their number, their card (USD) pays.
 - **The closed-ticket message quotes only the report** (039, 10 Nov): `{{2}}` is the description before the
   first " | ", so what the bot adds to a ticket ("הדייר שוב שואל...") never reaches the tenant.
 - **Templates belong to the number's own WhatsApp account.** No template leaves UChat until it is

@@ -11,6 +11,27 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### The guidebook checked against Meta's docs and our notes, and corrected (the owner: "make sure its accurate and correct"), 12:05 UTC
+- **Read:** Meta's pages on webhook overrides, Cloud API webhooks, managing webhooks, messaging limits and pricing, plus our own notes (CONTEXT 21 Aug, WORKLOG Oct-Nov).
+- **Wrong, now fixed:**
+  - **Messaging limits.** They are the business's, shared by all its numbers (since Oct 2025), not the number's. They count people messaged outside the 24-hour window, and replies don't count. Verification is the quickest way past 250; the other is 2,000 high-quality template sends in 30 days. The display name plays no part in the limit.
+  - **Marketing messages.** "Business not verified" is not why they are held back (131049). Removed from section 1, the client list and troubleshooting.
+  - **The 10 days of "sent" templates.** The missing card stopped delivery. The missing app subscription only hid the failures.
+  - **Our test number's drops.** "Meta's test numbers keep dropping their registration" is now "ours lost its registration four times in October".
+  - **The currency.** Changing it means a new WhatsApp account, which Meta has a migration for, not "never".
+  - **Second-admin approval.** Now "Meta can send it to another admin, as it did on Homies". The unverified "don't switch the approval rule off" is gone.
+  - **"Subscribe webhooks".** Without it, nothing arrives, not only delivery updates. The figure now says so, and its caption says that on a live number the toggle is the switch.
+  - **Smaller fixes:**
+    - "is the client's WhatsApp account listed" (not the number);
+    - the app is created with the WhatsApp use case;
+    - other platforms use their own app.
+- **Checked and right as it was:**
+  - "1,000 free per number each month". Meta started charging replies again on 1 Oct 2026, with that free tier. The guide now says so, and that prices change.
+  - "Creating an inbox is the cutover" (CONTEXT 21 Aug).
+  - The app secret and app-level webhook lesson.
+- **Found for the switch:** Meta's docs subscribe webhook fields at the app level, and `subscribed_apps` takes no fields. So their app's own webhook is needed, not a maybe. At 11:50 the owner was told it "may not be needed". Corrected to the owner now, and in CONTEXT, HANDOVER and the runbook (`switch-to-homies.md`). The step is not scripted yet.
+- Rebuilt: still 15 pages, no figure warnings, the cover says "Checked against Meta's documentation on 23 November 2026". Opened in File Explorer.
+
 ### The guidebook PDF, updated with today's two lessons (the owner: "ok right now edit the pdf"), 11:52 UTC
 - **Added (`local/meta-guide/guide_content.md`, rebuilt; still 15 pages; opened in File Explorer):**
   - **Section 1:** a new row, "We thought the token was all we needed": the token can't change the app's own settings; copy the app secret with the token.

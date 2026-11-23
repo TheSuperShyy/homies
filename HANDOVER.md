@@ -64,7 +64,11 @@ appended to.
 >         - Downtime: about 1-2 minutes with no WhatsApp reply. The sitting takes about 15 minutes, a rollback about 2.
 >         - Recommended: on the night, ManyChat's replies are switched off, not disconnected (`--manychat-is-off`). A message in the gap then waits in ManyChat's inbox, and the number's registration is not touched.
 >         - Owed:
->           - their HOMIES app's secret in `.env` as `HOMIES_APP_SECRET` beforehand, so the app-level webhook, if Meta wants it, is set from here (not there yet at 11:41 UTC; the owner copies it on AnyDesk on Yariv's PC). Their WhatsApp account's billing is set (USD), so no card is owed;
+>           - their HOMIES app's secret in `.env` as `HOMIES_APP_SECRET` beforehand, so the app-level webhook is set from here.
+>             - It is needed, not a maybe: Meta's docs subscribe webhook fields at the app level (read 23 Nov 12:05 UTC; CONTEXT).
+>             - Not there yet at 11:41 UTC. The owner copies it on AnyDesk on Yariv's PC.
+>             - Not scripted yet: one `POST /{app-id}/subscriptions` right after inbox 1 takes their number.
+>             - Their WhatsApp account's billing is set (USD), so no card is owed;
 >           - the wallet top-up ($30.31 left) and a higher cap.
 >     - **The approver (23 Nov):** People in "הומי'ז ניהול ואחזקת מבנים" lists two with full access, Yariv and one other admin (name kept out of the repo). A Hebrew how-to video for that admin is in `local/meta-approve-video/meta-approve-request-he.mp4`, and a voiced copy (the Ronit video's Cartesia "Ayala", Clix's key) is `meta-approve-request-he-voice.mp4`. `build.py [--voice]` rebuilds them.
 >     - **Two portfolios on Yariv's login (23 Nov):** "Homies" (…7261), where he is the only person, and "הומי'ז ניהול ואחזקת מבנים" (…2992), which holds CLIX, the HOMIES app, their WhatsApp account and the request. The approver is in the second one's People list.
