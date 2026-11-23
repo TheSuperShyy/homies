@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### A Hebrew how-to video for Homies' other admin: approve Yariv's token request (the owner: "create a video for me fast that has the arrows and stuff with natural local native everyday hebrew words to guide how to accept the request"), 10:02 UTC
+- **Who approves:** the owner's screenshot of People in "הומי'ז ניהול ואחזקת מבנים" (…2992) shows two people with full access, Yariv and one other admin (name kept out of the repo). That other admin approves. In Yariv's view, "דרושה בדיקה" is empty, because his request sits under Sent.
+- **The video:** `local/meta-approve-video/meta-approve-request-he.mp4` (gitignored), 39.6 s, 1920x1080, H.264 with a silent track, 1.1 MB. Shown in the owner's File Explorer. `build.py` there rebuilds it in about a minute.
+  - The backgrounds are the owner's own screenshots (Requests, and the open request), cropped to the page: no tabs, address bar, AnyDesk or taskbar.
+  - Spotlight, bouncing arrows and captions in plain impersonal Hebrew ("נכנסים", "לוחצים"), Heebo, right to left. A title card, then 5 steps: business.facebook.com with your own Facebook and check the portfolio's name; the gear, then בקשות; the דרושה בדיקה tab; the request (access token, HOMIES); אישור, typing a password or code if asked. Then a thanks card with a tip for when the request doesn't show.
+  - Yariv's view has "לבטל את הבקשה" where the approver's button should be. It is covered, and the spot carries a drawn "אישור". The approver's own view was not seen.
+
 ### The owner's screenshot of People is a different portfolio (AnyDesk, 11:50 Israel time), read only, 09:50 UTC
 - **What it shows:** Settings → Users → People of a portfolio named "Homies" (business id …7261), with one person, Yariv Levi, full access. The page is in English through the browser's translation.
 - **Not the one that matters:** CLIX, the HOMIES app, their WhatsApp account and the token request are in "הומי'ז ניהול ואחזקת מבנים" (business id …2992, the earlier screenshots' addresses). Its People list is what shows who can approve. Meta's note there says the other admins were told, so it has more than one.
