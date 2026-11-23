@@ -74,7 +74,10 @@ appended to.
 >             - **14:08 UTC, both dry runs green:**
 >               - `switch_to_homies.py`: validates, their app's own webhook would be set, and the verify token matches. ManyChat is the only NOTE.
 >               - `n8n_whatsapp_tohomies.py`: the typing nodes go to …637.
->             - Nothing more is needed from Meta for the switch.
+>             - ~~Nothing more is needed from Meta for the switch.~~ **Corrected 14:15 UTC: their HOMIES app must be PUBLISHED first.**
+>               - Meta's own box on its WhatsApp setup page (the owner's screenshot) says an unpublished app gets only test webhooks, no real messages.
+>               - Publishing doesn't touch ManyChat: App settings → Basic, then Publish. The category is not set and the icon is the default; the public privacy policy is set.
+>               - `switch_to_homies.py --apply` now needs `--app-is-published`. Runbook, "Still needed".
 >           - Their WhatsApp account's billing is set (USD), so no card is owed;
 >           - the wallet top-up ($30.31 left) and a higher cap.
 >     - **The approver (23 Nov):** People in "הומי'ז ניהול ואחזקת מבנים" lists two with full access, Yariv and one other admin (name kept out of the repo). A Hebrew how-to video for that admin is in `local/meta-approve-video/meta-approve-request-he.mp4`, and a voiced copy (the Ronit video's Cartesia "Ayala", Clix's key) is `meta-approve-request-he-voice.mp4`. `build.py [--voice]` rebuilds them.

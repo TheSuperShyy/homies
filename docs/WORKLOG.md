@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### Not yet: their app has to be published first (the owner's screenshot of the HOMIES app's WhatsApp setup page: "can we disconnet the manychat and implement ours or not yet?"), 14:15 UTC
+- **Meta's box on that page:** *"Apps will only be able to receive test webhooks sent from the app dashboard while the app is unpublished. No production data, including from app admins, developers or testers, will be delivered unless the app has been published."* Switching now would leave the number silent. Our dry runs couldn't see this, since the mode can't be read with the app secret.
+- **Read with the app secret:**
+  - the privacy policy URL is set: a Google Doc that opens publicly, titled "Privacy Policy – HOMIES";
+  - the category is not set;
+  - the icon is the default.
+- **Told the owner:**
+  - publish it now, logged in: App settings → Basic (category, icon, a data-deletion URL if asked), then Publish. It doesn't touch ManyChat.
+  - Leave the callback URL and verify token empty: the script sets them at the switch, and Chatwoot can't verify them before the inbox has the number.
+  - Then the switch still waits on: the time and who turns ManyChat's replies off (not Disconnect), staff in Chatwoot, the OXS OK, the wallet, and the owner's go.
+- **`switch_to_homies.py`:** the preflight prints a CHECK BY EYE line, and `--apply` refuses without `--app-is-published`. The runbook, HANDOVER and CONTEXT say the same.
+
 ### The WABA ID is back, found through the number's ID, and both dry runs are green (the owner's screenshot of the Phone Number ID: "is this it?"), 14:08 UTC
 - **It was the number's ID (…8637), not the account's.** It was enough, though: the number's `health_status` names its WhatsApp account (…0527), and that account's `phone_numbers` holds the number.
   - Written to `HOMIES_WHATSAPP_WABA_ID`, after a backup (`local/env-backups/.env.before-homies-waba-back-2026-11-23T2207`).

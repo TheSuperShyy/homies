@@ -3,7 +3,10 @@
 
     python scripts/switch_to_homies.py              # preflight, read only: both sides, and whether the move would validate
     python scripts/switch_to_homies.py --apply      # THE SWITCH. Refuses while ManyChat's app is still connected,
-                                                    #   unless --manychat-is-off says its WhatsApp replies are off
+                                                    #   unless --manychat-is-off says its WhatsApp replies are off,
+                                                    #   and without --app-is-published (their app must be published:
+                                                    #   Meta sends an unpublished app no real messages, and that
+                                                    #   can't be read from here)
     python scripts/switch_to_homies.py --restore    # back to "hadas 1", and Homies' number handed back to ManyChat
 
 WHY. The owner, 23 Nov: "so right now just prepare everything but dont disconnect everything". Homies' token (system
@@ -292,11 +295,17 @@ def main():
         print("NOTE        : --apply refuses until HOMIES_APP_SECRET (and a matching verify token) are in .env, or add"
               " --app-webhook-by-hand if someone sets the app's webhook in their Meta during the switch.")
 
+    print("CHECK BY EYE: their app is PUBLISHED (no yellow 'unpublished' box on its WhatsApp setup page). Meta sends an"
+          " unpublished app no real messages (seen 23 Nov). --apply needs --app-is-published.")
+
     if not apply:
         print("\nDry run: nothing written, in Chatwoot or at Meta.")
         return
     if not check.get("valid"):
         sys.exit("The move does not validate in Chatwoot. Refusing.")
+    if "--app-is-published" not in sys.argv:
+        sys.exit("Refusing: confirm their app is published, then add --app-is-published. Unpublished, it gets no real "
+                 "messages, so the number would go silent.")
     if others and "--manychat-is-off" not in sys.argv:
         sys.exit("Refusing while %s is connected. Turn its WhatsApp replies off, then add --manychat-is-off." % ", ".join(others))
     if not (app and vt_ok) and not by_hand:
