@@ -11,6 +11,12 @@ conversation that produced it.
 
 ## 2026-11-23
 
+### Homies' existing app and portfolio, reused (the owner: "so i just reused their old app and portfolio the one running their old bot"), answered, 08:30 UTC
+- **The portfolio has to be theirs:** 077-668-7949 and its WhatsApp account are in it, and the templates go on that account.
+- **The app doesn't carry the old bot:** HOMIES' webhook was empty and off in the 22 Nov screenshot, and ManyChat runs through its own app (22 Nov). A token on HOMIES adds our access beside it and changes nothing for ManyChat.
+- `.env`'s `HOMIES_WHATSAPP_TOKEN` and `HOMIES_WHATSAPP_WABA_ID` are still empty (read now, values not printed).
+- **Told the owner:** until the switch, leave the app's webhook page, ManyChat's connection and any other system user or token alone. Once the token is in, a read of their WABA's `subscribed_apps` should show ManyChat's app only.
+
 ### Once the token is in, can we work on Homies' Meta from here? Mostly (the owner: "when we get the system user token ... we can remotely edit it without the need of doing remote desk control everytime"), answered, 08:15 UTC
 - **From here, with the token** (whatsapp_business_management and whatsapp_business_messaging), as long as the system user holds their WhatsApp account with Full control:
   - templates: create, edit, delete, and their status;
