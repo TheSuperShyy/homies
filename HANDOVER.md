@@ -8,6 +8,13 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 24 Nov, 09:22 UTC: EVERY TENANT'S TICKET GOES INTO OXS** (Yariv's approval, through the owner: "yes oxs ticket for every tenant approved"; WORKLOG and CONTEXT 24 Nov).
+> - **What:** `OXS_MIRROR_TYPES` holds all 13 types `open_request` takes, so a ticket from any reporter, on WhatsApp or a phone agent, is copied into OXS on its building.
+>   - Set by `python scripts/oxs_mirror_list.py --every-tenant --apply`: `.env` and the one live secret, no deploy, read back by digest. The phone list (4 numbers) is unchanged.
+> - **Tests:** test prefixes (+972599, +9725000000) still stay out. Any other test ticket now goes into OXS too.
+> - **Not proven by a ticket yet.** The first ticket from a number not on the list shows it in OXS.
+> - **Rollback:** `python scripts/oxs_mirror_list.py --every-tenant-off --apply`.
+>
 > **LIVE 24 Nov, 08:22 UTC: both phone agents answer a short complete reply after 0.4 s instead of 0.8 s** (the owner: "lets try to make the delay of the voice agent both of them faster"; WORKLOG and CONTEXT 24 Nov).
 > - **What:** `startSpeakingPlan.customEndpointingRules`, one customer rule (`SHORT_REPLY_RE` in `vapi_sync.py`).
 >   - When everything the caller has said so far is one short reply (כן, לא, בסדר, תודה, זה אני…), Vapi ends the turn after 0.4 s.
@@ -57,7 +64,7 @@ appended to.
 >   - the "office homies" Meta admin on a screen share;
 >   - the number's PIN;
 >   - ManyChat's admin, to turn it off in the same sitting;
->   - the OK for OXS tickets for every tenant (the mirror holds 4 numbers);
+>   - ~~the OK for OXS tickets for every tenant~~ **given 24 Nov, and ON since 09:22 UTC** (top block);
 >   - a switch time after hours;
 >   - at least one person per department signed in (every mention reaches only the owner's login).
 > - **Missing, from the owner:** a top-up of the AI wallet ($30.31, about 275 turns with a tool), and a higher cap on the key ($50, $49.75 left).

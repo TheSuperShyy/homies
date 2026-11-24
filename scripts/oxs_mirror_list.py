@@ -18,6 +18,16 @@ this list is a decision the owner made in so many words:
           six tickets were not in OXS and that adding them is a write there: "so make sure when
           they open a ticket it will be opened to oxs directly"
 
+  24 Nov  EVERY TENANT. Yariv's approval, through the owner: "yes oxs ticket for every tenant
+          approved". `--every-tenant --apply` sets `OXS_MIRROR_TYPES` (the every-reporter gate) to
+          every ticket type the bot opens, so any reporter's ticket goes in, as the listed numbers'
+          always did. Test prefixes (+972599, +9725000000) still never qualify, so a probe stays
+          out of OXS; any other test ticket, in the test building or not, now goes in.
+          `--every-tenant-off --apply` takes it back to the list alone.
+
+    python scripts/oxs_mirror_list.py --every-tenant [--apply]
+    python scripts/oxs_mirror_list.py --every-tenant-off [--apply]
+
 NEVER ADD A NUMBER TO MAKE A TEST EASIER. Ask, name the numbers' owners, and wait for the word.
 
 WHAT THIS DOES, AND DOES NOT
@@ -54,6 +64,10 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ENV_PATH = os.path.join(ROOT, ".env")
 BACKUPS = os.path.join(ROOT, "local", "env-backups")
 NAME = "OXS_MIRROR_PHONES"
+TYPES_NAME = "OXS_MIRROR_TYPES"
+# Every type open_request takes (n8n_whatsapp.py's enum, which is vapi_tools.py's plus "payment").
+ALL_TYPES = ("plumbing", "electrical", "lighting", "elevator", "cleaning", "gardening", "pest_control",
+             "locksmith", "fire_safety", "maintenance", "other", "complaint", "payment")
 BUILDING = u"בר כוכבא 23, תל אביב - יפו"     # the ONE building opened for us
 API = "https://api.supabase.com"
 UA = "curl/8.5.0"                            # Cloudflare refuses urllib's own (supabase_functions.py)
@@ -144,13 +158,53 @@ def call(token, method, path, body=None):
         return ex.code, ex.read().decode("utf-8", "replace")[:200]
 
 
-def live_digest(token, ref):
+def live_digest(token, ref, name=NAME):
     """The live secret's digest (sha256 of its value), or None when the secret is absent."""
     code, out = call(token, "GET", "/v1/projects/%s/secrets" % ref)
     if code != 200 or not isinstance(out, list):
         sys.exit("Could not read the function's secrets: HTTP %s" % code)
     names = {s["name"]: s.get("value") for s in out}
-    return names.get(NAME), "OXS_KEY_REQUESTS" in names, "OXS_MIRROR_TYPES" in names
+    return names.get(name), "OXS_KEY_REQUESTS" in names, "OXS_MIRROR_TYPES" in names
+
+
+def every_tenant(token, ref, on, apply):
+    """The every-reporter gate: all ticket types for anyone (on), or absent (off). One secret, no deploy."""
+    digest, key_on, _ = live_digest(token, ref, TYPES_NAME)
+    want = ",".join(ALL_TYPES)
+    state = ("ON for every type" if digest == sha(want) else "ON for some types" if digest else "OFF")
+    print("every tenant  now %s; the mirror's key is %s" % (state, "present" if key_on else "ABSENT"))
+    if not key_on:
+        sys.exit("The mirror itself is off (no OXS_KEY_REQUESTS live). Nothing would be copied; refusing.")
+    if (on and digest == sha(want)) or (not on and not digest):
+        print("Nothing to do.")
+        return
+    if not apply:
+        print("Dry run. Re-run with --apply to switch it %s." % ("ON: every tenant's ticket opens in OXS too"
+                                                                if on else "OFF: back to the listed numbers"))
+        return
+    os.makedirs(BACKUPS, exist_ok=True)
+    stamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H%MZ")
+    backup = os.path.join(BACKUPS, ".env.before-oxs-every-tenant-%s" % stamp)
+    text = open(ENV_PATH, encoding="utf-8", newline="").read()
+    with open(backup, "w", encoding="utf-8", newline="") as f:
+        f.write(text)
+    with open(ENV_PATH, "w", encoding="utf-8", newline="") as f:
+        f.write(env_with(text, TYPES_NAME, want if on else ""))
+    print(".env          %s= rewritten (copy: %s)" % (TYPES_NAME, os.path.relpath(backup, ROOT)))
+    if on:
+        code, out = call(token, "POST", "/v1/projects/%s/secrets" % ref, [{"name": TYPES_NAME, "value": want}])
+    else:
+        code, out = call(token, "DELETE", "/v1/projects/%s/secrets" % ref, [TYPES_NAME])
+    print("live secret   HTTP %s" % code)
+    if code >= 300:
+        print(out)
+        sys.exit("The live switch was NOT changed, and .env was. Put .env back from the copy, or run this again.")
+    digest, _, _ = live_digest(token, ref, TYPES_NAME)
+    held = (digest == sha(want)) if on else (digest is None)
+    print("read back     %s" % ("every tenant ON, all %d types" % len(ALL_TYPES) if on and held else
+                                "OFF" if held else "NOT AS ASKED"))
+    if not held:
+        sys.exit(1)
 
 
 def residents(e):
@@ -175,6 +229,11 @@ def main():
     argv = sys.argv[1:]
     apply = "--apply" in argv
     argv = [a for a in argv if a != "--apply"]
+    if argv and argv[0] in ("--every-tenant", "--every-tenant-off"):
+        e = env()
+        token = e.get("SUPABASE_ACCESS_TOKEN", "").strip()
+        ref = e["SUPABASE_URL"].strip().split("//")[1].split(".")[0]
+        return every_tenant(token, ref, argv[0] == "--every-tenant", apply)
     action, flats = None, []
     if argv:
         if argv[0] not in ("--add-flat", "--remove-flat") or len(argv) < 2:
@@ -191,7 +250,8 @@ def main():
     digest, key_on, types_on = live_digest(token, ref)
     same = digest == sha(",".join(current)) or digest == sha(e.get(NAME, ""))
 
-    print("Copied into OXS: tickets from the numbers on %s." % NAME)
+    print("Copied into OXS: %s." % ("EVERY tenant's tickets (since 24 Nov), and the listed numbers'" if types_on
+                                     else "tickets from the numbers on %s" % NAME))
     print("  the mirror's key is %s on the live function; the every-reporter type switch is %s."
           % ("PRESENT" if key_on else "ABSENT (the mirror is off)", "ON" if types_on else "off"))
     print(".env's list:")

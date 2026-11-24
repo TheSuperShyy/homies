@@ -76,7 +76,8 @@ read-only checks below have run. ManyChat still answers on Homies' number, and o
   `health_status`. Both dry runs are green (14:08 UTC), and nothing more is needed from Meta.
 - Who turns ManyChat's WhatsApp off at the switch, and when (the switch time).
 - At least one person per department signed in to Chatwoot. Today every mention reaches only the owner's login.
-- The OK for OXS tickets for every tenant. The mirror holds four test numbers today.
+- ~~The OK for OXS tickets for every tenant.~~ Given 24 Nov, and every tenant's ticket goes into OXS since 09:22 UTC
+  (`oxs_mirror_list.py --every-tenant`).
 - Business verification, later. Until then, at most 250 people a day for messages we start. Replies are not limited.
 
 ## Notes

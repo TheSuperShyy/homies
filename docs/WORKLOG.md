@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-11-24
 
+### LIVE 09:22 UTC: every tenant's ticket goes into OXS (the owner: "yes oxs ticket for every tenant approved")
+- **The decision:** Yariv's approval, relayed by the owner. It was one of the four go-live items from Homies.
+- **How, using the gate built 5 Nov:**
+  - `OXS_MIRROR_TYPES` (any reporter) is set to all 13 types `open_request` takes: the eleven building categories, complaint and payment.
+  - So every reporter's ticket goes in, as the four listed numbers' always did.
+  - New: `oxs_mirror_list.py --every-tenant [--apply]` and `--every-tenant-off`. They refuse without the mirror's key, back up `.env`, push the one secret (no deploy) and read back by digest.
+- **Applied:**
+  - the dry run said OFF, with the key present;
+  - `--apply` answered HTTP 201, and the read back says every tenant ON, all 13 types;
+  - the phone list is unchanged (4 numbers).
+  - Backup: `local/env-backups/.env.before-oxs-every-tenant-2026-11-24T0922Z`.
+- **What it means for tests:** test prefixes (+972599, +9725000000) still never qualify. Any other test ticket, the test building included, now opens in OXS too.
+- **Memory updated:** `homies-oxs-read-only.md` and its index line.
+- **Not proven by a ticket yet.** The first ticket from a number not on the list shows it.
+
 ### The templates on Homies' own WhatsApp account, read again (the owner: "check the meta if the template message were approved on yariv account"), 08:30 UTC
 - `wa_templates.py --account homies list`: all four of ours APPROVED.
   - `ticket_resolved_he` and `payment_link_he` are UTILITY; `homies_hello_he` and `homies_message_he` are MARKETING.
