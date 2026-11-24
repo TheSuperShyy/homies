@@ -11,6 +11,23 @@ conversation that produced it.
 
 ## 2026-11-24
 
+### LIVE 16:37 UTC: Chatwoot invites sent to Yariv's staff list, everyone seated (the owner: "ok send the invite in the list of emails we have from yariv")
+- **The list:** `local/golive/homies-staff-2026-11-15.csv`, the same sheet as 15 Nov. Its example row is skipped. Those 15 Nov logins had been removed by the owner on 16 Nov, after the invites landed in spam under Brevo.
+- **Yariv:** already had login #17, administrator and confirmed, but was in neither inbox. Now he is in both.
+- **Invited through Chatwoot's API** (`POST /agents`, which sends the invite), with no email printed:
+  - #18 עדן ממן (administrator, management);
+  - #19 אור אלי, #21 מריל מימון and #22 בן ירוקני (agents, operations);
+  - #20 אור רטבי and #23 משרד כללי (agents, service);
+  - #24 מחלקת גבייה כללי and #25 יונתן ניומברג (agents, collections and service).
+- **Seated:**
+  - inboxes 1 and 2 by `POST /inbox_members`, which adds and removes nobody; members are now 11 and 10, all seated;
+  - teams by `chatwoot_teams.py --add … --apply`, each read back. Management: Assaf Clix, 17, 18. Operations: 2, 19, 21, 22. Service: 2, 20, 23, 24, 25. Collections: 2, 24, 25.
+- **The mail went out:** sidekiq ran 8 `MailDeliveryJob`s, User/18 to User/25, all performed with no error or retry, through Gmail (since 16 Nov). Inbox or spam at Homies' Google mail can't be seen from here.
+- **What follows:**
+  - each person "has not confirmed the invite" until they set a password;
+  - from now on, test hand-overs on the test number mention real staff in their department, and the 10-minute escalation goes to management;
+  - they see the test number's conversations until the switch.
+
 ### DONE: the detailed onboarding videos, staff 2:13 and admin 1:13 (the owner: "bro i told you detailed", with the list: password, the link sent separately, working the chat, a template, a new unregistered contact, the bot back on after a manual reply, tagging someone of a department; admin: adding a user, running it), 12:40 UTC
 - `local/chatwoot-video/build_short.py` now takes moments from three sources: the long staff and admin renders by segment, and the new-contact video by time. Its steps were placed by scene changes and frames read at 7.5 to 72 s.
 - **Staff, `chatwoot-onboarding-staff-he.mp4` (133.4 s), 16 lines:**

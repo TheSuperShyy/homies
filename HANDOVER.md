@@ -8,6 +8,12 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 24 Nov 16:37 UTC: Chatwoot invites sent to Yariv's staff list** (WORKLOG 24 Nov).
+> - #18-#25: 8 people from `local/golive/homies-staff-2026-11-15.csv`.
+> - Everyone, Yariv #17 included, is in inboxes 1 and 2 and in their department's team (`chatwoot_teams.py`).
+> - The 8 invite mails went out through Gmail. Nobody has set a password yet.
+> - Until the switch, test hand-overs now reach these people.
+>
 > **Chatwoot onboarding videos (24 Nov, local, gitignored):** the ones the owner wanted, `local/chatwoot-video/chatwoot-onboarding-staff-he.mp4` (2:13, every item of the owner's list) and `chatwoot-onboarding-admin-he.mp4` (1:13); the earlier too-short cuts are `chatwoot-*-short-he.mp4`; rebuilt by `build_short.py` from the long renders (`chatwoot-staff-guide-he.mp4` 3:59, `chatwoot-admin-guide-he.mp4` 1:57, `build_onboarding.py`). The long build's sign-ins filled the admin login's sessions: a new sign-in with it asks to end sessions (409), nothing ended by us. Clix's Cartesia key is nearly empty (about 26 credits): a re-voice needs a top-up.
 >
 > **LIVE 24 Nov, 09:22 UTC: EVERY TENANT'S TICKET GOES INTO OXS** (Yariv's approval, through the owner: "yes oxs ticket for every tenant approved"; WORKLOG and CONTEXT 24 Nov).
@@ -68,7 +74,7 @@ appended to.
 >   - ManyChat's admin, to turn it off in the same sitting;
 >   - ~~the OK for OXS tickets for every tenant~~ **given 24 Nov, and ON since 09:22 UTC** (top block);
 >   - a switch time after hours;
->   - at least one person per department signed in (every mention reaches only the owner's login).
+>   - ~~at least one person per department signed in~~ **invited and seated 24 Nov 16:37 UTC** (top block); signed in once they set a password.
 > - **Missing, from the owner:** a top-up of the AI wallet ($30.31, about 275 turns with a tool), and a higher cap on the key ($50, $49.75 left).
 > - **Not today in any case:** the templates on Homies' account (a day or two at Meta), and business verification (days; until then 250 people a day for messages we start).
 >   - **The templates go in as soon as we have access to Homies' account, before the switch day,** with `wa_templates.py create <name> --waba <their id> --apply` for each of the four. The bot's replies need none.
