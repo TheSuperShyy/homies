@@ -11,6 +11,17 @@ conversation that produced it.
 
 ## 2026-11-24
 
+### DONE: the two short Chatwoot videos, under a minute each (the owner: "create a simple explanation like no technical stuff ... make it short like 1:30 minutes max one for admin and 1 for employee departments", and "the video recording is renderng for more than 2hrs"), 11:30 UTC
+- **The long build was stopped:** two hours in, the admin re-render still running. Its two renders stayed on disk: staff 3:59 and admin 1:57.
+- **Nothing was recorded again.** `local/chatwoot-video/build_short.py` lays a new plain narration (Ayala, sonic-3.6, Clix's key) over the matching moments of the long renders, using their segment marks. Their sound is dropped, and a moment shorter than its line holds its last frame.
+- **Out:**
+  - `chatwoot-staff-short-he.mp4`, 56.7 s, 10 lines: the email and password, where messages arrive, Michael's hand-over and the counter, the yellow note, replying takes it, resolve, 10 minutes then management.
+  - `chatwoot-admin-short-he.mp4`, 48.0 s, 9 lines: the email, add an agent (role), the invite, both inboxes and "update", the department's team, deleting someone who left, reports.
+- **Checked:**
+  - a frame per line, against its narration;
+  - every line by the local speech-to-text. One admin line read "שמיכאל" as "Michal", so it was reworded to "כדי שיקבל את השיחות של המחלקה";
+  - video and sound lengths equal. The first build had lost a held frame to `-t` as an output option, so it is now an input option.
+
 ### IN PROGRESS: two Hebrew onboarding videos for Chatwoot (the owner: "create a video tutorial on how to operate the chatwoot in each department and as an admin basically onboarding on how to use the platform we set. in natural local native everyday hebrew with voice over used in ronit"), started 09:45 UTC
 - **Read first, from the live box and the repo:**
   - inboxes: 1 "WhatsApp — Homies" and 2 "Homies — Voice";
