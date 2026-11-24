@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-24
 
+### The 11/24 report (in chat, `/reporter`, 01:01 Philippine time on 25 Nov), 17:01 UTC
+- **Span:** 24 Nov, from the phone agents' short-reply rule (08:22 UTC) to the staff invites (16:37 UTC), one sitting into 25 Nov in the owner's clock.
+- **Given:** 6 done bullets and 3 Will lines.
+  - **Done:** the shorter wait after yes/no on both phone assistants; the WhatsApp assistant ready, with the four messages approved on Homies' account; OXS tickets for every tenant; the staff video guide; the admin video guide; 8 invites, each with their department.
+  - **Will:** the switch once Yariv gives the go; one real call on each phone assistant; the AI account topped up.
+- **Left out on purpose:** the long video build that was stopped, the voice account's credits, and the admin login's session limit.
+
 ### LIVE 16:37 UTC: Chatwoot invites sent to Yariv's staff list, everyone seated (the owner: "ok send the invite in the list of emails we have from yariv")
 - **The list:** `local/golive/homies-staff-2026-11-15.csv`, the same sheet as 15 Nov. Its example row is skipped. Those 15 Nov logins had been removed by the owner on 16 Nov, after the invites landed in spam under Brevo.
 - **Yariv:** already had login #17, administrator and confirmed, but was in neither inbox. Now he is in both.
