@@ -26,6 +26,12 @@ conversation that produced it.
   - demo data fulfilled in the browser, so no real tenant is shown;
   - every write aborted or fulfilled locally, apart from the one sign-in.
 - **Then the owner:** "make sure the video starts from the moment the email is received". Both videos open with the invite: the email in the inbox (and spam as a tip), "אישור ההזמנה", the password rules, the first entry. It reuses `build.py`'s render of the real invite and pages, with a demo address. Passed to the agent.
+- **Staff video rendered:** `local/chatwoot-video/chatwoot-staff-guide-he.mp4`, 3:59, 12.5 MB; contact sheet `sheet-staff-guide-he.png`, 34 frames.
+  - It opens with the invite (the email on top of the inbox plus the spam tip, "אישור ההזמנה", the password rules ticking, the first entry), then the tour.
+  - Three frames read up close by us: the email, Michael's yellow note, and "who gets what". All demo data: דני כהן, +972 50-000-0000, and the inviter "רונית שמש" (ronit@example.com) is a demo name.
+  - The agent's corrections to the script: Chatwoot 4.16 has no bell (the alert is the counter by "תיבת הדואר הנכנס שלי" plus a browser push); team names are English, so the captions pair them with Hebrew; the 24-hour notice is a red bar at the top of the conversation.
+  - Guard: 27 non-GETs, none sent (6 answered in the browser, 21 aborted).
+  - **Side effect, live:** about 18 headless sign-ins of the admin login (`CHATWOOT_ADMIN_EMAIL`, from about 16:47 Israel time) filled its sessions. A NEW sign-in with that login answers 409 "Active session limit reached" and offers to end sessions. None was ended, since that is a write. Browsers already signed in keep working, and the recorder now signs in no more: it reads with `CHATWOOT_API_TOKEN` only.
 
 ### LIVE 09:22 UTC: every tenant's ticket goes into OXS (the owner: "yes oxs ticket for every tenant approved")
 - **The decision:** Yariv's approval, relayed by the owner. It was one of the four go-live items from Homies.
