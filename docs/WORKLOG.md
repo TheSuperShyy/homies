@@ -11,6 +11,27 @@ conversation that produced it.
 
 ## 2026-11-24
 
+### DONE: the detailed onboarding videos, staff 2:13 and admin 1:13 (the owner: "bro i told you detailed", with the list: password, the link sent separately, working the chat, a template, a new unregistered contact, the bot back on after a manual reply, tagging someone of a department; admin: adding a user, running it), 12:40 UTC
+- `local/chatwoot-video/build_short.py` now takes moments from three sources: the long staff and admin renders by segment, and the new-contact video by time. Its steps were placed by scene changes and frames read at 7.5 to 72 s.
+- **Staff, `chatwoot-onboarding-staff-he.mp4` (133.4 s), 16 lines:**
+  - the email, and the password and its rules;
+  - the link, sent to them separately;
+  - where messages come in, Michael, and the tabs;
+  - the alert and the yellow note;
+  - replying, which takes the conversation;
+  - **back to the bot:** the assignee set to none, or by itself after 15 minutes;
+  - resolve;
+  - **tagging:** a private note with @ and the name, or the team changed in the side panel;
+  - **a template:** past 24 hours, the template icon, the template on screen;
+  - **a new contact, in three lines:** contacts, ⋮, add; Israel, the number without the 0, save; message, the contact, WhatsApp, choose a template, the opening one;
+  - the 10 minutes, and the end card.
+- **Admin, `chatwoot-onboarding-admin-he.mp4` (73.3 s), 12 lines:** the email; adding an agent with a role; the invite; both inboxes and "update"; the team and "update agents in team"; deleting; "all" shows every conversation; moving to another team; reports; templates through us; the end card.
+- **Checked:**
+  - a frame per line, against its words;
+  - every line by the local speech-to-text, all said. "עדכן" may sound like "adkin", with the button on screen. Whisper's "thank you" after the admin end is its own invention on silence.
+  - video and sound lengths equal.
+- **Clix's Cartesia key ran out:** 86 credits were left when the admin video needed about 95 for one line. The last two lines were made shorter, and the closing line reuses the cached one; about 26 credits remain. A re-voice needs a top-up. Homies' key was never used.
+
 ### DONE: the two short Chatwoot videos, under a minute each (the owner: "create a simple explanation like no technical stuff ... make it short like 1:30 minutes max one for admin and 1 for employee departments", and "the video recording is renderng for more than 2hrs"), 11:30 UTC
 - **The long build was stopped:** two hours in, the admin re-render still running. Its two renders stayed on disk: staff 3:59 and admin 1:57.
 - **Nothing was recorded again.** `local/chatwoot-video/build_short.py` lays a new plain narration (Ayala, sonic-3.6, Clix's key) over the matching moments of the long renders, using their segment marks. Their sound is dropped, and a moment shorter than its line holds its last frame.

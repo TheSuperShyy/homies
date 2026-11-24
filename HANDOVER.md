@@ -8,7 +8,7 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **Chatwoot onboarding videos (24 Nov, local, gitignored):** the short ones the owner wanted, `local/chatwoot-video/chatwoot-staff-short-he.mp4` (57 s) and `chatwoot-admin-short-he.mp4` (48 s), rebuilt by `build_short.py` from the long renders (`chatwoot-staff-guide-he.mp4` 3:59, `chatwoot-admin-guide-he.mp4` 1:57, `build_onboarding.py`). The long build's sign-ins filled the admin login's sessions: a new sign-in with it asks to end sessions (409), nothing ended by us.
+> **Chatwoot onboarding videos (24 Nov, local, gitignored):** the ones the owner wanted, `local/chatwoot-video/chatwoot-onboarding-staff-he.mp4` (2:13, every item of the owner's list) and `chatwoot-onboarding-admin-he.mp4` (1:13); the earlier too-short cuts are `chatwoot-*-short-he.mp4`; rebuilt by `build_short.py` from the long renders (`chatwoot-staff-guide-he.mp4` 3:59, `chatwoot-admin-guide-he.mp4` 1:57, `build_onboarding.py`). The long build's sign-ins filled the admin login's sessions: a new sign-in with it asks to end sessions (409), nothing ended by us. Clix's Cartesia key is nearly empty (about 26 credits): a re-voice needs a top-up.
 >
 > **LIVE 24 Nov, 09:22 UTC: EVERY TENANT'S TICKET GOES INTO OXS** (Yariv's approval, through the owner: "yes oxs ticket for every tenant approved"; WORKLOG and CONTEXT 24 Nov).
 > - **What:** `OXS_MIRROR_TYPES` holds all 13 types `open_request` takes, so a ticket from any reporter, on WhatsApp or a phone agent, is copied into OXS on its building.
