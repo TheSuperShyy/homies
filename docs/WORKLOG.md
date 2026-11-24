@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-11-24
 
+### IN PROGRESS: two Hebrew onboarding videos for Chatwoot (the owner: "create a video tutorial on how to operate the chatwoot in each department and as an admin basically onboarding on how to use the platform we set. in natural local native everyday hebrew with voice over used in ronit"), started 09:45 UTC
+- **Read first, from the live box and the repo:**
+  - inboxes: 1 "WhatsApp — Homies" and 2 "Homies — Voice";
+  - teams: collections, operations, management, service;
+  - labels: handover, handover-<dept>, bank-transfer, bot-off, after-hours, escalated;
+  - routing (`n8n_handover.py`): payment, billing and bank transfer go to collections; move, contract and quote to management; the rest to service;
+  - the ticker (`n8n_handback_escalate.py`): back to the bot after 15 quiet minutes; 10 then 25 minutes to escalate, in office hours, Sun-Thu 09:00-17:00;
+  - Sort's off-switches (CONTEXT): a User assignee, `bot-off`, or resolved.
+  - The account's locale is still `en`, so staff without a language of their own see English. The videos show the Hebrew screen, forced in the browser only, as the new-contact video does.
+- **Being built by a background agent:**
+  - `local/chatwoot-video/build_onboarding.py`, giving `chatwoot-staff-guide-he.mp4` and `chatwoot-admin-guide-he.mp4`;
+  - the Ronit voice: Cartesia "Ayala", sonic-3.6, Clix's `CARTESIA_API_KEY`;
+  - demo data fulfilled in the browser, so no real tenant is shown;
+  - every write aborted or fulfilled locally, apart from the one sign-in.
+
 ### LIVE 09:22 UTC: every tenant's ticket goes into OXS (the owner: "yes oxs ticket for every tenant approved")
 - **The decision:** Yariv's approval, relayed by the owner. It was one of the four go-live items from Homies.
 - **How, using the gate built 5 Nov:**
