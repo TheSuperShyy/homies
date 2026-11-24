@@ -8,6 +8,21 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 24 Nov, 08:22 UTC: both phone agents answer a short complete reply after 0.4 s instead of 0.8 s** (the owner: "lets try to make the delay of the voice agent both of them faster"; WORKLOG and CONTEXT 24 Nov).
+> - **What:** `startSpeakingPlan.customEndpointingRules`, one customer rule (`SHORT_REPLY_RE` in `vapi_sync.py`).
+>   - When everything the caller has said so far is one short reply (כן, לא, בסדר, תודה, זה אני…), Vapi ends the turn after 0.4 s.
+>   - One more word falls back to 0.8 s. Names, streets and numbers never match.
+>   - The pattern was tested in Node, as Vapi runs it, on 31 phrases.
+> - **Expected:** about 0.4 s off yes/no turns. Other turns are unchanged, at about 2.5 to 3 s on this stack.
+> - **Read back:** both agents equal the repo field by field. Before the apply, the rule was the only difference.
+> - **Not heard on a call yet.** Neither agent has had a call since 16 Nov, so the debt agent's 17 Nov `minimal` thinking is unproven too.
+>   - Vapi's text chat would test the model without a call, but it needs a card on Yariv's Vapi account ("Add a payment method to use chat").
+>   - Owed: one real call on each agent. Press 9 for the incoming agent; a /dialer Ring to Ido for the debt agent, on the owner's go. Then read Vapi's split per stage.
+> - **Rollback:** take the rule out of `vapi_sync.py` and sync both (`N8N_BASE_URL= python scripts/vapi_sync.py inbound|debt --keep-voice --apply`). Snapshots: `local/vapi-{inbound,debt}-live-24nov-before-shortreply.json`.
+> - **Bigger levers, the owner's call:**
+>   - thinking `none` on the incoming agent, which broke two rules on 22 Oct;
+>   - speech-to-speech (`gpt-realtime-2` on Vapi), about 1 s replies but a different voice.
+>
 > **LIVE 23 Nov, 09:22:23 UTC: the incoming phone agent gets the chatbot's emergency line and the yes before a request** (the owner: "ok apply the emergency and ticket rules to the phone line"; WORKLOG and CONTEXT 23 Nov).
 > - **What a caller gets:** an emergency (a person in danger or hurt, someone stuck in a lift, fire, smoke, flooding, a big leak, water near electricity), at any hour, hears only the digital assistant, please call our phone line urgently, and the number in words. No request, no note, no question. Gas gets the gas company, then our line. A fault opens a request only after the caller's yes.
 > - **Where:** `docs/assistant/demo-inbound.md`'s fence (15,724 characters) and `scripts/vapi_tools.py` (open_request, notify_team, save_partial_request; the incoming agent only). Read back equal to the repo. The voice, the first message and the debt agent `4bc03b57` (still 19 Nov 12:20:11 UTC) are untouched.

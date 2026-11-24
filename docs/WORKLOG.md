@@ -9,6 +9,23 @@ conversation that produced it.
 
 ---
 
+## 2026-11-24
+
+### LIVE 08:22 UTC: both phone agents answer a short complete reply after 0.4 s (the owner: "lets try to make the delay of the voice agent both of them faster")
+- **Read first (no change):**
+  - Both agents run gpt-5.6-sol on the fast tier: incoming at thinking `low`, debt at `minimal`.
+  - Deepgram nova-3 he; Cartesia sonic-3.5 with first chunk 10.
+  - Endpointing wait 0.25, punctuation 0.3, no punctuation 0.8, number 1.0.
+  - No call on either agent since 16 Nov. The last ones split as model 0.7-2.0 s, voice 0.5-1.0 s, transcriber 0.3-0.45 s and endpointing 0.3-0.8 s, about 2.6-3.6 s a turn.
+  - CONTEXT (21-25 Oct) already holds the earlier work: the fast tier, the 10-character first chunk, the tools in Tokyo, and 0.8 s kept because 0.5 failed the integrity run.
+- **Tried, not run:** comparing thinking levels on copies without tools through Vapi's text chat. Vapi answered "Add a payment method to use chat" (no card on Yariv's account), and nothing was charged.
+- **New lever found in Vapi's spec:** `customEndpointingRules`, which beat both endpointing plans when they match.
+- **Changed:** one customer rule in `vapi_sync.py`'s shared speaking plan. When the caller's whole turn so far is one short reply, the turn ends after 0.4 s.
+  - The words: כן, לא, נכון, בסדר, אוקיי, טוב, בטח, ברור, סבבה, תודה, אין בעיה, זה אני… Repeats and thanks may follow.
+  - Tested in Node on 31 phrases: "כן, אבל אין לי", "זה אני לא", streets and numbers don't match.
+- **Applied:** live and repo compared field by field before the apply (the rule was the only difference) and after it (0 differences), with snapshots in `local/`. The voices were not sent.
+- **Owed:** one real call on each agent, which also proves the debt agent's 17 Nov `minimal`. Bigger cuts are the owner's call: thinking `none`, or speech-to-speech.
+
 ## 2026-11-23
 
 ### The 11/23 report again (in chat, `/reporter`, 00:24 Philippine time), 16:25 UTC

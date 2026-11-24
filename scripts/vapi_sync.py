@@ -44,6 +44,22 @@ API = "https://api.vapi.ai"
 # tools' function runs: see the 25 Oct note in build().
 FUNCTION_REGION = "ap-northeast-1"
 
+# The caller's whole turn so far is one short, complete reply (24 Nov; see
+# startSpeakingPlan.customEndpointingRules). Node's RegExp.test runs it on the live
+# transcript: anchored at both ends, so a single added word ("כן, אבל") stops it
+# matching and the ordinary 0.8 s applies again. Names, streets and numbers never
+# match.
+SHORT_REPLY_WORDS = ("כן", "לא", "נכון", "בסדר", "אוקיי", "אוקי", "טוב", "בטח", "ברור", "סבבה",
+                     "יופי", "מעולה", "תודה", "אין בעיה", "שלום", "ביי", "הלו", "זה אני",
+                     "מדבר", "מדברת", "כן זה אני", "לא תודה", "לא לא", "תודה רבה")
+# What may follow, as people repeat or thank. Not "לא": after another word it
+# usually starts a new clause ("זה אני, לא...").
+SHORT_REPLY_TAIL = ("כן", "תודה", "רבה", "בסדר", "אוקיי", "אוקי", "נכון", "ביי")
+SHORT_REPLY_RE = (r"^\s*(?:%s)(?:[\s,]+(?:%s))*\s*[.!?]?\s*$"
+                  % ("|".join(w.replace(" ", r"[\s,]+") for w in sorted(SHORT_REPLY_WORDS, key=len, reverse=True)),
+                     "|".join(SHORT_REPLY_TAIL)))
+SHORT_REPLY_SECONDS = 0.4
+
 # Shared by both assistants. HilaNeural is female, which is why every written
 # line is feminine first person.
 #
@@ -253,6 +269,21 @@ BASE = {
             # ordinary speech, or the agent cuts in halfway through the number.
             "onNumberSeconds": 1.0,
         },
+        # 24 NOV (the owner: "lets try to make the delay of the voice agent both of
+        # them faster"). The 0.8 s above is the whole endpointing stage on Hebrew
+        # (CONTEXT, 23 Oct), and lowering it for everyone failed the integrity run
+        # at 0.5. This rule lowers it only when everything the caller has said so
+        # far is one short, complete reply ("כן", "לא תודה", "בסדר", "זה אני"),
+        # the commonest turn on a debt call. Vapi evaluates it on the live
+        # transcript, so a caller who goes on ("כן, אבל...") falls back to 0.8 the
+        # moment a word is added. Rules beat both plans when they match.
+        "customEndpointingRules": [
+            {
+                "type": "customer",
+                "regex": SHORT_REPLY_RE,
+                "timeoutSeconds": SHORT_REPLY_SECONDS,
+            },
+        ],
     },
     # numWords was 0, meaning any sound at all stopped her mid-sentence. On a
     # real call people say "mm-hmm" and "yeah" while you talk — that is

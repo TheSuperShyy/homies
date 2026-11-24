@@ -3402,6 +3402,16 @@ high, medium, low and none. Vapi's enum also offers `minimal`, which this model 
     so 0.1 s fires mid-thought. A street and its number with a pause between them came back as two
     turns. The pause is a safety setting first and a speed setting second. The same hesitant caller
     on 0.8 s was clean, so 0.8 / 0.3 stays.
+- **A short complete reply ends the turn after 0.4 s (24 Nov, both agents).**
+  - Vapi's `customEndpointingRules` beat both plans when they match. One customer rule (`SHORT_REPLY_RE`) matches only when the caller's whole turn so far is one short reply: כן, לא, בסדר, תודה, זה אני.
+  - The hesitant caller and the street with a pause keep 0.8 s, since any added word stops the match. So the integrity failures of 23 Oct cannot recur through it.
+  - The one risk left is "כן…" followed by a pause of more than 0.4 s and more words. "לא" is left out of the words that may follow, because after another word it usually starts a new clause.
+  - It saves about 0.4 s on yes/no turns, the commonest turn on a debt call.
+- **What is left to cut is the owner's call (24 Nov):**
+  - thinking `none` (on 22 Oct it broke two rules on the incoming agent);
+  - a model swap (gpt-4.1, the quality Yariv rejected);
+  - speech-to-speech (`gpt-realtime-2` on Vapi, about 1 s, a different voice).
+  - Vapi's text chat would compare thinking levels without a call, but needs a card on the account.
 - **The model stays gpt-5.6-sol; the speed comes from the fast tier (25 Oct).** The owner:
   *"reduce the latency of the bot wether we need to replace the LLM model or what"*.
   - gpt-4.1 is the faster model: 0.74 s on its one measured turn.
