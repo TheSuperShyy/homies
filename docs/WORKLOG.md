@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-11-24
 
+### The templates on Homies' own WhatsApp account, read again (the owner: "check the meta if the template message were approved on yariv account"), 08:30 UTC
+- `wa_templates.py --account homies list`: all four of ours APPROVED.
+  - `ticket_resolved_he` and `payment_link_he` are UTILITY; `homies_hello_he` and `homies_message_he` are MARKETING.
+- A fifth, not ours, is APPROVED too: `hyy_h_m_pnyytk_dyyn_rlwwntyt` (MARKETING), Homies' own from before. Its name spells "היי, האם פנייתך עדיין רלוונטית".
+
 ### LIVE 08:22 UTC: both phone agents answer a short complete reply after 0.4 s (the owner: "lets try to make the delay of the voice agent both of them faster")
 - **Read first (no change):**
   - Both agents run gpt-5.6-sol on the fast tier: incoming at thinking `low`, debt at `minimal`.
