@@ -25,6 +25,7 @@ conversation that produced it.
   - the Ronit voice: Cartesia "Ayala", sonic-3.6, Clix's `CARTESIA_API_KEY`;
   - demo data fulfilled in the browser, so no real tenant is shown;
   - every write aborted or fulfilled locally, apart from the one sign-in.
+- **Then the owner:** "make sure the video starts from the moment the email is received". Both videos open with the invite: the email in the inbox (and spam as a tip), "אישור ההזמנה", the password rules, the first entry. It reuses `build.py`'s render of the real invite and pages, with a demo address. Passed to the agent.
 
 ### LIVE 09:22 UTC: every tenant's ticket goes into OXS (the owner: "yes oxs ticket for every tenant approved")
 - **The decision:** Yariv's approval, relayed by the owner. It was one of the four go-live items from Homies.
