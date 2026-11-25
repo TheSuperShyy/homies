@@ -11,6 +11,22 @@ conversation that produced it.
 
 ## 2026-11-25
 
+### The dialer dashboard's video guide, in Hebrew (local, gitignored): `local/dialer-video/homies-dialer-guide-he-hila.mp4`
+- **The owner:** *"create a video tutorial on how to use this dashboard and why its needed"*.
+- **What it is:** 3:25, 1920x1080, 18 scenes, each with a spoken line and a caption.
+  - **Why the dashboard is needed:** Michael makes the debt calls; in each he says the amount and months, sends the WhatsApp payment link, and records what was agreed.
+  - **How to use it:** the menu, the list of who owes, filtering and search, calling one tenant or ticking several, the line bar and the counts, Stop, the results, today's calls and a call's transcript, Phone calls (no answer, links sent), the rules (hours, once a day, 4 tries, skipped), the automatic pause and Resume, test calls, the Voice agent call.
+- **Nothing real on screen.** It is the live dashboard (`main` `954fafe`) run from a throwaway worktree (`D:/work/Homie-video`, port 3124, `DEMO=1`), whose database client is a stand-in with invented tenants, buildings and calls (`lib/demo-db.ts`). A cookie, `demo_phase`, picks the moment of the story. Nothing reached Supabase, Tokomni or Vapi. The kit is kept beside the video (`demo-preview.patch`, `demo-db.ts`).
+- **How it is made** (`local/dialer-video/build.py`, about 3 minutes, not hours):
+  - every line is voiced first, so each scene is recorded paced to its own line;
+  - the frames are screenshots with the Chatwoot videos' overlay (captions, cursor, click ripples, spotlight), read from their recorder.
+- **The voice is Hila** (Microsoft's free Hebrew voice, `edge-tts`, updated to 7.3.1 after a 403). Ayala, the Chatwoot videos' voice, needs about 2,600 Cartesia credits, and Clix's key had 26 (a 402, nothing charged). After a top-up: `build.py --voice ayala`.
+- **Checked:** a frame from every scene, and the narration transcribed by Whisper. First takes fixed:
+  - the menu's spotlight was on the logo, because the logo links to the Dialer too;
+  - the closing scene showed the paused page from the browser's 30-second cache;
+  - an apostrophe in "הומי'ז" broke the sample data's code (now the Hebrew geresh, ׳);
+  - the page's 10-second refresh made Stop unclickable (off in the recording copy only).
+
 ### Can the invites' spam be fixed on our side? (the owner: "so we cant fix on our end?"), answered, 14:35 UTC
 - **Certain, and fully ours:** skip the email. Each open invite gets its own set-password link, made in Chatwoot, and the owner sends it on WhatsApp. A new link replaces the emailed one.
 - **Ours, but not certain:** send from Clix's own domain instead of the "test" Gmail address. `clixsolutions.info` has its DNS at GoDaddy (`domaincontrol.com`), no MX and DMARC `p=quarantine`. Brevo's DKIM records there would make the mail authenticated as Clix. Homies' Google still judges an outside sender and the hosting-subdomain link.
