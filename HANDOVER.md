@@ -8,7 +8,7 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **The dialer dashboard's video guide (25 Nov, local, gitignored):** `local/dialer-video/homies-dialer-guide-he-hila.mp4` (3:25, Hebrew, why it is needed and how to use it; invented data only). Voiced by Hila (free) because Clix's Cartesia key has 26 credits; Ayala, like the Chatwoot videos, is `build.py --voice ayala` after a top-up of about 2,600 credits. The recording kit (`demo-preview.patch`, `demo-db.ts`) is beside it; WORKLOG 25 Nov.
+> **The dialer dashboard's video guide (25 Nov, local, gitignored):** `local/dialer-video/homies-dialer-guide-he-hila.mp4` (3:26, Hebrew, why it is needed and how to use it; invented data only). Voiced by Hila (free) because Clix's Cartesia key has 26 credits; Ayala, like the Chatwoot videos, is `build.py --voice ayala` after a top-up of about 2,600 credits. The recording kit (`demo-preview.patch`, `demo-db.ts`) is beside it; WORKLOG 25 Nov.
 >
 > **LIVE 25 Nov: THE DASHBOARD SHOWS ONLY THE DIALER AND THE CALLS** (the owner: "in the dashboard i want everything gone only the dialer and call related should be seen here"; PR #25, `main` `954fafe`; CONTEXT, Standing decisions; WORKLOG 25 Nov).
 > - **Menu:** Dialer (with Test calls), Phone calls, Voice agent call. It opens on the Dialer, and so does the sign-in.

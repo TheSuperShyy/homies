@@ -19,7 +19,7 @@ conversation that produced it.
 
 ### The dialer dashboard's video guide, in Hebrew (local, gitignored): `local/dialer-video/homies-dialer-guide-he-hila.mp4`
 - **The owner:** *"create a video tutorial on how to use this dashboard and why its needed"*.
-- **What it is:** 3:25, 1920x1080, 18 scenes, each with a spoken line and a caption.
+- **What it is:** 3:26, 1920x1080, 18 scenes, each with a spoken line and a caption.
   - **Why the dashboard is needed:** Michael makes the debt calls; in each he says the amount and months, sends the WhatsApp payment link, and records what was agreed.
   - **How to use it:** the menu, the list of who owes, filtering and search, calling one tenant or ticking several, the line bar and the counts, Stop, the results, today's calls and a call's transcript, Phone calls (no answer, links sent), the rules (hours, once a day, 4 tries, skipped), the automatic pause and Resume, test calls, the Voice agent call.
 - **Nothing real on screen.** It is the live dashboard (`main` `954fafe`) run from a throwaway worktree (`D:/work/Homie-video`, port 3124, `DEMO=1`), whose database client is a stand-in with invented tenants, buildings and calls (`lib/demo-db.ts`). A cookie, `demo_phase`, picks the moment of the story. Nothing reached Supabase, Tokomni or Vapi. The kit is kept beside the video (`demo-preview.patch`, `demo-db.ts`).
@@ -32,6 +32,8 @@ conversation that produced it.
   - the closing scene showed the paused page from the browser's 30-second cache;
   - an apostrophe in "הומי'ז" broke the sample data's code (now the Hebrew geresh, ׳);
   - the page's 10-second refresh made Stop unclickable (off in the recording copy only).
+  - three lines Whisper heard wrong were reworded and voiced again: "תוך כרבע דקה" (heard "קרוו") is now "תוך כמה שניות"; "קישור" in scene 3 (heard "כישול", twice) is now "לינק", the dashboard's own word; "לוחצים על לשיחה" is now "מכל שיחה אפשר להיכנס". Heard right afterwards.
+- **Final:** 3:26 (205.9 s), 15.4 MB, H.264 and AAC. The recording worktree and its server are removed; the frames were deleted, and the voice lines are cached in `voice/hila/`.
 
 ### Can the invites' spam be fixed on our side? (the owner: "so we cant fix on our end?"), answered, 14:35 UTC
 - **Certain, and fully ours:** skip the email. Each open invite gets its own set-password link, made in Chatwoot, and the owner sends it on WhatsApp. A new link replaces the emailed one.
