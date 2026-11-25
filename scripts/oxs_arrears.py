@@ -277,6 +277,14 @@ def main():
                     help="skip the sweep, load the last dry run's JSON")
     a = ap.parse_args()
 
+    # 25 Nov 2026 (feature 24): charges hold OXS's own debt, written by debt-tools every 10 minutes
+    # (migration 044). This estimate matched OXS on 57 of the Dialer page's 201 flats, and its write
+    # would put its months back over OXS's. A dry run still reports; --apply is refused.
+    if a.apply:
+        sys.exit("--apply is off since 25 Nov 2026: charges are OXS's own debt now (feature 24, "
+                 "migration 044, debt-tools' oxs-debts-sync). This estimate matched OXS on 57 of "
+                 "201 flats. See docs/features/24-oxs-live-debts/.")
+
     out = os.path.join(ROOT, "docs", "reference", f"arrears-{YEAR}.json")
     if a.from_json:
         blob = json.load(open(out, encoding="utf-8"))

@@ -1,6 +1,6 @@
 import 'server-only';
 import { serverClient } from '@/lib/supabase-server';
-import { inCallingHours } from '@/lib/dialer-rules';
+import { e164, inCallingHours, localForm } from '@/lib/dialer-rules';
 import {
   ACTIVE_STATUSES, groupOwing, skipSummary, type Charge, type DialerCall, type Outcome, type Owing,
 } from '@/lib/dialer-board';
@@ -27,10 +27,17 @@ async function everyRow<Row>(page: (from: number, to: number) => PromiseLike<{ d
   return out;
 }
 
+/** Feature 24: how the copy of OXS's debts stands (oxs_debt_state, migration 044). */
+export type OxsSync = {
+  last_ok_at: string | null; last_run_at: string | null; last_error: string | null;
+  backlog: number | null; complete_at: string | null;
+};
+
 export type Board = {
   owing: Owing[];
   calls: DialerCall[];
   state: { paused_at: string | null; paused_why: string | null; last_tick_at: string | null; last_error: string | null } | null;
+  oxs: OxsSync | null;
   error: string | null;
 };
 
@@ -39,9 +46,9 @@ export async function board(): Promise<Board> {
   const db = serverClient();
   try {
     const since = new Date(Date.now() - 36 * 3600_000).toISOString();
-    const [charges, outcomes, recent, active, state] = await Promise.all([
+    const [charges, outcomes, recent, active, state, oxs] = await Promise.all([
       everyRow<Charge>((from, to) => db.from('charges')
-        .select('resident_id,period,amount,attempts,unit,residents(full_name,building,phone,do_not_call)')
+        .select('resident_id,period,amount,attempts,unit,kind,label,residents(full_name,building,phone,do_not_call)')
         .eq('status', 'unpaid').gt('amount', 0)
         .order('id', { ascending: true }).range(from, to) as any),
       db.from('call_outcomes').select('resident_id,outcome,created_at')
@@ -51,6 +58,8 @@ export async function board(): Promise<Board> {
       db.from('dialer_calls').select('*').in('status', [...ACTIVE_STATUSES])
         .order('pressed_at', { ascending: false }).limit(500),
       db.from('dialer_state').select('paused_at,paused_why,last_tick_at,last_error').eq('id', 1).maybeSingle(),
+      // Only a note on the page: a failed read here must not hide the list.
+      db.from('oxs_debt_state').select('last_ok_at,last_run_at,last_error,backlog,complete_at').eq('id', 1).maybeSingle(),
     ]);
     const failed = outcomes.error ?? recent.error ?? active.error ?? state.error;
     if (failed) throw new Error(String(failed.message ?? failed));
@@ -64,10 +73,11 @@ export async function board(): Promise<Board> {
       owing: groupOwing(charges, (outcomes.data ?? []) as Outcome[]),
       calls,
       state: (state.data as Board['state']) ?? null,
+      oxs: oxs.error ? null : ((oxs.data as OxsSync) ?? null),
       error: null,
     };
   } catch (e) {
-    return { owing: [], calls: [], state: null, error: String((e as Error)?.message ?? e).slice(0, 200) };
+    return { owing: [], calls: [], state: null, oxs: null, error: String((e as Error)?.message ?? e).slice(0, 200) };
   }
 }
 
@@ -108,4 +118,45 @@ export async function resumeCalls(): Promise<Record<string, string>> {
   } catch (e) {
     return { r: 'db', b: String(e).slice(0, 200) };
   }
+}
+
+/**
+ * Feature 24: what OXS says this number owes, now. debt-tools reads the flats on which OXS lists the
+ * number as a payer and writes their debt onto it (`oxs-debts-phone`), so the call that follows is
+ * about OXS's figure of this moment. The function's own secret, server side only.
+ */
+async function oxsLookup(phone: string): Promise<{ ok: boolean; owed: number; error?: string }> {
+  const base = String(process.env.NEXT_PUBLIC_SUPABASE_URL ?? '').replace(/\/+$/, '');
+  const secret = process.env.TOOL_SECRET ?? '';
+  if (!base || !secret) return { ok: false, owed: 0, error: 'not set up' };
+  try {
+    const res = await fetch(`${base}/functions/v1/debt-tools`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', 'x-homies-secret': secret },
+      body: JSON.stringify({ message: { type: 'oxs-debts-phone', phone } }),
+      cache: 'no-store',
+      signal: AbortSignal.timeout(25_000),
+    });
+    const d = await res.json().catch(() => null);
+    if (!res.ok || !d) return { ok: false, owed: 0, error: `HTTP ${res.status}` };
+    if (!d.ok) return { ok: false, owed: 0, error: String(d.error ?? 'oxs').slice(0, 120) };
+    return { ok: true, owed: Number(d.owed) || 0 };
+  } catch (e) {
+    return { ok: false, owed: 0, error: String((e as Error)?.message ?? e).slice(0, 120) };
+  }
+}
+
+/**
+ * A number typed on the page: its debt read from OXS now, then queued like a row's Call. A number
+ * OXS lists with nothing overdue is not queued: Michael would have nothing to call about. Never throws.
+ */
+export async function callNumber(typed: string): Promise<Record<string, string>> {
+  const local = localForm(typed);
+  if (!local) return { r: 'badnumber' };
+  if (!inCallingHours(new Date())) return { r: 'hours' };
+  const phone = e164(local);
+  const looked = await oxsLookup(phone);
+  if (!looked.ok) return { r: 'oxs', b: looked.error ?? '' };
+  if (!(looked.owed > 0)) return { r: 'nodebt', p: local };
+  return queueCalls([phone]);
 }
