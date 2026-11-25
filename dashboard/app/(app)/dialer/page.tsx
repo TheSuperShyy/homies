@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import { getLocale, translator, when, type Key, type Locale, type T } from '@/lib/i18n';
 import { shekels } from '@/lib/money';
 import { inCallingHours } from '@/lib/dialer-rules';
-import { board, queueCalls, resumeCalls, stopCalls } from '@/lib/dialer-queue';
+import { board, callNumber, queueCalls, resumeCalls, stopCalls, type OxsSync } from '@/lib/dialer-queue';
 import {
   ACTIVE_STATUSES, MAX_TRIES, RANG_STATUSES, blockOf, israelDate, matches, monthRange, parseSummary,
   todayByPhone, type DialerCall, type Owing,
@@ -32,9 +32,9 @@ import { DialerTabs } from './tabs';
 //
 // The test calls page (feature 20) is at /dialer/test, the second tab.
 
-type Q = Partial<Record<'month' | 'q' | 'page' | 'per' | 'r' | 'n' | 'k' | 'w' | 'b', string>>;
+type Q = Partial<Record<'month' | 'q' | 'page' | 'per' | 'r' | 'n' | 'k' | 'w' | 'b' | 'p', string>>;
 
-const OUTCOME_PARAMS = ['r', 'n', 'k', 'w', 'b'] as const;
+const OUTCOME_PARAMS = ['r', 'n', 'k', 'w', 'b', 'p'] as const;
 
 /** Only ever back to this page, whatever the form carries. */
 function backTo(v: FormDataEntryValue | null): string {
@@ -60,6 +60,13 @@ async function call(formData: FormData) {
   const one = String(formData.get('one') ?? '');
   const phones = one ? [one] : formData.getAll('phone').map(String);
   redirect(withOutcome(backTo(formData.get('back')), await queueCalls(phones)));
+}
+
+// Feature 24: a number typed above the list. Its debt is read from OXS now, then it is queued as a
+// row's Call would be (lib/dialer-queue.ts, callNumber).
+async function callTyped(formData: FormData) {
+  'use server';
+  redirect(withOutcome(backTo(formData.get('back')), await callNumber(String(formData.get('number') ?? ''))));
 }
 
 async function stop(formData: FormData) {
@@ -145,6 +152,26 @@ function tickError(t: T, state: { last_tick_at: string | null; last_error: strin
   return t('dial.errTick', { why: iso(e) });
 }
 
+/**
+ * Where the amounts come from, and how fresh they are (feature 24): OXS's own overdue debt, copied
+ * every 10 minutes and read again just before each call. Before the first full copy, and when the
+ * copy has not run for a while, the note says so.
+ */
+function OxsNote({ t, oxs, at }: { t: T; oxs: OxsSync | null; at: (iso: string | null) => string }) {
+  if (!oxs?.last_ok_at) return <div className="notice info" role="status"><IconInfo /><span>{t('dial.oxsNever')}</span></div>;
+  if (!oxs.complete_at && (oxs.backlog ?? 0) > 0) {
+    return <div className="notice info" role="status"><IconInfo /><span>{t('dial.oxsLoading', { n: oxs.backlog ?? 0 })}</span></div>;
+  }
+  if (Date.now() - Date.parse(oxs.last_ok_at) > 45 * 60_000) {
+    return (
+      <div className="notice bad" role="status">
+        <IconAlert /><span>{t('dial.oxsStale', { at: at(oxs.last_ok_at), why: iso(oxs.last_error || '—') })}</span>
+      </div>
+    );
+  }
+  return <p className="dialhint">{t('dial.oxsNote', { at: at(oxs.last_ok_at) })}</p>;
+}
+
 /** The pill for a dialer row, in the ticket pills' colours. */
 function Pill({ t, status }: { t: T; status: string }) {
   return <span className={`pill ${PILL[status] ?? ''}`}>{STATUS[status] ? t(STATUS[status]) : status}</span>;
@@ -208,6 +235,9 @@ function Outcome({ t, q }: { t: T; q: Q }) {
     case 'stopped': return box('ok', t('dial.stopped', { n }));
     case 'resumed': return box('ok', t('dial.resumed'));
     case 'db': return box('bad', t('dial.errDb', { why: iso(q.b ?? '') }));
+    case 'badnumber': return box('bad', t('dial.typedBad'));
+    case 'nodebt': return box('info', t('dial.typedNoDebt', { phone: iso(q.p ?? '') }));
+    case 'oxs': return box('bad', t('dial.typedOxs', { why: iso(q.b ?? '') }));
     default: return null;
   }
 }
@@ -227,7 +257,7 @@ export default async function Dialer({ searchParams }: { searchParams?: Q }) {
     timeZone: 'Asia/Jerusalem', weekday: 'long', hour: '2-digit', minute: '2-digit',
   }).format(now);
 
-  const { owing, calls, state, error } = await board();
+  const { owing, calls, state, oxs, error } = await board();
   // Today's times as the time alone; anything older keeps its date.
   const clockFmt = new Intl.DateTimeFormat(locale === 'he' ? 'he-IL' : 'en-GB', {
     timeZone: 'Asia/Jerusalem', hour: '2-digit', minute: '2-digit',
@@ -255,7 +285,9 @@ export default async function Dialer({ searchParams }: { searchParams?: Q }) {
   const busy = Boolean(onLine) || waiting > 0;
 
   // ---- the list ------------------------------------------------------------
-  const months = [...new Set(owing.flatMap((r) => r.months))].sort().reverse();
+  // The 12 newest months as filters. Since feature 24 a debt can reach back years, and a chip per
+  // month would fill the bar; an older month is still in every row's tooltip, and under All.
+  const months = [...new Set(owing.flatMap((r) => r.months))].sort().reverse().slice(0, 12);
   const month = q.month && months.includes(q.month) ? q.month : 'all';
   const rows = owing.filter((r) => (month === 'all' || r.months.includes(month)) && matches(r, search));
   const visible = pageSlice(rows, page, size);
@@ -351,6 +383,17 @@ export default async function Dialer({ searchParams }: { searchParams?: Q }) {
       </div>
 
       <h2>{t('dial.listHead')}</h2>
+      <OxsNote t={t} oxs={oxs} at={at} />
+      <form action={callTyped} className="search dialtyped">
+        <input type="hidden" name="back" value={back} />
+        <input name="number" type="tel" inputMode="tel" dir="ltr" autoComplete="off" required
+               aria-label={t('dial.typedLabel')} aria-describedby="dial-typed-note"
+               placeholder={t('dial.typedHint')} />
+        <PendingButton busy={t('dial.adding')} disabled={!open || paused}>
+          <IconPhoneOut />{t('dial.typedLabel')}
+        </PendingButton>
+      </form>
+      <p id="dial-typed-note" className="dialhint">{t('dial.typedNote')}</p>
       <div className="filters">
         <nav className="seg" aria-label={t('col.period')}>
           {['all', ...months].map((m) => (
@@ -422,7 +465,15 @@ export default async function Dialer({ searchParams }: { searchParams?: Q }) {
                       </td>
                       <td className="num" data-label={t('debts.owed')}>
                         <span className="mono">{shekels(r.owed)}</span>
-                        <span className="sub" title={span.full}>{monthsCount(t, r.months.length)} · {span.range}</span>
+                        {r.months.length > 0 && (
+                          <span className="sub" title={span.full}>{monthsCount(t, r.months.length)} · {span.range}</span>
+                        )}
+                        {r.special > 0 && (
+                          <span className="sub" title={r.specials.join(' · ')}>
+                            {t(r.specials.length > 1 ? 'dial.specialN' : 'dial.special1', { n: r.specials.length })}
+                            {' · '}<bdi>{shekels(r.special)}</bdi>
+                          </span>
+                        )}
                       </td>
                       <td data-label={t('col.status')}>
                         <Standing t={t} locale={locale} row={r} today={mine} block={block} />

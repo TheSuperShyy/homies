@@ -105,6 +105,24 @@ test("groupOwing: one row per phone, its flats and months, largest first", () =>
   assert.equal(dana.name, "דנה לוי");
 });
 
+test("groupOwing (feature 24): a special payment counts in the amount and is named, never as a month", () => {
+  const charges = [
+    { resident_id: "a", period: "2025-11-01", amount: 400, attempts: 0, unit: "7", kind: "monthly", residents: person("+972541111111", "דנה לוי") },
+    { resident_id: "a", period: "2026-10-01", amount: 600, attempts: 1, unit: "7", kind: "monthly", residents: person("+972541111111", "דנה לוי") },
+    { resident_id: "a", period: null, amount: 1273, attempts: 0, unit: "7", kind: "special", label: " קרן  חירום ", residents: person("+972541111111", "דנה לוי") },
+    { resident_id: "a", period: null, amount: 297, attempts: 0, unit: "7", kind: "special", label: "שיפוץ לובי", residents: person("+972541111111", "דנה לוי") },
+    { resident_id: "b", period: null, amount: 5000, attempts: 4, unit: "2", kind: "special", label: "גבייה מיוחדת", residents: person("+972542222222", "משה כהן") },
+  ];
+  const rows = list.groupOwing(charges as any, []);
+  assert.deepEqual(rows.map((r) => [r.phone, r.owed, r.special]), [["+972542222222", 5000, 5000], ["+972541111111", 2570, 1570]]);
+  const [moshe, dana] = rows;
+  assert.deepEqual(dana.months, ["2025-11", "2026-10"]);
+  assert.deepEqual(dana.specials, ["קרן חירום", "שיפוץ לובי"]);
+  assert.deepEqual(moshe.months, []);
+  assert.equal(moshe.callable, false);
+  assert.equal(list.monthRange(dana.months, "en").range, "Nov 2025 – Oct 2026");
+});
+
 test("groupOwing: a couple on one phone is one row, under the one who owes more; do-not-call from either", () => {
   const charges = [
     { resident_id: "h", period: "2026-10-01", amount: 200, attempts: 0, unit: "5", residents: person("+972544444444", "יוסי") },

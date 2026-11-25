@@ -15,7 +15,9 @@ export const ACTIVE_STATUSES = ['waiting', 'sending', 'ringing', 'answered'] as 
 export const RANG_STATUSES = ['ringing', 'answered', 'done', 'no_answer'] as const;
 
 export type Charge = {
-  resident_id: string; period: string; amount: number | string; attempts: number | null; unit: string | null;
+  resident_id: string; period: string | null; amount: number | string; attempts: number | null; unit: string | null;
+  /** Feature 24: 'special' is an open special payment (תשלום מיוחד), which has no month. */
+  kind?: string | null; label?: string | null;
   residents: { full_name: string | null; building: string | null; phone: string | null; do_not_call: boolean | null } | null;
 };
 
@@ -34,7 +36,11 @@ export type Owing = {
   buildings: string[];
   units: string[];
   owed: number;
+  /** The months of the monthly payment still open, "YYYY-MM", earlier years included. */
   months: string[];
+  /** What of `owed` is special payments (a renovation, a reserve fund), and their names. */
+  special: number;
+  specials: string[];
   /** The most tries any open month has had. */
   tries: number;
   /** Some open month has had fewer than four tries. */
@@ -66,14 +72,20 @@ export function groupOwing(charges: Charge[], outcomes: Outcome[] = []): Owing[]
     const amount = Number(c.amount);
     if (!phone || !Number.isFinite(amount) || amount <= 0) continue;
     const row: Acc = rows.get(phone) ?? {
-      phone, name: '', buildings: [], units: [], owed: 0, months: [], tries: 0, callable: false,
+      phone, name: '', buildings: [], units: [], owed: 0, months: [], special: 0, specials: [], tries: 0, callable: false,
       dnc: false, last: null, byResident: new Map(), residents: new Set(),
     };
     row.owed += amount;
     row.byResident.set(c.resident_id, (row.byResident.get(c.resident_id) ?? 0) + amount);
     row.residents.add(c.resident_id);
-    const m = String(c.period ?? '').slice(0, 7);
-    if (m && !row.months.includes(m)) row.months.push(m);
+    if (c.kind === 'special') {
+      row.special += amount;
+      const label = String(c.label ?? '').replace(/\s+/g, ' ').trim();
+      if (label && !row.specials.includes(label)) row.specials.push(label);
+    } else {
+      const m = String(c.period ?? '').slice(0, 7);
+      if (m && !row.months.includes(m)) row.months.push(m);
+    }
     const unit = String(c.unit ?? '').trim();
     if (unit && !row.units.includes(unit)) row.units.push(unit);
     const building = String(c.residents?.building ?? '').trim();
