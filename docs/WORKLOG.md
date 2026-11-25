@@ -11,6 +11,12 @@ conversation that produced it.
 
 ## 2026-11-25
 
+### Would a new email named "homies" fix the spam? (the owner: "if i make a new email named homies will it work"), answered, 14:46 UTC
+- **A new @gmail.com named "homies":** it takes away the "test" name and the name/address mismatch. But it is still an outside personal Gmail, brand new with no sending history, with the same hosting-subdomain link. Likely still spam for some. Not a fix.
+- **A new address on Homies' own domain** (for example homies@ or noreply@homies-management.co.il, made in their Google Workspace): yes. Mail between their own Workspace users is trusted. It needs 2-Step Verification and an App password on it, then `chatwoot_smtp.py` switches and the five open invites go again.
+  - A new Workspace user is a paid seat. Their existing office@ mailbox with an App password costs nothing.
+- **A slip:** commit `4d9c21d`, meant for this entry, carried another session's uncommitted entry above (the dialer video guide) under this entry's message, because that Edit had failed. It was left as it is, since history is not rewritten under a session that is still working. This entry follows in its own commit.
+
 ### The dialer dashboard's video guide, in Hebrew (local, gitignored): `local/dialer-video/homies-dialer-guide-he-hila.mp4`
 - **The owner:** *"create a video tutorial on how to use this dashboard and why its needed"*.
 - **What it is:** 3:25, 1920x1080, 18 scenes, each with a spoken line and a caption.
