@@ -11,6 +11,12 @@ conversation that produced it.
 
 ## 2026-11-25
 
+### Can the invites' spam be fixed on our side? (the owner: "so we cant fix on our end?"), answered, 14:35 UTC
+- **Certain, and fully ours:** skip the email. Each open invite gets its own set-password link, made in Chatwoot, and the owner sends it on WhatsApp. A new link replaces the emailed one.
+- **Ours, but not certain:** send from Clix's own domain instead of the "test" Gmail address. `clixsolutions.info` has its DNS at GoDaddy (`domaincontrol.com`), no MX and DMARC `p=quarantine`. Brevo's DKIM records there would make the mail authenticated as Clix. Homies' Google still judges an outside sender and the hosting-subdomain link.
+  - A proper Chatwoot address would help with the link too, but FRONTEND_URL is what Meta's webhook override points at, so not before the switch.
+- **Certain inbox, from Homies' side only:** their own mailbox's App password, or their Workspace allowlist.
+
 ### Why the Chatwoot invites still land in spam (the owner: "the email invitation is still going in the spam"), read only, 14:26 UTC
 - **Sending is authenticated now:** `/opt/chatwoot/.env` sends through `smtp.gmail.com:587` as "Homies <testclix46@gmail.com>" (since 16 Nov), so gmail.com's own checks pass. Spam is no longer a failed check; it is how Google judges the mail.
 - **What Homies' Google sees:** their domain is Google Workspace (MX `aspmx.l.google.com`, no SPF, no DMARC). The mail comes:
