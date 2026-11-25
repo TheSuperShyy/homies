@@ -111,7 +111,7 @@ test("leadsAdded: inserted_count when Tokomni gives it, else null", () => {
 test("the wait for Tokomni fits inside the page's time limit, and the message says the same wait", async () => {
   const { readFileSync } = await import("node:fs");
   const dialer = readFileSync(new URL("../dashboard/lib/dialer.ts", import.meta.url), "utf8");
-  const page = readFileSync(new URL("../dashboard/app/(app)/dialer/page.tsx", import.meta.url), "utf8");
+  const page = readFileSync(new URL("../dashboard/app/(app)/dialer/test/page.tsx", import.meta.url), "utf8");
   const i18n = readFileSync(new URL("../dashboard/lib/i18n.ts", import.meta.url), "utf8");
   const waitMs = Number(/TOKOMNI_WAIT_MS = ([\d_]+)/.exec(dialer)?.[1].replace(/_/g, ""));
   const limitS = Number(/export const maxDuration = (\d+)/.exec(page)?.[1]);

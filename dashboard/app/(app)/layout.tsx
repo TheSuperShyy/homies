@@ -59,17 +59,22 @@ const NAV = [
     ['overview', '/'],
     ['tickets', '/tickets'],
     ['debts', '/debts'],
+    // 25 Nov: the dialer calls the tenants the Debts page lists, so it sits beside it. It was
+    // under System while it was only the test page (now its second tab, /dialer/test).
+    ['dialer', '/dialer'],
     ['conversations', '/conversations'],
     ['calls', '/calls'],
     ['voice', '/voice'],
   ]],
   ['nav.group.support', [
-    // Pressing Ring on it rings a phone, so it sits with the things you operate.
-    ['dialer', '/dialer'],
     ['sync', '/sync'],
     ['settings', '/settings'],
   ]],
 ] as const;
+
+// The phone's tab bar has room for the six it had. The dialer stays in the phone's top bar
+// instead (below), where it has been since 28 Oct.
+const NOT_IN_TABS = new Set<string>(['dialer']);
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const locale = getLocale();
@@ -113,7 +118,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   // The same five destinations as the sidebar's first group, under the names
   // they go by when a label has 78px rather than 200 — see `tab.*` in i18n.
-  const tabs: NavItem[] = NAV[0][1].map(([key, href]) => {
+  const tabs: NavItem[] = NAV[0][1].filter(([key]) => !NOT_IN_TABS.has(key)).map(([key, href]) => {
     const Icon = NAV_ICON[key];
     return { href, label: t(`tab.${key}` as any), icon: <Icon /> };
   });
@@ -177,7 +182,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       </nav>
 
       {/* THE PHONE'S TOP BAR. Brand on one side, the things you operate on
-          the other — the dialer test, Import and Settings — which are exactly
+          the other — the dialer, Import and Settings — which are exactly
           the ones the tab bar below does not carry. Desk-width readers never
           see this; they have the sidebar, which has all of them. */}
       <header className="mtop">
