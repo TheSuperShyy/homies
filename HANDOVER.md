@@ -1,6 +1,6 @@
 # HANDOVER — Homies, everything you need to take over
 
-**Current as of 2026-10-01.** If you have just been told "read the handover",
+**Current as of 2026-11-25.** If you have just been told "read the handover",
 this file plus `CONTEXT.md` is the whole briefing. Read both, then start
 working. Go to `docs/WORKLOG.md` only when you need to know *why* something
 was decided — it is the chronology with full reasoning, newest first.
@@ -8,10 +8,18 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 25 Nov: THE DASHBOARD HAS A REAL DIALER, `/dialer`** (the owner: "we need to have an actual dialer section there not just the dialer test", then "ok build it"; feature 23, `docs/features/23-dialer/`; WORKLOG and CONTEXT 25 Nov).
+> - **What staff see:** everyone who owes, one row per phone (flats, amount, months, tries of 4, the last call's result, today's state). Tick tenants and press "חייג למסומנים", or "חייג" on one row. Above the list: the line now, how many wait, Stop, today's counts and today's calls with their results. "חייגן" is in the main menu next to Debts; the test page is the second tab, `/dialer/test`.
+> - **What happens:** debt-tools sends one tenant at a time to Omni's dialer on a 15 s pg_cron tick, only in calling hours and only while 208 is quiet on Vapi. The router marks the lead answered, the end-of-call report marks it done with the agent's outcome. No pickup in 2 minutes is "no answer" and one try. Five in a row that reached nobody, or a Tokomni-side refusal, pause it until Resume.
+> - **Where:** PR #23, `main` `6cb70ec` (Vercel and the function deploy from it). Migration 043 applied by hand; the function's `TOKOMNI_TOKEN` / `TOKOMNI_CAMPAIGN_ID` set and read back by digest (`scripts/dialer_setup.py`).
+> - **Checked:** 88 node tests (13 new), tsc, a production build, and every database path in one rolled-back transaction on the live data. **Not proven by a real call.** Nothing rings until someone presses Call.
+> - **Owed:** the first press, on Ido in calling hours (he is on try 3 of 4: one call left before he leaves the debt call list; `bk_reset_attempts.py --apply` resets the test building). The legal calling hours are Homies' to confirm before real tenants (PRD §13 #6).
+> - **Kill switch:** `python scripts/dialer_setup.py --off`. **Rollback:** `git revert` 6cb70ec through a PR, then `--off`.
+>
 > **LIVE 24 Nov 16:37 UTC: Chatwoot invites sent to Yariv's staff list** (WORKLOG 24 Nov).
 > - #18-#25: 8 people from `local/golive/homies-staff-2026-11-15.csv`.
 > - Everyone, Yariv #17 included, is in inboxes 1 and 2 and in their department's team (`chatwoot_teams.py`).
-> - The 8 invite mails went out through Gmail. Nobody has set a password yet.
+> - The 8 invite mails went out through Gmail. Yonatan (#25) has set a password, as had Yariv; the other 7 have not (read 25 Nov).
 > - Until the switch, test hand-overs now reach these people.
 >
 > **Chatwoot onboarding videos (24 Nov, local, gitignored):** the ones the owner wanted, `local/chatwoot-video/chatwoot-onboarding-staff-he.mp4` (2:13, every item of the owner's list) and `chatwoot-onboarding-admin-he.mp4` (1:13); the earlier too-short cuts are `chatwoot-*-short-he.mp4`; rebuilt by `build_short.py` from the long renders (`chatwoot-staff-guide-he.mp4` 3:59, `chatwoot-admin-guide-he.mp4` 1:57, `build_onboarding.py`). The long build's sign-ins filled the admin login's sessions: a new sign-in with it asks to end sessions (409), nothing ended by us. Clix's Cartesia key is nearly empty (about 26 credits): a re-voice needs a top-up.

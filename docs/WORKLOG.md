@@ -9,6 +9,30 @@ conversation that produced it.
 
 ---
 
+## 2026-11-25
+
+### LIVE about 12:27 UTC: the dashboard has a real dialer, `/dialer` (feature 23, PR #23)
+- **Asked:** *"ok in the dashboard we need to have an actual dialer section there not just the dialer test"*. The design went to the owner in chat (one tenant at a time through Omni's dialer, running with the page closed, calling hours, 4 tries, once a day, pause after 5 unanswered, no PIN); the owner: *"ok build it"*.
+- **What staff see:** everyone who owes, one row per phone (209 on 25 Nov from 789 unpaid charges, months Jan-Oct 2026): flats, amount, months, tries of 4, the last call's result, today's state. Tick rows or the whole page, "חייג למסומנים", or "חייג" on one row. Above: the line now, waiting, Stop, four counts for today, today's calls. "חייגן" moved into the main menu next to Debts (the phone's tab bar is unchanged; the top-bar icon stays). The test page moved to `/dialer/test`, the second tab, unchanged.
+- **How it calls:** a press puts waiting rows in `dialer_calls` (migration 043). pg_cron's `dialer-tick` posts to debt-tools every 15 s while the queue has work; one tick sends at most one lead, only in calling hours and only while 208 is quiet on Vapi (`GET /call?phoneNumberId=e9f95429…`). `dialer_claim_next` (one lock) re-checks `press_call()`, once a day and shared numbers at send time. The router marks a lead answered (in the background); the end-of-call report marks it done with the agent's outcome. No pickup in 2 minutes (and 90 s of a quiet line) is no answer: one try, and a `no_answer` row in `call_outcomes`. Each placed call counts one try, once. Five unanswered in a row, or a Tokomni-side refusal (401/403/404/5xx), pause it until Resume. The end of the hours cancels whoever still waits.
+- **Done in order:**
+  1. built in a worktree from `origin/main` (`feature/real-dialer`); `dialer.ts` added to `supabase_functions.py`'s upload list (index.ts imports it; without it the whole function would fail to start) and to the syntax check;
+  2. checked: 88 node tests (13 new; the 3 `check_route` failures on this PC are CRLF in `call.ts` and pass with LF, as CI has them), `tsc`, a production `next build`;
+  3. **043 and a scripted test of every database path in one transaction on the live data, rolled back by an exception carrying the results:** queue, already queued, unknown number, bad number, claim, busy, answered, ended once (the try counted once, 3 to 4, a second report not again), already called today, no answer only on a quiet line, the five-in-a-row pause and Resume, Stop, the hours' cancel, anon cannot queue, staff cannot claim or insert. Read back after: nothing left;
+  4. **12:2x UTC, applied for real:** `scripts/dialer_setup.py --apply` set the function's `TOKOMNI_TOKEN` / `TOKOMNI_CAMPAIGN_ID` (HTTP 201, digests as `.env`; `VAPI_PRIVATE_KEY` as `.env` too) and applied 043 (table present, `dialer-tick` every 15 s, active);
+  5. PR #23: `checks` green, both Vercel previews built; merged, `main` `6cb70ec`. The pipeline deployed the function (**v167, ACTIVE, dialer.ts 6,104 chars**); Vercel production READY on `6cb70ec` (`dpl_71cLDgnN…`);
+  6. read after: keep-warm answers 200 warm since the deploy; one tick by hand on the empty queue answered `idle` with no error; the page's own grouping on the live data: 209 rows, all tickable, no shared phones.
+- **Not proven by a real call.** Nothing rings until someone presses.
+- **Owed:**
+  - the first press, on Ido, in calling hours. He is on try 3 of 4 (read 25 Nov): one call left before he leaves the debt call list (`bk_reset_attempts.py --apply` resets the test building);
+  - Homies to confirm the legal calling hours before real tenants (PRD §13 #6); ours are Sun-Thu 09-20, Fri to 13.
+- **The same code is on `feature/chatbot`**, taken from `6cb70ec` (every file was identical to `main` before; `i18n.ts` by patch, keeping its own 7 lines).
+- **Kill switch:** `python scripts/dialer_setup.py --off`. Docs: `docs/features/23-dialer/`, CONTEXT (the Omni and dialer section), HANDOVER.
+
+### Yonatan's question in Chatwoot (the owner's screenshot, early 25 Nov)
+- **Asked:** whether he has anything else to do, and whether conversations are assigned to him or he assigns himself. A Hebrew reply was drafted in chat for the owner to send: nothing else to do; Michael hands his department's conversations over and he gets the counter by "תיבת הדואר הנכנס שלי"; his reply makes the conversation his; "פתרון" when done; 10 minutes in office hours or it also goes to management; until the switch, what he sees are our tests.
+- **Read only:** of the 9 logins, only Yariv (#17) and Yonatan (#25) had set a password.
+
 ## 2026-11-24
 
 ### The 11/24 report (in chat, `/reporter`, 01:01 Philippine time on 25 Nov), 17:01 UTC

@@ -2,7 +2,7 @@
 
 **Estimate:** 0.5d
 **Depends on:** 18-dialer-routing (who answers), Omni's dialer API token (27 Oct)
-**Status:** page LIVE on `homies-dashboard.vercel.app/dialer` since 28 Oct (main `c97eca3`); `TOKOMNI_TOKEN` and `TOKOMNI_CAMPAIGN_ID` set in Vercel 28 Oct, 11:44 UTC; production redeployed with them 12:33 UTC (`dpl_hnfcMnUHm4VasRVmyhARgD9FZRGh`); the first press for Ido is owed
+**Status:** since 25 Nov at `/dialer/test`, the second tab of the dialer (feature 23, `docs/features/23-dialer/`), unchanged otherwise. Page LIVE on `homies-dashboard.vercel.app/dialer` since 28 Oct (main `c97eca3`); `TOKOMNI_TOKEN` and `TOKOMNI_CAMPAIGN_ID` set in Vercel 28 Oct, 11:44 UTC; production redeployed with them 12:33 UTC (`dpl_hnfcMnUHm4VasRVmyhARgD9FZRGh`); the first press for Ido is owed
 
 ## Purpose
 
@@ -85,6 +85,7 @@ answer), `db` (the residents check failed), `tenant`, `number`, `hours`, `off`.
 ## Not in this feature
 
 - **The Debts page's Call button** still goes to Vapi's phone number (feature 15), which does not exist. Moving it to the dialer is a separate decision.
+- **Calling real tenants:** feature 23 (25 Nov), the dialer itself, at `/dialer`.
 - **A calling-hours check for the live dialer** in general. This page has its own.
 - **Removing a lead from List 2.** Omni's API has no remove call.
 - **Reading call results from Tokomni.** The outcome of the call is on the Calls page, from Vapi.

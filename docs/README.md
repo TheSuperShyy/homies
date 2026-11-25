@@ -128,9 +128,10 @@ the WhatsApp bot (11) have one; the metrics CRM and the live OXS bridge do not.
 | 17 | [Name and number before a ticket](features/17-name-before-ticket/feature.md) | 2d | live on the phone line 22 Oct (Homies' updated spec, section 1); WhatsApp (Plan B) not built |
 | 18 | [Who answers on the 208 line](features/18-dialer-routing/feature.md) | 1d | LIVE 25 Oct, 15:30 UTC (function v130); the first real calls are Ido's |
 | 19 | [WhatsApp sandbox](features/19-whatsapp-sandbox/feature.md) | 2d | built 26 Oct, production fingerprint unchanged; the paid acceptance run waits on the owner's go. An independent copy (Chatwoot account 3 in Hebrew, three n8n copies, `debt-tools-sandbox`, a local chat page) running Yariv's section 6 changes |
-| 20 | [Dialer test on the dashboard](features/20-dialer-test/feature.md) | 0.5d | page LIVE 28 Oct on `/dialer` (`main` `c97eca3`); connected to Tokomni since the 12:33 UTC redeploy; the first press for Ido is owed |
+| 20 | [Dialer test on the dashboard](features/20-dialer-test/feature.md) | 0.5d | page LIVE 28 Oct on `/dialer` (`main` `c97eca3`); connected to Tokomni since the 12:33 UTC redeploy; **since 25 Nov at `/dialer/test`**, the second tab of feature 23's dialer |
 | 21 | [Moving to UChat, if ever needed](features/21-uchat-migration/feature.md) | 13-19d | prepared 3 Nov; **the UChat version of the bot is built (3 Nov)**: the live bot regenerated with UChat in front through a Chatwoot-speaking translator (`scripts/n8n_uchat.py`), live tools, test phones only; waits for the "Michael" sub flow in UChat's dashboard. No number moved |
 | 22 | [CI/CD: checks before `main`, the function deploys from `main`](features/22-ci-cd/feature.md) | 0.5d | **LIVE 5 Nov**: `checks` in front of `main` (protected, admins included), the function deploys itself from `main` code-only (v143 the first); PR #1 `33651ba`, PR #2 `46bae91` |
+| 23 | [The dialer on the dashboard](features/23-dialer/feature.md) | 1d | **LIVE 25 Nov** (PR #23, `main` `6cb70ec`): `/dialer` lists who owes, staff tick tenants and the function calls them through Omni's dialer one at a time (migration 043 applied, the function's Tokomni pair set); the first real press is owed |
 
 Feature 11 is inbound support on WhatsApp, in Hebrew, reusing the tool webhook
 the voice agents already call. Everything but the channel is written and
