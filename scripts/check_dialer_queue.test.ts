@@ -180,3 +180,13 @@ test("matches: a name, a building or a flat, or the phone however its digits are
   }
   for (const q of ["משה", "0549999", "רוטשילד"]) assert.equal(list.matches(row, q), false, q);
 });
+
+test("monthRange: a short range in place of the month list, every month kept for the tooltip", () => {
+  assert.deepEqual(list.monthRange(["2026-10", "2026-07", "2026-08", "2026-10"], "en"),
+    { range: "Jul–Oct 2026", full: "Jul 2026, Aug 2026, Oct 2026" });
+  assert.equal(list.monthRange(["2026-10"], "en").range, "Oct 2026");
+  assert.equal(list.monthRange(["2025-11", "2026-02"], "en").range, "Nov 2025 – Feb 2026");
+  assert.equal(list.monthRange(["2026-01", "2026-04", "2026-10"], "he").range, "ינואר–אוקטובר 2026");
+  assert.deepEqual(list.monthRange([], "he"), { range: "", full: "" });
+  assert.deepEqual(list.monthRange(["junk"], "en"), { range: "", full: "" });
+});
