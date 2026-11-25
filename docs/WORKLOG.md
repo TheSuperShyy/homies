@@ -11,6 +11,18 @@ conversation that produced it.
 
 ## 2026-11-25
 
+### Why the Chatwoot invites still land in spam (the owner: "the email invitation is still going in the spam"), read only, 14:26 UTC
+- **Sending is authenticated now:** `/opt/chatwoot/.env` sends through `smtp.gmail.com:587` as "Homies <testclix46@gmail.com>" (since 16 Nov), so gmail.com's own checks pass. Spam is no longer a failed check; it is how Google judges the mail.
+- **What Homies' Google sees:** their domain is Google Workspace (MX `aspmx.l.google.com`, no SPF, no DMARC). The mail comes:
+  - from an outside personal Gmail address with "test" in its name;
+  - under the display name "Homies";
+  - with a "set your password" button pointing at a hosting subdomain, `chat.srv1879140.hstgr.cloud`.
+  - That is the shape of a phishing mail, so Workspace files it as spam. Not proven from headers: no Homies mailbox is ours to read.
+- **24 Nov's invites:** #19, #20 and #25 have accepted (confirmed). #18, #21, #22, #23 and #24 have not; their emails went out 24 Nov 16:36 UTC.
+- **The fix:** send from Homies' own Workspace mailbox (for example office@homies-management.co.il). Mail inside their own Workspace is trusted, and the sender is one the staff know. It needs 2-Step Verification and an App password on that mailbox, from the owner or Yariv. Then `chatwoot_smtp.py` switches the login and the sender, and the five open invites are sent again.
+- **Until then:** "Not spam" on the mail turns its button on (Gmail disables links in spam). Or Homies' Workspace admin allowlists the sender (Admin console → Gmail → Spam → approved senders).
+- Nothing changed.
+
 ### LIVE about 15:1x UTC: the dashboard shows only the dialer and the calls (PR #25, `main` `954fafe`)
 - **The owner:** *"ok so in the dashboard i want everything gone only the dialer and call related should be seen here"*.
 - **Read as:**
