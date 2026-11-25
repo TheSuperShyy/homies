@@ -1563,6 +1563,10 @@ thead .dialcheck { margin: 0; }
 /* The row action hugs the end edge and never wraps its label. */
 .dialtable th:last-child, .dialact { width: 1%; white-space: nowrap; text-align: end; }
 .dialact .btn-nav svg { width: 14px; height: 14px; }
+/* Feature 24: where the amounts come from, and the number box above the list. */
+.dialhint { margin: -6px 0 16px; font-size: var(--text-sm); color: var(--text-3); line-height: 1.55; }
+.search.dialtyped { margin-block-end: 6px; }
+.search.dialtyped input { flex: 0 1 260px; }
 /* How many are ticked, on Call selected. */
 .dialcount {
   display: inline-flex; align-items: center; justify-content: center;

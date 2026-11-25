@@ -67,6 +67,12 @@ import {
   TOKOMNI_WAIT_MS,
 } from "./dialer.ts";
 import { sameNameAnyScript } from "./names.ts";
+// OXS's own debt, into our charges (feature 24, 25 Nov). Pure, so Node can test it:
+// scripts/check_oxs_debts.test.ts.
+import {
+  agrees, choosePayer, flatOf, homeFlats, itemsOf, looksWhole, OXS_BASE, OXS_GAP_MS, RUN_BUDGET_MS,
+  type Flat, type Item,
+} from "./oxsdebts.ts";
 
 const db = createClient(
   Deno.env.get("SUPABASE_URL")!,
@@ -3484,19 +3490,23 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
 
     let q = db
       .from("charges")
-      .select("period,amount,status,unit")
+      .select("period,amount,status,unit,kind,label")
       .eq("resident_id", resident.id);
     if (askedUnit !== null) q = q.eq("unit", askedUnit);
-    const { data: charges, error } = await q.order("period", { ascending: true });
+    const { data: charges, error } = await q.order("period", { ascending: true, nullsFirst: false });
     if (error) return { ok: false, error: error.message };
 
     const owed = (charges ?? []).filter((c) => c.status === "unpaid");
+    // Feature 24 (25 Nov): charges are OXS's own debt, and a special payment (תשלום מיוחד: a
+    // renovation, a reserve fund) has no month. It is listed by its name, never read as a month.
+    const monthly = owed.filter((c) => c.kind !== "special");
+    const special = owed.filter((c) => c.kind === "special");
 
     // Months are summed across apartments rather than listed twice. An owner of
     // two flats owing April on both owes April once, for the sum — "April, and
     // also April" is not a sentence anybody should hear read back to them.
     const byMonth = new Map<string, number>();
-    for (const c of owed) {
+    for (const c of monthly) {
       const p = String(c.period).slice(0, 7);
       byMonth.set(p, (byMonth.get(p) ?? 0) + Number(c.amount));
     }
@@ -3510,7 +3520,7 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         unit: u,
         total: owed.filter((c) => String(c.unit) === u)
           .reduce((s, c) => s + Number(c.amount), 0),
-        months: owed.filter((c) => String(c.unit) === u)
+        months: monthly.filter((c) => String(c.unit) === u)
           .map((c) => String(c.period).slice(0, 7)),
       }))
       : undefined;
@@ -3526,12 +3536,19 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       unit: askedUnit ?? (units.length === 1 ? units[0] : null),
       owed_total: owed.reduce((s, c) => s + Number(c.amount), 0),
       owed_months: [...byMonth].map(([period, amount]) => ({ period, amount })),
+      // Absent when there is none, so a balance with no special payment reads exactly as before.
+      owed_special: special.length
+        ? special.map((c) => ({ label: String(c.label ?? "").trim() || "תשלום מיוחד", amount: Number(c.amount),
+                                unit: String(c.unit ?? "") }))
+        : undefined,
       owed_apartments: byApartment,
       // Disputed and pending rows are facts the agent should not hide behind
       // a clean zero — "in review with the team" is the truthful phrasing.
       in_review: (charges ?? [])
         .filter((c) => c.status === "disputed" || c.status === "pending_charge")
-        .map((c) => ({ period: String(c.period).slice(0, 7), status: c.status })),
+        .map((c) => c.kind === "special"
+          ? { label: String(c.label ?? "").trim() || "תשלום מיוחד", status: c.status }
+          : { period: String(c.period).slice(0, 7), status: c.status }),
     };
   },
 
@@ -5080,6 +5097,25 @@ async function dialerTick(): Promise<Record<string, unknown>> {
       return { ok: true, state: next.state, expired: expired.data };
     }
 
+    // Feature 24: the tenant's flats read again from OXS, so the agent is told today's figure and
+    // nobody who paid since the last sync is rung. If OXS does not answer, the last sync's stand.
+    const fresh = await oxsRefreshPhone(String(next.phone ?? ""), false);
+    if (fresh.ok && fresh.flats > 0) {
+      const again = await db.rpc("press_call", { p_phone: String(next.phone ?? "") });
+      if (!again.error && !again.data) {
+        await db.from("dialer_calls").update({ status: "skipped", why: "paid", ended_at: new Date().toISOString() })
+          .eq("id", next.id);
+        await dialerNote(null);
+        return { ok: true, state: "skipped", why: "paid" };
+      }
+      const amount = Number(again.data?.amount);
+      if (!again.error && Number.isFinite(amount) && amount > 0) {
+        await db.from("dialer_calls").update({ amount }).eq("id", next.id);
+      }
+    } else if (!fresh.ok) {
+      console.warn("dialer: oxs refresh failed, sending on the last sync's figures", fresh.error);
+    }
+
     const local = localOf(String(next.phone ?? ""));
     const externalId = externalIdFor(next.resident_id ?? null, now);
     if (!local) {
@@ -5130,6 +5166,196 @@ async function dialerTick(): Promise<Record<string, unknown>> {
       // the note is a courtesy; the next tick tries again
     }
     return { ok: false, error: String(e) };
+  }
+}
+
+// ---------------------------------------------------------------------------
+// OXS's own debt (feature 24, 25 Nov)
+// ---------------------------------------------------------------------------
+// The owner, on the Dialer page's amounts: "i need it to be accurate". charges were our estimate
+// from payment records; now they are OXS's own figure. pg_cron posts `oxs-debts-sync` every 10
+// minutes (migration 044). A run reads OXS's list of the flats that owe (GET /debts, one call),
+// then the month-by-month detail of each flat whose totals changed, the flats being dialled first,
+// and writes it through oxs_debt_apply. The dialer reads a tenant's flats again just before it
+// rings them, and a number typed on the Dialer page is looked up the same way (oxsRefreshPhone).
+// OXS is only read.
+
+/** One read with OXS's finance key. Throws "oxs <status>"; a 429 stops the run that hit it. */
+async function oxsDebtGet(path: string): Promise<any> {
+  const key = Deno.env.get("OXS_KEY_DEBTS") ?? "";
+  if (!key) throw new Error("no OXS_KEY_DEBTS");
+  const res = await fetch(OXS_BASE + path, {
+    headers: { "x-api-key": key, "user-agent": "homies-debt-tools/1.0" },
+    signal: AbortSignal.timeout(30_000),
+  });
+  const body = await res.json().catch(() => null);
+  if (!res.ok || body?.status !== 1) {
+    throw new Error(`oxs ${res.status}${body?.error ? ": " + String(body.error).slice(0, 80) : ""}`);
+  }
+  return body.data;
+}
+
+const oxsPause = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** Every row of a table, a thousand at a time (PostgREST's page). */
+async function allRows(table: string, columns: string): Promise<any[]> {
+  const out: any[] = [];
+  for (let from = 0; from < 20_000; from += 1000) {
+    const { data, error } = await db.from(table).select(columns).range(from, from + 999);
+    if (error) throw new Error(`${table}: ${error.message}`);
+    out.push(...(data ?? []));
+    if (!data || data.length < 1000) break;
+  }
+  return out;
+}
+
+/** One flat's items written into charges (044's oxs_debt_apply). Throws on a database error. */
+async function oxsApplyFlat(p: {
+  ref: string; phone: string | null; name: string; building: string; unit: string; home: boolean;
+  fp: string | null; items: Item[]; overdue?: number; with_month?: number;
+}): Promise<Record<string, any>> {
+  const { data, error } = await db.rpc("oxs_debt_apply", { p });
+  if (error) throw new Error(`apply: ${error.message}`);
+  if (data?.error) throw new Error(`apply: ${data.error}`);
+  return data ?? {};
+}
+
+/** What a phone owes now, from charges: every open month and special payment on its resident. */
+async function owedOn(phone: string): Promise<number> {
+  const { data, error } = await db.from("charges").select("amount,residents!inner(phone)")
+    .eq("residents.phone", phone).eq("status", "unpaid").gt("amount", 0);
+  if (error) throw new Error(`owed: ${error.message}`);
+  return Math.round((data ?? []).reduce((s: number, c: any) => s + Number(c.amount || 0), 0) * 100) / 100;
+}
+
+/** One sync run. Never throws: how it went is written to oxs_debt_state for the page. */
+async function oxsDebtsSync(): Promise<Record<string, unknown>> {
+  const started = Date.now();
+  const run = new Date().toISOString();
+  const lease = await db.rpc("oxs_debt_lease", { p_seconds: 240 });
+  if (lease.error) return { ok: false, error: `lease: ${lease.error.message}` };
+  if (!lease.data) return { ok: true, state: "another run is going" };
+
+  let owing: number | null = null;
+  let overdueFlats: number | null = null;
+  let pending: number | null = null;
+  let clear = false;
+  let error: string | null = null;
+  let done = 0, failed = 0, mismatched = 0, written = 0, closed = 0;
+  try {
+    const { data: st } = await db.from("oxs_debt_state").select("owing").eq("id", 1).maybeSingle();
+    const listed = await oxsDebtGet("/debts");
+    const rows: any[] = Array.isArray(listed?.results) ? listed.results : Array.isArray(listed) ? listed : [];
+    owing = rows.length;
+    if (!looksWhole(rows.length, st?.owing)) throw new Error(`oxs list too short: ${rows.length}`);
+
+    const addresses = new Map<string, string>();
+    for (const b of await allRows("buildings", "id,address")) {
+      if (b?.id && b?.address) addresses.set(String(b.id), String(b.address));
+    }
+    const flats = rows.map((r) => flatOf(r, (id) => addresses.get(id))).filter((f): f is Flat => !!f);
+    overdueFlats = flats.filter((f) => f.overdue > 0).length;
+
+    const seen = await db.rpc("oxs_debt_seen", { p_flats: flats, p_run: run });
+    if (seen.error) throw new Error(`seen: ${seen.error.message}`);
+    clear = true;
+    const backlog: Array<{ ref: string; phone: string | null; legacy_phone: string | null }> =
+      Array.isArray(seen.data) ? seen.data : [];
+    pending = backlog.length;
+
+    // The phone each flat is on: the one it is on now if OXS still lists it, else the one the old
+    // estimate called, else the first payer (a renter's mobile first).
+    const stored = new Map<string, string | null>();
+    for (const r of await allRows("oxs_debt_flats", "apartment_ref,phone")) {
+      stored.set(String(r.apartment_ref), r.phone ?? null);
+    }
+    const legacy = new Map(backlog.map((b) => [b.ref, b.legacy_phone ?? null]));
+    const payerOf = new Map(flats.map((f) => [f.ref, choosePayer(f.payers, stored.get(f.ref), legacy.get(f.ref))]));
+    const home = homeFlats(flats, (f) => payerOf.get(f.ref)?.phone ?? null);
+    const byRef = new Map(flats.map((f) => [f.ref, f]));
+
+    for (const b of backlog) {
+      if (Date.now() - started > RUN_BUDGET_MS) break;
+      const f = byRef.get(b.ref);
+      if (!f) continue;
+      await oxsPause(OXS_GAP_MS);
+      try {
+        const detail = await oxsDebtGet(`/apartments/${encodeURIComponent(f.ref)}/debts?lean=true`);
+        const got = itemsOf(detail, new Date());
+        // Checked on 35 real flats (25 Nov): every one added up. A flat that does not is still
+        // written, as OXS gives it month by month; the count is in the run's log line.
+        if (!agrees(got, f.overdue)) mismatched++;
+        const payer = payerOf.get(f.ref) ?? null;
+        const res = await oxsApplyFlat({
+          ref: f.ref, phone: payer?.phone ?? null, name: payer?.name ?? "", building: f.address, unit: f.number,
+          home: Boolean(payer && home.get(payer.phone) === f.ref), fp: f.fp, items: got.items,
+          overdue: f.overdue, with_month: f.with_month,
+        });
+        written += Number(res.written ?? 0);
+        closed += Number(res.closed ?? 0) + Number(res.legacy ?? 0);
+        done++;
+        pending--;
+      } catch (e) {
+        const why = String((e as Error)?.message ?? e);
+        if (why.startsWith("oxs 429")) throw e;
+        failed++;
+        console.error("oxs debts: flat failed", f.ref, why.slice(0, 160));
+      }
+    }
+  } catch (e) {
+    error = String((e as Error)?.message ?? e).slice(0, 240);
+    console.error("oxs debts sync", error);
+  }
+  let fin: any = null;
+  try {
+    const r = await db.rpc("oxs_debt_finish", {
+      p_run: run, p_clear: clear, p_backlog: pending, p_owing: owing, p_overdue: overdueFlats, p_error: error,
+    });
+    fin = r.error ? { error: r.error.message } : r.data;
+  } catch (e) {
+    fin = { error: String(e).slice(0, 200) };
+  }
+  const out = {
+    ok: !error, owing, overdue: overdueFlats, detailed: done, failed, mismatched, backlog: pending,
+    written, closed, finish: fin, ms: Date.now() - started, ...(error ? { error } : {}),
+  };
+  console.log("oxs debts sync", JSON.stringify(out));
+  return out;
+}
+
+/**
+ * A phone's flats read again from OXS, now: before the dialer rings it, and for a number typed on
+ * the Dialer page. `typed` also finds a flat on which the number is any payer OXS lists, and puts
+ * the flat's debt on it, since the person being called is the one the call is about. Never throws.
+ * `flats` is how many were read; `owed` what the phone owes afterwards, from charges.
+ */
+async function oxsRefreshPhone(phone: string, typed: boolean): Promise<{
+  ok: boolean; flats: number; owed: number; name?: string; error?: string;
+}> {
+  try {
+    const cols = "apartment_ref,address,number,phone,phones,payers,fingerprint";
+    const q = db.from("oxs_debt_flats").select(cols);
+    const { data: flats, error } = await (typed
+      ? q.or(`phone.eq.${phone},phones.cs.{${phone}}`)
+      : q.eq("phone", phone)).limit(6);
+    if (error) throw new Error(`flats: ${error.message}`);
+    let n = 0;
+    let name: string | undefined;
+    for (const f of flats ?? []) {
+      if (n > 0) await oxsPause(OXS_GAP_MS);
+      const detail = await oxsDebtGet(`/apartments/${encodeURIComponent(String(f.apartment_ref))}/debts?lean=true`);
+      const got = itemsOf(detail, new Date());
+      const me = (Array.isArray(f.payers) ? f.payers : []).find((p: any) => p?.phone === phone);
+      if (!name && me?.name) name = String(me.name);
+      await oxsApplyFlat({
+        ref: String(f.apartment_ref), phone, name: String(me?.name ?? ""), building: String(f.address ?? ""),
+        unit: String(f.number ?? ""), home: false, fp: f.fingerprint ?? null, items: got.items,
+      });
+      n++;
+    }
+    return { ok: true, flats: n, owed: await owedOn(phone), ...(name ? { name } : {}) };
+  } catch (e) {
+    return { ok: false, flats: 0, owed: -1, error: String((e as Error)?.message ?? e).slice(0, 200) };
   }
 }
 
@@ -5226,6 +5452,27 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify(await dialerTick()), {
         headers: { "content-type": "application/json" },
       });
+    }
+    // Feature 24. pg_cron does not wait (the run goes on after the answer); a script that sends
+    // "wait": true gets the run's own result.
+    if (type === "oxs-debts-sync") {
+      if (message?.wait === true) {
+        return new Response(JSON.stringify(await oxsDebtsSync()), {
+          headers: { "content-type": "application/json" },
+        });
+      }
+      background(oxsDebtsSync());
+      return new Response(JSON.stringify({ ok: true, state: "started" }), {
+        headers: { "content-type": "application/json" },
+      });
+    }
+    // A number typed on the Dialer page: its flats from OXS now, before it is queued.
+    if (type === "oxs-debts-phone") {
+      const phone = String(message?.phone ?? "").trim();
+      const out = /^\+972[0-9]{8,9}$/.test(phone)
+        ? await oxsRefreshPhone(phone, true)
+        : { ok: false, flats: 0, owed: -1, error: "number" };
+      return new Response(JSON.stringify(out), { headers: { "content-type": "application/json" } });
     }
     if (type !== "end-of-call-report") {
       return new Response(JSON.stringify({ ok: true, ignored: type }), {

@@ -73,6 +73,8 @@ PAYLINK = os.path.join(ROOT, "supabase", "functions", SLUG, "paylink.ts")
 # 25 Nov (feature 23): the dashboard dialer's tick, also pure. index.ts imports it, so a deploy
 # without it would fail to start the whole function: every file index.ts imports must be here.
 DIALER = os.path.join(ROOT, "supabase", "functions", SLUG, "dialer.ts")
+# 25 Nov (feature 24): OXS's own debt into charges, also pure, also imported by index.ts.
+OXSDEBTS = os.path.join(ROOT, "supabase", "functions", SLUG, "oxsdebts.ts")
 API = "https://api.supabase.com"
 
 # api.supabase.com sits behind Cloudflare, which rejects urllib's default
@@ -108,7 +110,7 @@ def differs_from_main():
     """
     subprocess.run(["git", "-C", ROOT, "fetch", "-q", "origin", "main"], check=True)
     stale = []
-    for path in (SRC, IDENTITY, ROUTE, NAMES, PAYLINK, DIALER):
+    for path in (SRC, IDENTITY, ROUTE, NAMES, PAYLINK, DIALER, OXSDEBTS):
         rel = os.path.relpath(path, ROOT).replace(os.sep, "/")
         r = subprocess.run(["git", "-C", ROOT, "show", "origin/main:" + rel],
                            capture_output=True)
@@ -214,13 +216,14 @@ def main():
     names_src = open(NAMES, encoding="utf-8").read()
     paylink_src = open(PAYLINK, encoding="utf-8").read()
     dialer_src = open(DIALER, encoding="utf-8").read()
+    oxsdebts_src = open(OXSDEBTS, encoding="utf-8").read()
     files = [("index.ts", src), ("identity.ts", identity_src),
              ("route.ts", route_src), ("names.ts", names_src), ("paylink.ts", paylink_src),
-             ("dialer.ts", dialer_src)]
+             ("dialer.ts", dialer_src), ("oxsdebts.ts", oxsdebts_src)]
     print("files          index.ts %d chars, identity.ts %d chars, route.ts %d chars, names.ts %d chars, "
-          "paylink.ts %d chars, dialer.ts %d chars"
+          "paylink.ts %d chars, dialer.ts %d chars, oxsdebts.ts %d chars"
           % (len(src), len(identity_src), len(route_src), len(names_src), len(paylink_src),
-             len(dialer_src)))
+             len(dialer_src), len(oxsdebts_src)))
 
     print("project        %s" % ref)
     print("function       %s  (%d lines, verify_jwt=false)" % (SLUG, src.count("\n")))

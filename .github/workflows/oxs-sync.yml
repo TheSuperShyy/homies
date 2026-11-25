@@ -146,26 +146,24 @@ jobs:
           done
           echo "wrote .env with 6 values"
 
-      # THE THREE IMPORTS NO LONGER SHARE A FATE.
+      # THE IMPORTS DO NOT SHARE A FATE.
       #
       # They used to be a plain sequence, so arrears dying took maintenance
       # requests — a ten-second job — down with it. Each carries its own timeout
       # and runs unless the whole job was cancelled, and the gate at the end
       # fails the run if any of them did not land. Residents first, because the
-      # other two match against the rows it writes.
+      # requests match against the rows it writes.
+      #
+      # NO ARREARS STEP SINCE 25 NOV (feature 24). oxs_arrears.py estimated the
+      # debt from payment records, and 57 of the Dialer page's 201 flats matched
+      # OXS. charges now hold OXS's own debt, written by debt-tools every 10
+      # minutes (migration 044, `oxs-debts-sync`). Running the estimate as well
+      # would write its months back over OXS's, so it is not run here.
       - name: Residents
         id: residents
         timeout-minutes: 20
         run: |
           python scripts/oxs_api_import.py --quiet --skip-charges \
-            ${{ github.event.inputs.dry_run == 'true' && ' ' || '--apply' }}
-
-      - name: Arrears
-        id: arrears
-        if: ${{ !cancelled() }}
-        timeout-minutes: 45
-        run: |
-          python scripts/oxs_arrears.py --quiet \
             ${{ github.event.inputs.dry_run == 'true' && ' ' || '--apply' }}
 
       - name: Maintenance requests
@@ -180,18 +178,16 @@ jobs:
         if: always()
         run: rm -f .env
 
-      # Names which of the three landed, and goes red if any did not. Without it
+      # Names which of the two landed, and goes red if either did not. Without it
       # a partial import is a red run with no summary, and finding out which
       # step died means opening a log that is mostly progress counters.
-      - name: Did all three land?
+      - name: Did both land?
         if: always()
         run: |
           echo "residents: ${{ steps.residents.outcome }}"
-          echo "arrears:   ${{ steps.arrears.outcome }}"
           echo "requests:  ${{ steps.requests.outcome }}"
           fail=0
           for s in "residents=${{ steps.residents.outcome }}" \
-                   "arrears=${{ steps.arrears.outcome }}" \
                    "requests=${{ steps.requests.outcome }}"; do
             case "$s" in
               *=success) ;;
