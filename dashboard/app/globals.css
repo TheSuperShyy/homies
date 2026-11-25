@@ -1530,3 +1530,22 @@ button.danger svg { width: 15px; height: 15px; }
 .voice-told dl { margin: 8px 0 0; }
 .voice-told dt { font-weight: 600; opacity: .8; }
 .voice-told dd { margin: 0 0 6px; white-space: pre-wrap; }
+
+/* --------------------------------------------------------------- dialer -- */
+/* Feature 23 (25 Nov). The line's state is a notice with its one action, Stop
+   or Resume, at the far end; on a phone the button wraps under the words. */
+.dialnow { align-items: center; flex-wrap: wrap; }
+.dialnow > span { flex: 1 1 220px; }
+.dialnow > form { margin-inline-start: auto; }
+/* Stop is the one red control on the page: outlined, as button.danger is, at
+   the row action's size so it sits level with the line it acts on. */
+.btn-sm.dialstop { background: transparent; color: var(--st-review); border-color: var(--st-review); }
+.btn-sm.dialstop:hover { background: var(--st-review-bg); }
+/* The tick box sits in the name's label, so the whole name is the target. */
+.dialpick { display: inline-flex; align-items: center; gap: 10px; cursor: pointer; }
+.dialcheck {
+  width: 18px; height: 18px; margin: 0; flex: none; cursor: pointer;
+  accent-color: var(--accent-fill);
+}
+.dialcheck:disabled { cursor: not-allowed; opacity: .4; }
+.dialtabs { margin-block-end: 18px; }

@@ -60,6 +60,12 @@ import { DELIVERY_WAITS_MS, ON_ITS_WAY, claimOnce, pollUntil, stopwatch, windowO
 // Which agent answers a call on the 208 line (feature 18, 25 Oct). Pure, so
 // Node can test it: scripts/check_route.test.ts.
 import { callDirection, debtVariables, FEMININE_DICT, FIXED_DEFAULTS, isDialerCall, routeOf, voiceForGender } from "./route.ts";
+// The dashboard's dialer (feature 23, 25 Nov): one tenant at a time to Omni's dialer. Pure, so
+// Node can test it: scripts/check_dialer_queue.test.ts.
+import {
+  externalIdFor, inCallingHours, LINE_208, lineOf, localOf, answerText, sendResult, TOKOMNI_INSERT,
+  TOKOMNI_WAIT_MS,
+} from "./dialer.ts";
 import { sameNameAnyScript } from "./names.ts";
 
 const db = createClient(
@@ -4997,12 +5003,155 @@ async function keepWarm(): Promise<Record<string, unknown>> {
   return { ok: !error, warm: true, voice: Boolean(voice), ms: Date.now() - started };
 }
 
+// ---------------------------------------------------------------------------
+// The dialer (feature 23, 25 Nov)
+// ---------------------------------------------------------------------------
+// The dashboard's /dialer puts the tenants a person chose in `dialer_calls`
+// (migration 043). pg_cron posts `dialer-tick` here every 15 s while that queue
+// has work, and a tick sends at most one tenant to Omni's dialer: only in
+// calling hours, only when the bot's line is quiet, and only one lead at a
+// time, because 208 takes one call and List 2 dials two leads per free agent.
+// Every decision about WHO is the database's (dialer_claim_next, under one
+// lock); this side reads the line, talks to Tokomni and writes down the answer.
+
+/**
+ * The bot's line, from Vapi's newest calls on 208: busy while one has not
+ * ended, else quiet since the newest ended. An error says nothing about the
+ * line, so the tick then neither gives up on a ringing lead nor sends one.
+ */
+async function dialerLine(): Promise<{ busy: boolean; quietSince: string | null; error?: string }> {
+  const key = Deno.env.get("VAPI_PRIVATE_KEY");
+  if (!key) return { busy: false, quietSince: null, error: "no VAPI_PRIVATE_KEY" };
+  const line = Deno.env.get("VAPI_LINE_208_ID") ?? LINE_208;
+  try {
+    const res = await fetch(`https://api.vapi.ai/call?phoneNumberId=${line}&limit=5`, {
+      headers: { Authorization: `Bearer ${key}`, "User-Agent": "homies-debt-tools" },
+      signal: AbortSignal.timeout(5000),
+    });
+    if (!res.ok) return { busy: false, quietSince: null, error: `vapi ${res.status}` };
+    return lineOf(await res.json());
+  } catch (e) {
+    return { busy: false, quietSince: null, error: `vapi ${String(e).slice(0, 120)}` };
+  }
+}
+
+async function dialerNote(error: string | null) {
+  await db.from("dialer_state")
+    .update({ last_tick_at: new Date().toISOString(), last_error: error })
+    .eq("id", 1);
+}
+
+/** One tick. Never throws: what went wrong is written to dialer_state for the page. */
+async function dialerTick(): Promise<Record<string, unknown>> {
+  try {
+    const now = new Date();
+    const line = await dialerLine();
+    const quiet = line.error || line.busy ? null : line.quietSince;
+    const expired = await db.rpc("dialer_expire", { p_line_quiet_since: quiet });
+    if (expired.error) throw new Error(`expire: ${expired.error.message}`);
+
+    // Nothing waits for the morning: a person presses again tomorrow.
+    if (!inCallingHours(now)) {
+      const { data } = await db.rpc("dialer_cancel_waiting", { p_why: "hours" });
+      await dialerNote(null);
+      return { ok: true, state: "closed", cancelled: data ?? 0, expired: expired.data };
+    }
+    const token = Deno.env.get("TOKOMNI_TOKEN")?.trim();
+    const campaign = Deno.env.get("TOKOMNI_CAMPAIGN_ID")?.trim();
+    if (!token || !campaign) {
+      const { data } = await db.rpc("dialer_cancel_waiting", { p_why: "not_connected" });
+      await dialerNote("not_connected");
+      return { ok: false, state: "not connected", cancelled: data ?? 0 };
+    }
+    if (line.error) {
+      await dialerNote(line.error);
+      return { ok: false, state: "line unknown", error: line.error };
+    }
+    if (line.busy) {
+      await dialerNote(null);
+      return { ok: true, state: "line busy", expired: expired.data };
+    }
+
+    const claim = await db.rpc("dialer_claim_next");
+    if (claim.error) throw new Error(`claim: ${claim.error.message}`);
+    const next = claim.data ?? {};
+    if (next.state !== "send") {
+      await dialerNote(null);
+      return { ok: true, state: next.state, expired: expired.data };
+    }
+
+    const local = localOf(String(next.phone ?? ""));
+    const externalId = externalIdFor(next.resident_id ?? null, now);
+    if (!local) {
+      await db.from("dialer_calls").update({ status: "failed", why: "number", ended_at: now.toISOString() })
+        .eq("id", next.id);
+      await dialerNote(null);
+      return { ok: false, state: "bad number" };
+    }
+    let status = 0;
+    let body = "";
+    try {
+      const res = await fetch(TOKOMNI_INSERT, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ external_id: externalId, campaign_id: campaign, number: local }),
+        signal: AbortSignal.timeout(TOKOMNI_WAIT_MS),
+      });
+      status = res.status;
+      body = await res.text();
+    } catch (e) {
+      body = String(e);
+    }
+    const result = sendResult(status, body);
+    const answer = status ? `${status}: ${answerText(body)}` : `no answer: ${body.slice(0, 120)}`;
+    await db.from("dialer_calls").update({
+      status: result,
+      external_id: externalId,
+      tokomni_status: status || null,
+      why: answer.slice(0, 240),
+      ...(result === "failed" ? { ended_at: new Date().toISOString() } : {}),
+    }).eq("id", next.id);
+    // Numbers are never logged; the row id and the lead id say which press it was.
+    console.log("dialer sent", String(next.id), externalId, status, result);
+    // A refusal that is Tokomni's or the token's, not this lead's (blacklisted or a bad number
+    // answer 200 or 400), would refuse every tenant behind it one by one, every 15 s. So the
+    // dialer pauses, and the rest wait for a person to press Resume.
+    if (result === "failed" && (status === 401 || status === 403 || status === 404 || status >= 500)) {
+      await db.from("dialer_state").update({ paused_at: new Date().toISOString(), paused_why: "tokomni" })
+        .eq("id", 1);
+    }
+    await dialerNote(null);
+    return { ok: true, state: result, tokomni: status };
+  } catch (e) {
+    console.error("dialer tick threw", String(e));
+    try {
+      await dialerNote(String(e).slice(0, 240));
+    } catch {
+      // the note is a courtesy; the next tick tries again
+    }
+    return { ok: false, error: String(e) };
+  }
+}
+
+/** The router saw a dialer call arrive on 208: if it is our lead, the tenant picked up. */
+async function dialerAnswered(phone: string, callId: string): Promise<void> {
+  try {
+    const { error } = await db.rpc("dialer_answered", { p_phone: phone, p_call_id: callId });
+    if (error) console.error("dialer answered", String(error.message ?? error));
+  } catch (e) {
+    console.error("dialer answered threw", String(e));
+  }
+}
+
 async function assistantFor(message: any): Promise<Record<string, unknown>> {
   const intake = { assistantId: INTAKE_ASSISTANT_YARIV };
   try {
     const call = { ...(message?.call ?? {}) };
     if (!call.customer) call.customer = message?.customer ?? {};
     const phone = isDialerCall(call) ? callNumberOf(call) : null;
+    // Feature 23: the dashboard's dialer learns its lead was answered. After the
+    // answer to Vapi, so the tenant never waits on it.
+    if (phone && call.id) background(dialerAnswered(phone, String(call.id)));
     // A woman's call needs the live voice. Asked now, beside the database rather
     // than after it, so a worker that has not kept it yet costs the longer of the
     // two, not both. A man's call never waits for it. Never throws.
@@ -5073,6 +5222,11 @@ Deno.serve(async (req) => {
         headers: { "content-type": "application/json" },
       });
     }
+    if (type === "dialer-tick") {
+      return new Response(JSON.stringify(await dialerTick()), {
+        headers: { "content-type": "application/json" },
+      });
+    }
     if (type !== "end-of-call-report") {
       return new Response(JSON.stringify({ ok: true, ignored: type }), {
         headers: { "content-type": "application/json" },
@@ -5091,6 +5245,19 @@ Deno.serve(async (req) => {
           backstopped = await backstopTeamNote(id, ctx, toolCalls, messages, dispo);
         } catch (e) {
           console.error("backstop threw", ctx.callId, String(e));
+        }
+      }
+      // Feature 23: a dialer call ended, so the dashboard's lead is done and the
+      // line is free for the next tenant. Only a lead we sent matches.
+      const ended = message?.call?.customer ? message.call : { ...(message?.call ?? {}), customer: message?.customer ?? {} };
+      if (isDialerCall(ended)) {
+        try {
+          const { error } = await db.rpc("dialer_ended", {
+            p_call_id: String(ctx.callId ?? ""), p_phone: callNumberOf(ended), p_interaction: id,
+          });
+          if (error) console.error("dialer ended", ctx.callId, String(error.message ?? error));
+        } catch (e) {
+          console.error("dialer ended threw", ctx.callId, String(e));
         }
       }
       return new Response(JSON.stringify({ ok: true, interaction: id, salvaged, backstopped }), {

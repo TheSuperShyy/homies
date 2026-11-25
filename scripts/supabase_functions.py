@@ -70,6 +70,9 @@ ROUTE = os.path.join(ROOT, "supabase", "functions", SLUG, "route.ts")
 NAMES = os.path.join(ROOT, "supabase", "functions", SLUG, "names.ts")
 # 10 Nov: how long the caller waits for the debt call's payment link, also pure.
 PAYLINK = os.path.join(ROOT, "supabase", "functions", SLUG, "paylink.ts")
+# 25 Nov (feature 23): the dashboard dialer's tick, also pure. index.ts imports it, so a deploy
+# without it would fail to start the whole function: every file index.ts imports must be here.
+DIALER = os.path.join(ROOT, "supabase", "functions", SLUG, "dialer.ts")
 API = "https://api.supabase.com"
 
 # api.supabase.com sits behind Cloudflare, which rejects urllib's default
@@ -105,7 +108,7 @@ def differs_from_main():
     """
     subprocess.run(["git", "-C", ROOT, "fetch", "-q", "origin", "main"], check=True)
     stale = []
-    for path in (SRC, IDENTITY, ROUTE, NAMES, PAYLINK):
+    for path in (SRC, IDENTITY, ROUTE, NAMES, PAYLINK, DIALER):
         rel = os.path.relpath(path, ROOT).replace(os.sep, "/")
         r = subprocess.run(["git", "-C", ROOT, "show", "origin/main:" + rel],
                            capture_output=True)
@@ -210,11 +213,14 @@ def main():
     route_src = open(ROUTE, encoding="utf-8").read()
     names_src = open(NAMES, encoding="utf-8").read()
     paylink_src = open(PAYLINK, encoding="utf-8").read()
+    dialer_src = open(DIALER, encoding="utf-8").read()
     files = [("index.ts", src), ("identity.ts", identity_src),
-             ("route.ts", route_src), ("names.ts", names_src), ("paylink.ts", paylink_src)]
+             ("route.ts", route_src), ("names.ts", names_src), ("paylink.ts", paylink_src),
+             ("dialer.ts", dialer_src)]
     print("files          index.ts %d chars, identity.ts %d chars, route.ts %d chars, names.ts %d chars, "
-          "paylink.ts %d chars"
-          % (len(src), len(identity_src), len(route_src), len(names_src), len(paylink_src)))
+          "paylink.ts %d chars, dialer.ts %d chars"
+          % (len(src), len(identity_src), len(route_src), len(names_src), len(paylink_src),
+             len(dialer_src)))
 
     print("project        %s" % ref)
     print("function       %s  (%d lines, verify_jwt=false)" % (SLUG, src.count("\n")))
@@ -279,6 +285,12 @@ def main():
     # Unset here leaves the project's value as it is; "off" switches it off.
     name_channels = e.get("NAME_REQUIRED_CHANNELS", "").strip()
     print("name required  %s" % (name_channels or "unchanged (not in .env)"))
+    # Feature 23 (25 Nov): the dashboard dialer's tick sends leads to Omni's dialer from the
+    # function, with the same pair as Vercel's dialer test page. Both or neither.
+    tk_token = e.get("TOKOMNI_TOKEN", "").strip()
+    tk_campaign = e.get("TOKOMNI_CAMPAIGN_ID", "").strip()
+    print("dialer         %s" % ("ON  (TOKOMNI_TOKEN + TOKOMNI_CAMPAIGN_ID)" if tk_token and tk_campaign
+                                  else "unchanged — TOKOMNI_TOKEN / TOKOMNI_CAMPAIGN_ID empty in .env"))
     if not apply:
         print("\nDry run. Re-run with --apply.")
         return
@@ -325,6 +337,9 @@ def main():
         to_push.append({"name": "UCHAT_API_KEY", "value": uchat_key})
     if media_extra:
         to_push.append({"name": "MEDIA_HOSTS_EXTRA", "value": media_extra})
+    if tk_token and tk_campaign:
+        to_push.append({"name": "TOKOMNI_TOKEN", "value": tk_token})
+        to_push.append({"name": "TOKOMNI_CAMPAIGN_ID", "value": tk_campaign})
     oxs_key = e.get("OXS_KEY_REQUESTS", "").strip()
     # 24 Sep: the mirror came back on for ONE number, the owner's +63 tester.
     # `OXS_MIRROR_PHONES` is the second gate inside oxsMirror() and travels with
