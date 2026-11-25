@@ -8,6 +8,7 @@
 // dashboard that looks broken.
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
+import { HOME, hiddenPath } from '@/lib/sections';
 
 export async function middleware(request: NextRequest) {
   // Request headers the server components read. Setting them HERE, on the
@@ -87,7 +88,12 @@ export async function middleware(request: NextRequest) {
   }
   // Signed in and on /login: nothing to do there — go to the dashboard.
   if (user && path === '/login') {
-    return NextResponse.redirect(new URL('/', request.url));
+    return NextResponse.redirect(new URL(HOME, request.url));
+  }
+  // 25 Nov: the dashboard shows the dialer and the calls only (lib/sections.ts). Any other page,
+  // the overview at / included, goes to the dialer, so an old bookmark lands somewhere useful.
+  if (user && hiddenPath(path)) {
+    return NextResponse.redirect(new URL(HOME, request.url));
   }
 
   return response;
