@@ -8,6 +8,11 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 25 Nov: THE DASHBOARD SHOWS ONLY THE DIALER AND THE CALLS** (the owner: "in the dashboard i want everything gone only the dialer and call related should be seen here"; PR #25, `main` `954fafe`; CONTEXT, Standing decisions; WORKLOG 25 Nov).
+> - **Menu:** Dialer (with Test calls), Phone calls, Voice agent call. It opens on the Dialer, and so does the sign-in.
+> - **Everything else** (overview, tickets, debts, WhatsApp conversations, search, import) sends a signed-in visitor to the Dialer. One list, `dashboard/lib/sections.ts`, is read by the menu and the middleware; the pages are in the code, untouched.
+> - **Chrome:** the top bar's search box and the phone's search, dialer and import icons are gone; Settings stays behind the gear.
+>
 > **LIVE 25 Nov: THE DASHBOARD HAS A REAL DIALER, `/dialer`** (the owner: "we need to have an actual dialer section there not just the dialer test", then "ok build it"; feature 23, `docs/features/23-dialer/`; WORKLOG and CONTEXT 25 Nov).
 > - **What staff see** (the layout redone the same evening, PR #24 `c5196c1`, after the owner's "the design is not good"): the line now (Stop), today's counts, then everyone who owes, one row per phone in five columns (the tenant with a tick box, the building and flats, the amount with "8 months · Jan–Oct 2026", where they stand, Call only when callable), then today's calls. "חייג למסומנים" shows how many are ticked. "חייגן" is in the main menu next to Debts; the test page is the second tab, `/dialer/test`.
 > - **What happens:** debt-tools sends one tenant at a time to Omni's dialer on a 15 s pg_cron tick, only in calling hours and only while 208 is quiet on Vapi. The router marks the lead answered, the end-of-call report marks it done with the agent's outcome. No pickup in 2 minutes is "no answer" and one try. Five in a row that reached nobody, or a Tokomni-side refusal, pause it until Resume.

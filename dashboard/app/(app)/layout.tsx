@@ -5,9 +5,9 @@ import { serverClient } from '@/lib/supabase-server';
 import { COOKIE, THEME_COOKIE, getLocale, getTheme, translator, type Locale } from '@/lib/i18n';
 import { BackField, RailNav, TabBar, type NavGroup, type NavItem } from '@/components/nav';
 import {
-  NAV_ICON, IconDialer, IconImport, IconLanguage, IconMoon, IconSearch,
-  IconSettings, IconSignOut, IconSun,
+  NAV_ICON, IconLanguage, IconMoon, IconSettings, IconSignOut, IconSun,
 } from '@/components/icons';
+import { HOME } from '@/lib/sections';
 
 /**
  * The signed-in furniture: sidebar, topbar, account block.
@@ -54,27 +54,19 @@ async function setTheme(formData: FormData) {
 // the things you operate. The division is a true one — the second group is the
 // only place in the app where pressing something changes state rather than
 // filtering a view.
+//
+// 25 Nov, the owner: "in the dashboard i want everything gone only the dialer and call related
+// should be seen here". So the menu is the dialer, the phone calls and the agent's browser call;
+// every other page sends you to the dialer (lib/sections.ts, read by the middleware). The account's
+// settings stay behind the gear and the name in the corner. Putting a page back is its row here
+// and its path in lib/sections.ts.
 const NAV = [
   ['nav.group.main', [
-    ['overview', '/'],
-    ['tickets', '/tickets'],
-    ['debts', '/debts'],
-    // 25 Nov: the dialer calls the tenants the Debts page lists, so it sits beside it. It was
-    // under System while it was only the test page (now its second tab, /dialer/test).
     ['dialer', '/dialer'],
-    ['conversations', '/conversations'],
     ['calls', '/calls'],
     ['voice', '/voice'],
   ]],
-  ['nav.group.support', [
-    ['sync', '/sync'],
-    ['settings', '/settings'],
-  ]],
 ] as const;
-
-// The phone's tab bar has room for the six it had. The dialer stays in the phone's top bar
-// instead (below), where it has been since 28 Oct.
-const NOT_IN_TABS = new Set<string>(['dialer']);
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const locale = getLocale();
@@ -116,9 +108,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     }),
   }));
 
-  // The same five destinations as the sidebar's first group, under the names
-  // they go by when a label has 78px rather than 200 — see `tab.*` in i18n.
-  const tabs: NavItem[] = NAV[0][1].filter(([key]) => !NOT_IN_TABS.has(key)).map(([key, href]) => {
+  // The same destinations as the sidebar's first group, under the names they
+  // go by when a label has 78px rather than 200 — see `tab.*` in i18n.
+  const tabs: NavItem[] = NAV[0][1].map(([key, href]) => {
     const Icon = NAV_ICON[key];
     return { href, label: t(`tab.${key}` as any), icon: <Icon /> };
   });
@@ -126,7 +118,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="shell">
       <nav className="rail" aria-label={t('nav.menu')}>
-        <Link className="brand" href="/">
+        <Link className="brand" href={HOME}>
           {/* The real mark, not the generic building glyph that stood in for
               it. Two files rather than one because the logo carries a black
               ladder and figure that disappear on a near-black sidebar; the
@@ -181,31 +173,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
       </nav>
 
-      {/* THE PHONE'S TOP BAR. Brand on one side, the things you operate on
-          the other — the dialer, Import and Settings — which are exactly
-          the ones the tab bar below does not carry. Desk-width readers never
-          see this; they have the sidebar, which has all of them. */}
+      {/* THE PHONE'S TOP BAR. Brand on one side, the account's settings on
+          the other, which the tab bar below does not carry. Desk-width
+          readers never see this; they have the sidebar and the gear. */}
       <header className="mtop">
-        <Link className="brand" href="/">
+        <Link className="brand" href={HOME}>
           <img className="mark" alt=""
                src={theme === 'light' ? '/homies-mark.png' : '/homies-mark-dark.png'} />
           <span><b>{t('app.name')}</b></span>
         </Link>
         <div className="mtop-acts">
-          {/* The topbar and its search pill are desk-only, so without this the
-              phone has no way to reach the one box that searches everything. */}
-          <Link className="iconbtn" href="/search"
-                aria-label={t('search.title')} title={t('search.title')}>
-            <IconSearch />
-          </Link>
-          <Link className="iconbtn" href="/dialer"
-                aria-label={t('nav.dialer')} title={t('nav.dialer')}>
-            <IconDialer />
-          </Link>
-          <Link className="iconbtn" href="/sync"
-                aria-label={t('nav.sync')} title={t('nav.sync')}>
-            <IconImport />
-          </Link>
+          {/* 25 Nov: search, the dialer and Import are gone from here. The
+              search box searched tickets, residents and chats, which the
+              dashboard no longer shows, and the dialer is in the tab bar now. */}
           <Link className="iconbtn" href="/settings"
                 aria-label={t('nav.settings')} title={t('nav.settings')}>
             <IconSettings />
@@ -218,18 +198,10 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             the top of the screen and a second bar under it would take a third
             of the viewport before any content. */}
         <header className="topbar">
-          <div className="mid">
-            {/* It works now. It was a disabled pill labelled "Soon" from the
-                day the shell was rebuilt, which was honest and stayed empty —
-                the same thing the notification bell was doing before it was
-                taken out. A GET form, so the query lands in the URL and a
-                search is a link you can send somebody. */}
-            <form className="searchpill" method="get" action="/search">
-              <IconSearch />
-              <input type="search" name="q" autoComplete="off"
-                     aria-label={t('chrome.search')} placeholder={t('chrome.search')} />
-            </form>
-          </div>
+          {/* The search box that sat here searched tickets, residents, chats
+              and calls together; since 25 Nov the dashboard shows the dialer
+              and the calls only, and the Calls page has its own search. */}
+          <div className="mid" />
 
           <div className="right">
             <form action={setTheme} className="themeswitch">

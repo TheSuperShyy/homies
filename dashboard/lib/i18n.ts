@@ -88,6 +88,7 @@ const S = {
   // worse than a short one — it looks like a broken layout rather than a name.
   // These are the names the same destinations go by when there is no room.
   'tab.overview':      { he: 'סקירה',            en: 'Overview' },
+  'tab.dialer':        { he: 'חייגן',            en: 'Dialer' },
   'tab.tickets':       { he: 'קריאות',           en: 'Tickets' },
   'tab.debts':         { he: 'חובות',            en: 'Debts' },
   'tab.conversations': { he: 'ווטסאפ',           en: 'Chats' },

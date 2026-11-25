@@ -25,6 +25,12 @@ The user is the builder. The client is Homies.
 
 ## Standing decisions. Do not relitigate these.
 
+**The dashboard shows the dialer and the calls only (25 Nov; the owner: *"in the dashboard i want everything gone only the dialer and call related should be seen here"*).** PR #25, `main` `954fafe`.
+- **The menu** is the Dialer (with its Test calls tab), Phone calls and the Voice agent call, in the desk sidebar and the phone's tab bar. The dashboard and the sign-in open on the Dialer.
+- **Every other page sends a signed-in visitor to the Dialer** (the middleware, reading `dashboard/lib/sections.ts`): the overview at `/`, tickets, debts, WhatsApp conversations, search, import. The pages are still in the code, untouched. One comes back only on the owner's word: its path in `SHOWN` and its row in the layout's `NAV`.
+- **Gone from the chrome:** the top bar's search box (it searched what is hidden) and the phone's search, dialer and import icons. Settings stays behind the gear and the name in the corner. The reviewers' pages (`/review`) and the API routes are not affected.
+- **So a change to a hidden page reaches nobody.** Say so before building one.
+
 **Live code goes through a pull request to `main` (5 Nov, feature 22; the owner: *"we need a ci/cd before pushing live"*, *"dont overtest"*).**
 - `.github/workflows/ci.yml`, job `checks`, runs only the checks that already existed: the function's syntax, `node --test scripts/*.test.ts`, `compileall`, the name-flow tests and the dashboard's `tsc`. `main` requires it, admins included.
 - **The function deploys itself from `main`.** `deploy-function` runs `supabase_functions.py --apply --code-only` after a merge that touched it. It uploads code only and never pushes or deletes a secret.

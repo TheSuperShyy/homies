@@ -1,6 +1,7 @@
 'use client';
 import { useState } from 'react';
 import { browserClient } from '@/lib/supabase-browser';
+import { HOME } from '@/lib/sections';
 
 /**
  * The only client component on the dashboard, and it is one because signing in
@@ -34,7 +35,7 @@ export function LoginForm({ labels, children }:
     if (error) { setError(error.message); setBusy(false); return; }
     // Hard navigation, not router.push: the middleware has to see the new
     // cookie, and a client-side transition does not give it that chance.
-    window.location.href = '/';
+    window.location.href = HOME;
   }
 
   return (

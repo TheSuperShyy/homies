@@ -11,6 +11,23 @@ conversation that produced it.
 
 ## 2026-11-25
 
+### LIVE about 15:1x UTC: the dashboard shows only the dialer and the calls (PR #25, `main` `954fafe`)
+- **The owner:** *"ok so in the dashboard i want everything gone only the dialer and call related should be seen here"*.
+- **Read as:**
+  - **Kept:** the Dialer (with its Test calls tab), Phone calls (the log and each call's page) and the Voice agent call (the browser call to the agents), which are the call pages. Settings stays reachable from the gear (the account's password, name, language), not from the menu.
+  - **Gone:** the overview, tickets, debts, WhatsApp conversations, search and import.
+- **Built:**
+  - `dashboard/lib/sections.ts` (`HOME` /dialer, `SHOWN`, `hiddenPath`), read by the middleware: a signed-in visitor on a hidden page, or on /login, goes to /dialer.
+  - The layout's `NAV` is the three; the tab bar is the same three (`tab.dialer` added); the logo links to the Dialer.
+  - The top bar's search box is gone (it searched tickets, residents and chats), and so are the phone's search, dialer and import icons. The login form lands on the Dialer.
+  - The pages themselves are untouched, so one comes back with its path in `SHOWN` and its row in `NAV`.
+- **Checked:**
+  - On a local run with the sign-in skipped (local only, removed before the commit): `/`, `/tickets`, `/debts`, `/conversations`, `/search`, `/sync` and a signed-in `/login` answer 307 to `/dialer`; `/calls`, `/voice`, `/settings` and `/dialer/test` answer 200. Screenshots of the menu on desk and phone.
+  - `scripts/check_sections.test.ts` (3); `tsc`; a production build.
+- **Live:** CI green; Vercel production READY on `954fafe`. Logged out, every address still goes to /login.
+- **The same change is on `feature/chatbot`:** layout, login form, `sections.ts` and the test taken from `954fafe`; `middleware.ts` and `i18n.ts` by patch, since this branch's copies differ from main's. `tsc` passes there.
+- **Not changed:** the reviewers' pages (`/review`) and the API routes.
+
 ### LIVE about 13:4x UTC: the Dialer page's layout redone (PR #24, `main` `c5196c1`)
 - **The owner, with a screenshot of `/dialer`:** *"the design is not good"*. It showed the Call buttons cut off at the table's edge, the months column ("2026-01, 2026-02, … 2026-10", never wrapping) taking the width, and names, buildings and "Not called yet" wrapping into three or four lines.
 - **Done through the design skill's polish pass, page only.** The dialer's behaviour, its database and the function are unchanged.
