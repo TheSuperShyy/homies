@@ -11,6 +11,31 @@ conversation that produced it.
 
 ## 2026-11-25
 
+### LIVE 16:27 UTC: the Dialer's amounts are OXS's own debt, and a number can be typed and called (feature 24, PR #26)
+- **Asked:** *"fym mostly no i need it to be accurate and has an option to manually call the input number"* (after the read below).
+- **What changed:**
+  - **`charges` hold OXS's own calculation (API rev 1.10):** one row per overdue month, earlier years included, and one row per open special payment. A special payment has `kind` 'special', no month, and its name in `label`.
+  - **debt-tools `oxs-debts-sync`, posted by pg_cron every 10 minutes:** one `GET /debts`, then the month-by-month detail (`?lean=true`) of each flat whose totals changed, the flats being dialled first. It makes at most one OXS call every 1.5 s, because the payment link shares the finance key's 60 a minute.
+  - **What OXS no longer counts is closed** (`paid`). Rows in review and the test building's `agent` rows are never touched.
+  - **Before the dialer rings someone,** their flats are read again from OXS. Whoever paid since is skipped as `paid`.
+  - **The debt agent's `months_phrase`** gives the year when a month is not this year's, and names special payments after the months. The prompt is unchanged.
+  - **`get_balance` (WhatsApp and the phone line)** lists special payments in `owed_special`, never as a month.
+  - **The Dialer page:** special payments are shown under the amount, a note says where the figures come from and when, and a new "חיוג למספר" box takes a number. The number's flats are found by any payer phone OXS lists, read from OXS at the press, put on that number, and queued like a row's Call. A number with nothing overdue in OXS is not queued.
+  - **The GitHub OXS sync no longer runs the estimate,** and `oxs_arrears.py --apply` refuses.
+  - Files: `supabase/044_oxs_live_debts.sql`, `supabase/functions/debt-tools/oxsdebts.ts` (pure), `index.ts`, `dashboard/lib/dialer-board.ts` / `dialer-queue.ts`, the page, `scripts/oxs_debts_setup.py`.
+- **Checked before live:**
+  - `itemsOf` on 35 real flats: months plus special payments equal OXS's `totalDebt` on all 35. The first comparison wrongly showed 28 differing, because the lean answer has no monthly total; it is now checked against `totalDebt`.
+  - 044 and every function path on the live data in one rolled-back transaction. The call-queue views were identical before and after for today's rows, apart from the two added fields.
+  - 30 node tests, `tsc`, `next build`. The 3 `check_route` failures on this PC are the CRLF ones, and pass with LF.
+  - The page with invented data (the video's `demo-db.ts`, in a throwaway worktree), in Hebrew and English, at 1366 and 390 px, with no sideways scroll. The number box's Hebrew placeholder lost its first letter on a phone, so it was shortened.
+- **Order:** 044 applied about 16:08 UTC (`oxs_debts_setup.py --apply`). PR #26 was opened and merged through GitHub's outage, with the REST API retried (squash, `main` `ec2e19f`). The function deployed at 16:10 and Vercel production was READY. The same commit is on `feature/chatbot` as `c3f40b0`.
+- **First full pass** (`--run`, 16:11-16:27 UTC): 11 runs, 512 overdue flats detailed, 0 failed, 0 mismatched. 493 old-estimate rows were closed at completion.
+- **`--check` after:** OXS has 512 overdue flats. The Dialer has 490, all 490 equal to OXS, none different, none not overdue in OXS. The 22 missing are exactly the flats with no phone in OXS. Open rows: 406 monthly and 365 special payments.
+- **Vercel's `TOOL_SECRET`** is stored as sensitive, so it can't be read back. It was set to the function's own value (sha256 `dc1467ac5956`) and production redeployed (READY, `ec2e19f`). No dashboard code read it before this change.
+- **Live probe:** one real debtor's own number through `oxs-debts-phone`: one flat, owed equal to OXS's overdue, and its 26 rows unchanged.
+- **Not proven yet:** a staff press, or a typed number, through the signed-in page. A debt call that names a special payment.
+- **Effect for tenants:** WhatsApp and phone balance answers now give OXS's figures, special payments included.
+
 ### Are the Dialer page's amounts right? No: they are our own arrears, and most differ from OXS's live debts (the owner: "is the debt balance in the dashboard accurate?"), read only, 15:25 UTC
 - **Where the page's amounts come from:** `charges` (unpaid, amount > 0), summed per phone (`dialer-board.ts` `groupOwing`). The OXS sync (`oxs-sync.yml`, twice a day) writes them with `oxs_arrears.py`: every ended 2026 month with no `monthsPaid` entry in the building's payment records counts as owed, at the flat's most common monthly amount. A charge turns paid only when a later run finds that month paid (same phone and flat). Nothing reads what OXS actually billed.
 - **Compared with OXS's live `GET /debts`** (one call, 875 flats owe; calculated by the rules of OXS's payments screen since API rev 1.10), by building and flat, the test building left out. Of the page's 201 flats:

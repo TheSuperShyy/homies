@@ -8,11 +8,21 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
-> **THE DIALER PAGE'S AMOUNTS ARE NOT OXS'S (read 25 Nov, 15:25 UTC; WORKLOG and CONTEXT 25 Nov).**
-> - **Today:** the page sums our `charges`, which the OXS sync works out from missing payment records. Of 201 real flats, 57 match OXS's live `GET /debts`. 75 owe nothing in OXS (6 checked one by one), 18 owe only this month, 50 differ either way. 749 flats OXS says owe are not on the page.
-> - **Effect:** a press can ring someone who owes nothing, and the debt agent quotes the page's amount.
-> - **Owed: the owner's decision** (the one from 17 Nov): amounts from OXS's live debts, which total (overdue `totalDebt`, or with this month), and whether special payments and earlier years count.
-> - **Asked too:** a box to type a number and call that person. The search plus the row's "חייג" covers anyone on the list. A typed number for anyone OXS says owes is possible, with the debt looked up in OXS at the press; it goes with the decision above. Nothing built.
+> **LIVE 25 Nov, 16:27 UTC: THE DIALER'S AMOUNTS ARE OXS'S OWN DEBT, AND A NUMBER CAN BE TYPED AND CALLED** (the owner: "i need it to be accurate and has an option to manually call the input number"; feature 24, `docs/features/24-oxs-live-debts/`; PR #26, `main` `ec2e19f`; WORKLOG and CONTEXT 25 Nov).
+> - **What is owed:** OXS's `totalDebt`, i.e. overdue without this month, every year, plus open special payments (60% of it). `charges` hold it month by month. A special payment is a row with no month (`kind` 'special', `label`).
+> - **How it stays right:**
+>   - pg_cron's `oxs-debts-sync` runs every 10 minutes (one `GET /debts`, then the detail of flats that changed, about 40 OXS calls a minute).
+>   - The dialer reads each tenant again from OXS just before ringing them, and skips them as `paid` if nothing is overdue.
+>   - The old estimate (`oxs_arrears.py`) is off in the GitHub sync and refuses `--apply`.
+> - **Checked after the first full pass:** all 490 flats on the Dialer equal OXS. The 22 overdue flats OXS gives no phone are not on it.
+> - **The page:**
+>   - special payments are shown under the amount;
+>   - a note says the figures are OXS's and when they were read;
+>   - the "חיוג למספר" box reads the number's debt from OXS at the press and queues it, or says it has nothing overdue in OXS.
+> - **Also changed:** the debt agent hears the year of an older month and the special payments' names (prompt unchanged). Balance answers on WhatsApp and the phone line list special payments by name.
+> - **Not proven yet:** a staff press or a typed number through the signed-in page, and a debt call naming a special payment.
+> - **Tools:** `python scripts/oxs_debts_setup.py` (state), `--check` (the Dialer against OXS), `--run`, `--off` (the kill switch: unschedule the sync; charges keep the last copy).
+> - **Rollback:** `--off`, then `git revert` ec2e19f through a PR. 044 can stay: it is additive.
 >
 > **The dialer dashboard's video guide (25 Nov, local, gitignored):** `local/dialer-video/homies-dialer-guide-he-hila.mp4` (3:26, Hebrew, why it is needed and how to use it; invented data only). Voiced by Hila (free) because Clix's Cartesia key has 26 credits; Ayala, like the Chatwoot videos, is `build.py --voice ayala` after a top-up of about 2,600 credits. The recording kit (`demo-preview.patch`, `demo-db.ts`) is beside it; WORKLOG 25 Nov.
 >

@@ -31,6 +31,12 @@ The user is the builder. The client is Homies.
 - **Gone from the chrome:** the top bar's search box (it searched what is hidden) and the phone's search, dialer and import icons. Settings stays behind the gear and the name in the corner. The reviewers' pages (`/review`) and the API routes are not affected.
 - **So a change to a hidden page reaches nobody.** Say so before building one.
 
+**The debt figures are OXS's own, never our estimate (25 Nov; the owner: *"i need it to be accurate"*).** Feature 24, PR #26.
+- On the Dialer, in the debt agent's figures and in every balance answer, the amount is OXS's `totalDebt`: overdue without this month, every year, with special payments.
+- debt-tools copies it every 10 minutes (`oxs-debts-sync`) and reads a tenant again just before the dialer rings them.
+- The estimate from payment records (`oxs_arrears.py`) matched 57 of 201 flats. It is off in the GitHub sync and refuses `--apply`. Do not bring it back.
+- A number typed on the Dialer is called only if OXS shows it owes something overdue.
+
 **Live code goes through a pull request to `main` (5 Nov, feature 22; the owner: *"we need a ci/cd before pushing live"*, *"dont overtest"*).**
 - `.github/workflows/ci.yml`, job `checks`, runs only the checks that already existed: the function's syntax, `node --test scripts/*.test.ts`, `compileall`, the name-flow tests and the dashboard's `tsc`. `main` requires it, admins included.
 - **The function deploys itself from `main`.** `deploy-function` runs `supabase_functions.py --apply --code-only` after a merge that touched it. It uploads code only and never pushes or deletes a secret.
@@ -6028,9 +6034,11 @@ endpoint — `/apartments/:aid` returns nothing.
 rev 1.11, read 17 Nov; `local/omnitelecom/OXS_External_API_v1 (7).pdf`,
 gitignored; the v5 file we had was rev 1.9).
 - **Before rev 1.10** they read a summary OXS no longer updated. That is why the
-  11 Aug and 24 Sep sweeps found one debtor row, and why `charges` is computed
-  from payment records (`oxs_arrears.py`, `import_arrears.py`). Those are still
-  the only writers of `charges`, and `oxs_debt_sync.py` is still report-only.
+  11 Aug and 24 Sep sweeps found one debtor row, and why `charges` was computed
+  from payment records (`oxs_arrears.py`, `import_arrears.py`) until 25 Nov.
+  Since then debt-tools' `oxs-debts-sync` writes them from OXS's own debt
+  (feature 24, below), `oxs_arrears.py --apply` refuses, and `oxs_debt_sync.py`
+  is still report-only.
 - **Now** each debt endpoint is calculated at the moment of the call (`GET /debts`
   at most a minute old), with the rules of the building payments screen
   (תשלומים). Monthly payments count from their month, standing orders once their
@@ -6052,8 +6060,30 @@ gitignored; the v5 file we had was rev 1.9).
   - The sweep's "no `monthsPaid` entry = owed" is not OXS's rule. One traced flat:
     payment records for 2024, 2025 and November 2026 only, so ten months owed for
     us, and nothing owed for OXS.
-  - So a figure from `charges` is our estimate, not what the office sees on OXS's
-    payments screen.
+  - So a figure from `charges` was our estimate, not what the office sees on OXS's
+    payments screen. Fixed the same day (feature 24, next paragraph).
+- **Since 25 Nov, 16:27 UTC, `charges` are OXS's own debt** (feature 24, migration
+  044, PR #26):
+  - One row per overdue month, every year, with what is left on it, and one row per
+    open special payment: `kind` 'special', no month, `label` its name, `oxs_ref` its
+    id. `apartment_ref` is the flat's OXS id on every such row.
+  - Owed means `totalDebt`: overdue, without this month. Special payments were 60% of
+    it on 25 Nov.
+  - pg_cron's `oxs-debts-sync` (every 10 min) reads `GET /debts` once, then
+    `GET /apartments/:id/debts?lean=true` for flats whose totals changed, at most one
+    OXS call every 1.5 s, since the payment link shares the finance key's 60 a minute.
+    `oxs_debt_apply` writes a flat in one transaction.
+  - What OXS no longer counts is closed as `paid`. Rows in review keep their status;
+    `agent` rows are never touched.
+  - The dialer reads a tenant again from OXS just before ringing them.
+  - **The lean detail has no monthly total:** check months + special payments against
+    `GET /debts`' `totalDebt` (35 of 35 equal on 25 Nov, and 512 of 512 in the first
+    full pass).
+  - **A flat's debt goes on one phone:** the one it is on while OXS still lists it,
+    else renters before owners, a mobile before a landline. A typed number on the
+    Dialer takes the flat onto itself.
+  - `python scripts/oxs_debts_setup.py --check` compares the Dialer with OXS per flat.
+    `--off` is the kill switch.
 - **Rev 1.11 adds building bank accounts**, for tenants who pay by transfer.
   `GET /bank-accounts` and `GET /buildings/:id/bank-accounts`, which the finance
   key reads, give bank, branch, account number, owner and `isApproved`. Give the
