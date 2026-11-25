@@ -684,7 +684,8 @@ const S = {
                          en: 'The debts from OXS have not updated since {at} ({why}). Each is checked with OXS again just before its call.' },
   'dial.oxsNever':     { he: 'החובות עוד לא נקראו מ-OXS.', en: 'The debts have not been read from OXS yet.' },
   'dial.typedLabel':   { he: 'חיוג למספר', en: 'Call a number' },
-  'dial.typedHint':    { he: 'מספר טלפון, למשל 050-1234567', en: 'A phone number, e.g. 050-1234567' },
+  // Short: the field is narrow on a phone, and its label already says what it is for.
+  'dial.typedHint':    { he: 'למשל 050-1234567', en: 'e.g. 050-1234567' },
   'dial.typedNote':    { he: 'החוב של המספר נבדק ב-OXS ברגע הלחיצה, ומיכאל מדבר איתו עליו. מספר בלי חוב בפיגור ב-OXS לא מחויג.',
                          en: "The number's debt is checked in OXS at the press, and Michael talks to them about it. A number with no overdue debt in OXS is not called." },
   'dial.typedBad':     { he: 'זה לא נראה כמו מספר ישראלי.', en: 'That does not look like an Israeli number.' },
