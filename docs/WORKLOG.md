@@ -11,6 +11,12 @@ conversation that produced it.
 
 ## 2026-11-25
 
+### The 11/25 report (in chat, `/reporter`, about 00:40 Philippine time on 26 Nov), 16:40 UTC
+- **Span:** 25 Nov in the owner's clock: from Yonatan's question (morning) to the Dialer's OXS amounts and number box (live 16:27 UTC), one sitting into 26 Nov.
+- **Given:** 10 done bullets and 3 Will lines.
+  - **Done:** Yonatan's reply; the dialer section; its redesign; the dashboard cut down to the dialer and calls; the Hebrew video guide; why the invites land in spam; the Dialer's amounts found to be our estimate (57 of 201 matched); every amount from OXS (all 490 match); special payments and earlier years, refreshed every 10 minutes and before each call; the number box.
+  - **Will:** the first real Dialer call and the number box tried; the 5 remaining staff logins; the switch to Homies' own number once Yariv gives the go.
+
 ### LIVE 16:27 UTC: the Dialer's amounts are OXS's own debt, and a number can be typed and called (feature 24, PR #26)
 - **Asked:** *"fym mostly no i need it to be accurate and has an option to manually call the input number"* (after the read below).
 - **What changed:**
