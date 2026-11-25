@@ -1,16 +1,17 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { getLocale, translator, when, type Key, type T } from '@/lib/i18n';
+import { getLocale, translator, when, type Key, type Locale, type T } from '@/lib/i18n';
 import { shekels } from '@/lib/money';
 import { inCallingHours } from '@/lib/dialer-rules';
 import { board, queueCalls, resumeCalls, stopCalls } from '@/lib/dialer-queue';
 import {
-  ACTIVE_STATUSES, MAX_TRIES, RANG_STATUSES, blockOf, israelDate, matches, parseSummary, todayByPhone,
-  type DialerCall,
+  ACTIVE_STATUSES, MAX_TRIES, RANG_STATUSES, blockOf, israelDate, matches, monthRange, parseSummary,
+  todayByPhone, type DialerCall, type Owing,
 } from '@/lib/dialer-board';
 import { Pager, pageFrom, pageSlice, perParam, sizeFrom } from '@/components/pager';
 import { PendingButton } from '@/components/pending-button';
 import { SelectAll } from '@/components/select-all';
+import { CallSelected } from '@/components/call-selected';
 import { AutoRefresh } from '@/components/auto-refresh';
 import { IconAlert, IconCheck, IconInbox, IconInfo, IconOpenLink, IconPhoneOut } from '@/components/icons';
 import { DialerTabs } from './tabs';
@@ -24,6 +25,10 @@ import { DialerTabs } from './tabs';
 // tenant and four tries per debt. The tenant who picks up gets the debt agent with their figures
 // (feature 18's router). Nothing here rings anybody directly, and nothing rings that a signed-in
 // person did not choose: the queue runs with the page closed, and Stop empties it.
+//
+// The page reads top to bottom as the job does: what the line is doing, then who owes (the list
+// you call from), then today's calls. Each list row is four facts and a button, two short lines
+// at most, so a page of fifty reads at a glance (the owner, 25 Nov: "the design is not good").
 //
 // The test calls page (feature 20) is at /dialer/test, the second tab.
 
@@ -68,6 +73,9 @@ async function resume(formData: FormData) {
 }
 
 /** A value set inside a sentence in its own direction: a number or a name in Hebrew. */
+// In the tables, a name or a phone is a <bdi> inside a block that keeps the page's direction.
+// A block with its own dir= aligns to its own start, so in English a Hebrew name sat at the far
+// side of its cell (25 Nov), and Chrome has no text-align: match-parent to pull it back.
 const iso = (s: string) => `⁨${s}⁩`;
 
 // The words, by code. A code the page does not know is shown as it is rather than hidden.
@@ -106,16 +114,15 @@ function outcomeText(t: T, o: string | null | undefined): string {
 }
 
 /** What came of one dialer row, in words: the agent's outcome, or why it did not ring. */
-function resultOf(t: T, c: DialerCall): { text: string; sub?: string } {
+function resultOf(t: T, c: DialerCall): { text: string; raw?: string } {
   if (c.status === 'done') {
     return { text: outcomeText(t, c.outcome) || t('dial.talkedNoOutcome'),
-             sub: c.why === 'no_report' ? whyText(t, c.why) : undefined };
+             raw: c.why === 'no_report' ? whyText(t, c.why) : undefined };
   }
-  if (c.status === 'no_answer') return { text: t('outcome.noAnswer') };
   if (c.status === 'failed') {
     // Tokomni's own answer ("400: invalid: …") is kept for whoever has to chase it.
     return /^\d{3}:|^no answer/.test(String(c.why ?? ''))
-      ? { text: t('dial.why.refused'), sub: String(c.why) }
+      ? { text: t('dial.why.refused'), raw: String(c.why) }
       : { text: whyText(t, c.why) };
   }
   if (c.status === 'skipped' || c.status === 'cancelled') return { text: whyText(t, c.why) };
@@ -124,6 +131,11 @@ function resultOf(t: T, c: DialerCall): { text: string; sub?: string } {
 
 const by = (email: string | null) => (email ? email.split('@')[0] : '—');
 
+/** "4 months" / "4 חודשים", and Hebrew's own word for two. */
+function monthsCount(t: T, n: number) {
+  return n === 1 ? t('dial.months1') : n === 2 ? t('dial.months2') : t('dial.monthsN', { n });
+}
+
 /** The tick's last complaint, if it is recent enough to still be true. */
 function tickError(t: T, state: { last_tick_at: string | null; last_error: string | null } | null) {
   const e = state?.last_error;
@@ -131,6 +143,47 @@ function tickError(t: T, state: { last_tick_at: string | null; last_error: strin
   if (e === 'not_connected') return t('dial.errNotConnected');
   if (e.startsWith('vapi')) return t('dial.errLine', { why: iso(e) });
   return t('dial.errTick', { why: iso(e) });
+}
+
+/** The pill for a dialer row, in the ticket pills' colours. */
+function Pill({ t, status }: { t: T; status: string }) {
+  return <span className={`pill ${PILL[status] ?? ''}`}>{STATUS[status] ? t(STATUS[status]) : status}</span>;
+}
+
+/**
+ * Where a tenant stands, in one cell: today's call if there is one, else why they cannot be
+ * called, else the last call's result, else nothing yet. The tries ride underneath.
+ */
+function Standing({ t, locale, row, today, block }: {
+  t: T; locale: Locale; row: Owing; today?: DialerCall; block: string | null;
+}) {
+  const tries = row.tries > 0 ? t('dial.triesUsed', { n: row.tries, max: MAX_TRIES }) : '';
+  if (today) {
+    const res = resultOf(t, today);
+    return (
+      <>
+        <Pill t={t} status={today.status} />
+        {(res.text || tries) && <span className="sub">{res.text || tries}</span>}
+      </>
+    );
+  }
+  if (block === 'dnc' || block === 'tries') {
+    return <span className="muted">{whyText(t, block)}</span>;
+  }
+  if (row.last) {
+    return (
+      <>
+        <span>{outcomeText(t, row.last.outcome)}</span>
+        <span className="sub">{[when(row.last.created_at, locale), tries].filter(Boolean).join(' · ')}</span>
+      </>
+    );
+  }
+  return (
+    <>
+      <span className="muted">{t(row.tries > 0 ? 'dial.calledBefore' : 'dial.never')}</span>
+      {tries && <span className="sub">{tries}</span>}
+    </>
+  );
 }
 
 /** The outcome of the last press, from the URL the action came back with. */
@@ -175,6 +228,12 @@ export default async function Dialer({ searchParams }: { searchParams?: Q }) {
   }).format(now);
 
   const { owing, calls, state, error } = await board();
+  // Today's times as the time alone; anything older keeps its date.
+  const clockFmt = new Intl.DateTimeFormat(locale === 'he' ? 'he-IL' : 'en-GB', {
+    timeZone: 'Asia/Jerusalem', hour: '2-digit', minute: '2-digit',
+  });
+  const at = (iso: string | null) => (!iso ? '—'
+    : israelDate(iso) === day ? clockFmt.format(new Date(iso)) : when(iso, locale));
 
   // ---- the line and today ------------------------------------------------
   const active = calls.filter((c) => (ACTIVE_STATUSES as readonly string[]).includes(c.status));
@@ -225,7 +284,7 @@ export default async function Dialer({ searchParams }: { searchParams?: Q }) {
   const nowLine = onLine
     ? t(onLine.status === 'answered' ? 'dial.nowTalking' : onLine.status === 'sending' ? 'dial.nowSending' : 'dial.nowRinging',
         { name: iso(onLine.name || onLine.phone),
-          since: when(onLine.answered_at ?? onLine.sent_at ?? onLine.pressed_at, locale) })
+          since: at(onLine.answered_at ?? onLine.sent_at ?? onLine.pressed_at) })
     : t('dial.nowIdle');
 
   return (
@@ -261,7 +320,7 @@ export default async function Dialer({ searchParams }: { searchParams?: Q }) {
       )}
 
       {/* The line, now. Stop is here because this is where someone looks when they want it to stop. */}
-      <div className="notice dialnow" role="status" aria-live="polite">
+      <div className={`notice dialnow${onLine ? ' live' : ''}`} role="status" aria-live="polite">
         <IconPhoneOut />
         <span>
           <b>{nowLine}</b>
@@ -291,50 +350,6 @@ export default async function Dialer({ searchParams }: { searchParams?: Q }) {
         ))}
       </div>
 
-      {todays.length > 0 && (
-        <>
-          <h2>{t('dial.todayHead')}</h2>
-          <div className="panel">
-            <div className="scrollx">
-              <table>
-                <thead><tr>
-                  <th>{t('col.resident')}</th><th>{t('col.status')}</th><th>{t('dial.colResult')}</th>
-                  <th>{t('dial.colPressed')}</th><th>{t('dial.colBy')}</th><th>{t('dial.colCall')}</th>
-                </tr></thead>
-                <tbody>
-                  {todays.slice(0, 100).map((c) => {
-                    const res = resultOf(t, c);
-                    return (
-                      <tr key={c.id}>
-                        <td dir="auto" data-label={t('col.resident')}>
-                          {c.name || '—'}
-                          <span className="sub mono" dir="ltr">{c.phone}</span>
-                        </td>
-                        <td data-label={t('col.status')}>
-                          <span className={`pill ${PILL[c.status] ?? ''}`}>{STATUS[c.status] ? t(STATUS[c.status]) : c.status}</span>
-                          {c.attempt ? <span className="sub">{t('dial.tryN', { n: c.attempt, max: MAX_TRIES })}</span> : null}
-                        </td>
-                        <td dir="auto" data-label={t('dial.colResult')}>
-                          {res.text || '—'}
-                          {res.sub && <span className="sub mono" dir="ltr">{res.sub}</span>}
-                        </td>
-                        <td className="muted mono" data-label={t('dial.colPressed')}>{when(c.pressed_at, locale)}</td>
-                        <td className="muted" dir="auto" data-label={t('dial.colBy')}>{by(c.pressed_by)}</td>
-                        <td data-label={t('dial.colCall')}>
-                          {c.interaction_id
-                            ? <Link className="btn-sm" href={`/calls/${c.interaction_id}`}><IconOpenLink />{t('dial.openCall')}</Link>
-                            : <span className="muted">—</span>}
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </>
-      )}
-
       <h2>{t('dial.listHead')}</h2>
       <div className="filters">
         <nav className="seg" aria-label={t('col.period')}>
@@ -361,72 +376,68 @@ export default async function Dialer({ searchParams }: { searchParams?: Q }) {
         <input type="hidden" name="back" value={back} />
         <div className="panelhead">
           <span>{t('dial.listCount', { n: rows.length, total: iso(shekels(totalOwed)) })}</span>
-          <PendingButton className="btn-sm" busy={t('dial.adding')} disabled={!open || paused}>
-            <IconPhoneOut />{t('dial.callSelected')}
-          </PendingButton>
+          <CallSelected form="dialer-list" name="phone" label={t('dial.callSelected')} busy={t('dial.adding')}
+                        disabled={!open || paused} icon={<IconPhoneOut />} />
         </div>
         {visible.length ? (
           <div className="scrollx">
-            <table>
+            <table className="dialtable">
               <thead><tr>
                 <th>
-                  <span className="dialpick">
+                  <span className="dialwho">
                     <SelectAll form="dialer-list" name="phone" label={t('dial.selectAll')} />
-                    {t('col.resident')}
+                    <span>{t('col.resident')}</span>
                   </span>
                 </th>
                 <th>{t('col.building')}</th>
-                <th>{t('debts.owed')}</th>
-                <th>{t('debts.monthsOwed')}</th>
-                <th>{t('dial.colTries')}</th>
-                <th>{t('dial.colLast')}</th>
-                <th>{t('dial.colToday')}</th>
-                <th>{t('debts.call')}</th>
+                <th className="num">{t('debts.owed')}</th>
+                <th>{t('col.status')}</th>
+                <th><span className="sr-only">{t('debts.call')}</span></th>
               </tr></thead>
               <tbody>
                 {visible.map((r) => {
                   const mine = today.get(r.phone);
                   const block = blockOf(r, mine, day);
                   const can = open && !paused && !block;
+                  const span = monthRange(r.months, locale);
                   return (
                     <tr key={r.phone}>
-                      <td dir="auto">
-                        <label className="dialpick">
+                      <td>
+                        <label className="dialwho">
                           <input type="checkbox" className="dialcheck" name="phone" value={r.phone}
                                  disabled={!can} aria-label={t('dial.pick', { name: r.name || r.phone })} />
-                          <span>{r.name || '—'}</span>
+                          <span>
+                            <b><bdi>{r.name || '—'}</bdi></b>
+                            <span className="sub mono"><bdi dir="ltr">{r.phone}</bdi></span>
+                          </span>
                         </label>
-                        <span className="sub mono" dir="ltr">{r.phone}</span>
                       </td>
-                      <td dir="auto" data-label={t('col.building')}>
-                        {r.buildings.join(', ') || '—'}
+                      <td data-label={t('col.building')}>
+                        <bdi>{r.buildings.join(' · ') || '—'}</bdi>
                         {r.units.length > 0 && (
                           <span className="sub">
-                            {t(r.units.length > 1 ? 'dial.flatsMany' : 'dial.flats', { units: r.units.join(', ') })}
+                            {t(r.units.length > 1 ? 'dial.flatsMany' : 'dial.flats', { units: iso(r.units.join(', ')) })}
                           </span>
                         )}
                       </td>
-                      <td className="mono num" data-label={t('debts.owed')}>{shekels(r.owed)}</td>
-                      <td className="muted mono" data-label={t('debts.monthsOwed')}>{r.months.join(', ') || '—'}</td>
-                      <td className="mono" data-label={t('dial.colTries')}>{t('dial.tries', { n: r.tries, max: MAX_TRIES })}</td>
-                      <td dir="auto" data-label={t('dial.colLast')}>
-                        {r.last ? (
-                          <>
-                            {outcomeText(t, r.last.outcome)}
-                            <span className="sub mono">{when(r.last.created_at, locale)}</span>
-                          </>
-                        ) : <span className="muted">{t('dial.never')}</span>}
+                      <td className="num" data-label={t('debts.owed')}>
+                        <span className="mono">{shekels(r.owed)}</span>
+                        <span className="sub" title={span.full}>{monthsCount(t, r.months.length)} · {span.range}</span>
                       </td>
-                      <td data-label={t('dial.colToday')}>
-                        {mine
-                          ? <span className={`pill ${PILL[mine.status] ?? ''}`}>{STATUS[mine.status] ? t(STATUS[mine.status]) : mine.status}</span>
-                          : block ? <span className="muted">{whyText(t, block)}</span> : <span className="muted">—</span>}
+                      <td data-label={t('col.status')}>
+                        <Standing t={t} locale={locale} row={r} today={mine} block={block} />
                       </td>
-                      <td>
-                        <PendingButton className="btn-sm" busy={t('dial.adding')} disabled={!can}
-                                       name="one" value={r.phone} title={block ? whyText(t, block) : undefined}>
-                          <IconPhoneOut />{t('dial.call')}
-                        </PendingButton>
+                      <td className="dialact">
+                        {/* No button for a tenant who cannot be called: the Status cell says why.
+                            Outside the hours or while paused every button stays, greyed, and
+                            the notice above says why. */}
+                        {!block && (
+                          <PendingButton className="btn-sm" busy={t('dial.adding')} disabled={!can}
+                                         name="one" value={r.phone}
+                                         title={t('dial.callName', { name: r.name || r.phone })}>
+                            <IconPhoneOut />{t('dial.call')}
+                          </PendingButton>
+                        )}
                       </td>
                     </tr>
                   );
@@ -442,6 +453,53 @@ export default async function Dialer({ searchParams }: { searchParams?: Q }) {
         )}
         <p className="setnote">{t('dial.rules')}</p>
       </form>
+
+      {todays.length > 0 && (
+        <>
+          <h2>{t('dial.todayHead')}</h2>
+          <div className="panel">
+            <div className="scrollx">
+              <table className="dialtable">
+                <thead><tr>
+                  <th>{t('col.resident')}</th><th>{t('col.status')}</th>
+                  <th>{t('dial.colPressed')}</th><th>{t('dial.colBy')}</th>
+                  <th><span className="sr-only">{t('dial.colCall')}</span></th>
+                </tr></thead>
+                <tbody>
+                  {todays.slice(0, 100).map((c) => {
+                    const res = resultOf(t, c);
+                    return (
+                      <tr key={c.id}>
+                        <td>
+                          <b><bdi>{c.name || '—'}</bdi></b>
+                          <span className="sub mono"><bdi dir="ltr">{c.phone}</bdi></span>
+                        </td>
+                        <td data-label={t('col.status')}>
+                          <Pill t={t} status={c.status} />
+                          {res.text && <span className="sub">{res.text}</span>}
+                          {res.raw && <span className="sub mono"><bdi dir="ltr">{res.raw}</bdi></span>}
+                        </td>
+                        <td data-label={t('dial.colPressed')}>
+                          <span className="mono">{at(c.pressed_at)}</span>
+                          {c.attempt ? <span className="sub">{t('dial.tryN', { n: c.attempt, max: MAX_TRIES })}</span> : null}
+                        </td>
+                        <td className="muted" data-label={t('dial.colBy')}><bdi>{by(c.pressed_by)}</bdi></td>
+                        <td className="dialact">
+                          {c.interaction_id && (
+                            <Link className="btn-nav" href={`/calls/${c.interaction_id}`}>
+                              <IconOpenLink />{t('dial.openCall')}
+                            </Link>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
 }

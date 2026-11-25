@@ -144,6 +144,25 @@ export function parseSummary(s: string | undefined): Array<[string, number]> {
   });
 }
 
+/**
+ * The months a row owes as a short range, "Jul–Oct 2026" or "יולי–אוקטובר 2026", and every month
+ * for the tooltip. A list of ten "2026-01, 2026-02, …" set the whole table's width (25 Nov); the
+ * count beside the range (the page's own words) still says when there are gaps in it.
+ */
+export function monthRange(months: string[], locale: 'he' | 'en'): { range: string; full: string } {
+  const sorted = [...new Set(months)].filter((m) => /^\d{4}-\d{2}$/.test(m)).sort();
+  if (!sorted.length) return { range: '', full: '' };
+  const name = (m: string, withYear: boolean) => new Intl.DateTimeFormat(locale === 'he' ? 'he-IL' : 'en-GB', {
+    month: locale === 'he' ? 'long' : 'short', ...(withYear ? { year: 'numeric' as const } : {}), timeZone: 'UTC',
+  }).format(new Date(`${m}-01T00:00:00Z`));
+  const first = sorted[0];
+  const last = sorted[sorted.length - 1];
+  const range = first === last ? name(first, true)
+    : first.slice(0, 4) === last.slice(0, 4) ? `${name(first, false)}–${name(last, false)} ${last.slice(0, 4)}`
+    : `${name(first, true)} – ${name(last, true)}`;
+  return { range, full: sorted.map((m) => name(m, true)).join(', ') };
+}
+
 /** Matches a search box against a row: name, building or flat, or the phone's digits. */
 export function matches(row: Owing, q: string): boolean {
   const s = q.trim().toLowerCase();
