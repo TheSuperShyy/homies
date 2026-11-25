@@ -11,6 +11,20 @@ conversation that produced it.
 
 ## 2026-11-25
 
+### Are the Dialer page's amounts right? No: they are our own arrears, and most differ from OXS's live debts (the owner: "is the debt balance in the dashboard accurate?"), read only, 15:25 UTC
+- **Where the page's amounts come from:** `charges` (unpaid, amount > 0), summed per phone (`dialer-board.ts` `groupOwing`). The OXS sync (`oxs-sync.yml`, twice a day) writes them with `oxs_arrears.py`: every ended 2026 month with no `monthsPaid` entry in the building's payment records counts as owed, at the flat's most common monthly amount. A charge turns paid only when a later run finds that month paid (same phone and flat). Nothing reads what OXS actually billed.
+- **Compared with OXS's live `GET /debts`** (one call, 875 flats owe; calculated by the rules of OXS's payments screen since API rev 1.10), by building and flat, the test building left out. Of the page's 201 flats:
+  - 51 equal OXS's overdue total (`totalDebt`), and 6 more equal it with this month (`totalDebtWithCurrentMonth`);
+  - 75 owe nothing in OXS. Six of them, picked at random, read one by one (`/apartments/:id/debts`): all null, owes nothing;
+  - 18 owe only this month in OXS, nothing overdue;
+  - 26 are higher on the page, and 24 lower (12 of these carry special payments in OXS and 3 earlier years, which the sweep never counts);
+  - 1 is in a building now disabled in OXS.
+- **OXS's flats missing from the page:** 749 of 874, 665 of them owing no 2026 monthly payment (special payments, earlier years or this month only).
+- **One flat traced:** OXS's payment records show 2024 and 2025 paid (in payments made in October 2026) and November 2026, none for January to October. So the sweep counts ten months owed, while OXS's own calculation says the flat owes nothing.
+- **What it means:** a press can ring someone who owes nothing, and the debt agent is given the page's amount.
+- **The fix:** take the amounts from OXS's live debts. It is the decision already owed since 17 Nov: which total (overdue, or with this month) and whether special payments and earlier years count. The scripts are in the session scratchpad (`debt_compare.py`, `debt_compare2.py`, `debt_spot.py`). No shekel totals are written here (public repo); they went to the owner in chat.
+- **The owner's second question, "put the number of the person and call that specifically":** the Dialer's search already finds a phone on the list, and its row's "חייג" calls it. The test tab's number box refuses real tenants by design. A typed number for anyone OXS says owes is possible: the same queue and rules, with the debt looked up in OXS at the press. It goes with the fix above. Answered, nothing built.
+
 ### Would a new email named "homies" fix the spam? (the owner: "if i make a new email named homies will it work"), answered, 14:46 UTC
 - **A new @gmail.com named "homies":** it takes away the "test" name and the name/address mismatch. But it is still an outside personal Gmail, brand new with no sending history, with the same hosting-subdomain link. Likely still spam for some. Not a fix.
 - **A new address on Homies' own domain** (for example homies@ or noreply@homies-management.co.il, made in their Google Workspace): yes. Mail between their own Workspace users is trusted. It needs 2-Step Verification and an App password on it, then `chatwoot_smtp.py` switches and the five open invites go again.

@@ -6045,6 +6045,15 @@ gitignored; the v5 file we had was rev 1.9).
   residents, so the debt calls work from a far smaller list than OXS's. Whether
   to call from OXS's live debts instead is the owner's decision: which total,
   which years, and whether special payments count.
+- **The amounts differ too, not only the list (read 25 Nov, by building and flat).**
+  - The Dialer page's 201 real flats: 57 match OXS's live debts. 75 owe nothing in
+    OXS (6 confirmed one by one with `/apartments/:id/debts`), 18 owe only this
+    month, and 50 differ either way.
+  - The sweep's "no `monthsPaid` entry = owed" is not OXS's rule. One traced flat:
+    payment records for 2024, 2025 and November 2026 only, so ten months owed for
+    us, and nothing owed for OXS.
+  - So a figure from `charges` is our estimate, not what the office sees on OXS's
+    payments screen.
 - **Rev 1.11 adds building bank accounts**, for tenants who pay by transfer.
   `GET /bank-accounts` and `GET /buildings/:id/bank-accounts`, which the finance
   key reads, give bank, branch, account number, owner and `isApproved`. Give the

@@ -8,6 +8,12 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **THE DIALER PAGE'S AMOUNTS ARE NOT OXS'S (read 25 Nov, 15:25 UTC; WORKLOG and CONTEXT 25 Nov).**
+> - **Today:** the page sums our `charges`, which the OXS sync works out from missing payment records. Of 201 real flats, 57 match OXS's live `GET /debts`. 75 owe nothing in OXS (6 checked one by one), 18 owe only this month, 50 differ either way. 749 flats OXS says owe are not on the page.
+> - **Effect:** a press can ring someone who owes nothing, and the debt agent quotes the page's amount.
+> - **Owed: the owner's decision** (the one from 17 Nov): amounts from OXS's live debts, which total (overdue `totalDebt`, or with this month), and whether special payments and earlier years count.
+> - **Asked too:** a box to type a number and call that person. The search plus the row's "חייג" covers anyone on the list. A typed number for anyone OXS says owes is possible, with the debt looked up in OXS at the press; it goes with the decision above. Nothing built.
+>
 > **The dialer dashboard's video guide (25 Nov, local, gitignored):** `local/dialer-video/homies-dialer-guide-he-hila.mp4` (3:26, Hebrew, why it is needed and how to use it; invented data only). Voiced by Hila (free) because Clix's Cartesia key has 26 credits; Ayala, like the Chatwoot videos, is `build.py --voice ayala` after a top-up of about 2,600 credits. The recording kit (`demo-preview.patch`, `demo-db.ts`) is beside it; WORKLOG 25 Nov.
 >
 > **LIVE 25 Nov: THE DASHBOARD SHOWS ONLY THE DIALER AND THE CALLS** (the owner: "in the dashboard i want everything gone only the dialer and call related should be seen here"; PR #25, `main` `954fafe`; CONTEXT, Standing decisions; WORKLOG 25 Nov).
