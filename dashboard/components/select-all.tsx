@@ -16,9 +16,11 @@ export function SelectAll({ form, name, label }: { form: string; name: string; l
       title={label}
       onChange={(e) => {
         const on = e.currentTarget.checked;
-        document.getElementById(form)
-          ?.querySelectorAll<HTMLInputElement>(`input[type="checkbox"][name="${name}"]`)
+        const f = document.getElementById(form);
+        f?.querySelectorAll<HTMLInputElement>(`input[type="checkbox"][name="${name}"]`)
           .forEach((box) => { if (!box.disabled) box.checked = on; });
+        // Setting `checked` fires nothing, so the form is told, for the count on Call selected.
+        f?.dispatchEvent(new Event('change'));
       }}
     />
   );

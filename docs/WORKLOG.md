@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-11-25
 
+### LIVE about 13:4x UTC: the Dialer page's layout redone (PR #24, `main` `c5196c1`)
+- **The owner, with a screenshot of `/dialer`:** *"the design is not good"*. It showed the Call buttons cut off at the table's edge, the months column ("2026-01, 2026-02, … 2026-10", never wrapping) taking the width, and names, buildings and "Not called yet" wrapping into three or four lines.
+- **Done through the design skill's polish pass, page only.** The dialer's behaviour, its database and the function are unchanged.
+  - Order: the line and today's counts, then who owes (the job), then today's calls.
+  - Five columns instead of eight. The tenant (tick box, name, phone); the building and flats; the amount with "8 months · Jan–Oct 2026" under it (`monthRange`, every month in the tooltip); where they stand (today's pill, else do-not-call or 4 tries, else the last result and date, with the tries used); Call.
+  - No Call button for a tenant who cannot be called.
+  - "Call selected" shows how many are ticked and is off at none (`components/call-selected.tsx`); the whole-page box ticks only callable rows.
+  - Names and phones are `<bdi>` inside cells that keep the page's direction. In English a Hebrew name sat at the far side of its cell (`dir` on a block aligns to its own start), and Chrome has no `text-align: match-parent`: probed, `CSS.supports` false.
+  - Today's times as the time alone; "Called before" where tries were used with no result on file; the loading placeholder at 5 columns.
+- **Checked on a local copy with made-up tenants.** The login skip and sample data were local only and removed before the commit (`git grep` finds none).
+  - Rendered in Hebrew and English, dark and light, at 1890, 1366 and 390 px. The table's scroll width equals its width at all three; before, 1431/1398, 1451/1084 and 750/356.
+  - Ticking, the whole-page box (6 of 10 callable), the space bar, and no console errors.
+  - `tsc`, `next build`, `node --test` (a new `monthRange` test).
+- **Live:** CI green; Vercel production READY on `c5196c1` (`dpl_2hBMCLP2…`). The same code is on `feature/chatbot` (`i18n.ts` by patch).
+
 ### LIVE about 12:27 UTC: the dashboard has a real dialer, `/dialer` (feature 23, PR #23)
 - **Asked:** *"ok in the dashboard we need to have an actual dialer section there not just the dialer test"*. The design went to the owner in chat (one tenant at a time through Omni's dialer, running with the page closed, calling hours, 4 tries, once a day, pause after 5 unanswered, no PIN); the owner: *"ok build it"*.
 - **What staff see:** everyone who owes, one row per phone (209 on 25 Nov from 789 unpaid charges, months Jan-Oct 2026): flats, amount, months, tries of 4, the last call's result, today's state. Tick rows or the whole page, "חייג למסומנים", or "חייג" on one row. Above: the line now, waiting, Stop, four counts for today, today's calls. "חייגן" moved into the main menu next to Debts (the phone's tab bar is unchanged; the top-bar icon stays). The test page moved to `/dialer/test`, the second tab, unchanged.

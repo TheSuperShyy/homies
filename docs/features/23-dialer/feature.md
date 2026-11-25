@@ -2,7 +2,7 @@
 
 **Estimate:** 1d
 **Depends on:** 18-dialer-routing (who answers), 20-dialer-test (Omni's lead API), 15-call-button (`press_call`)
-**Status:** BUILT 25 Nov 2026, PR #23 (`feature/real-dialer`); migration 043 applied and the function's Tokomni pair set on 25 Nov; the first real press is owed
+**Status:** LIVE 25 Nov 2026: PR #23 (`main` `6cb70ec`, the dialer) and PR #24 (`c5196c1`, the page's layout after the owner's "the design is not good"); migration 043 applied and the function's Tokomni pair set on 25 Nov; the first real press is owed
 
 ## Purpose
 
@@ -16,16 +16,27 @@ section there not just the dialer test"*.
 1. **The page** (`/dialer`, "חייגן", in the main menu next to Debts; on a phone, the icon in the
    top bar) has two tabs: "חיוג לדיירים" (this) and "שיחות בדיקה" (feature 20, now at
    `/dialer/test`, unchanged).
-2. **The line, now:** ringing someone, Michael talking to someone, or free; how many are waiting;
-   a Stop button while anyone waits. Four counts for today: waiting, called, answered, no answer.
-   The page refreshes itself every 10 s while anything is waiting or on the line.
-3. **Today's calls:** each press of today, with its status, its result (the agent's outcome, or
-   why it did not ring), when, who pressed, and a link to the call's page once it has one.
-4. **Who owes:** one row per phone number (a couple on one phone is one ring; an owner of two flats
-   is one call about both): name, buildings and flats, amount, months, tries so far (of 4), the
-   last call's result, and today's state. Filter by month, search by name, phone or building, 10,
-   25 or 50 rows a page. Every unpaid charge counts; the month filter only picks who is shown.
-5. **A press:** tick rows (or the whole page) and press "חייג למסומנים", or press "חייג" on one
+2. **The line, now:** ringing someone, Michael talking to someone (the bar takes the "under way"
+   colour), or free; how many are waiting; a Stop button while anyone waits. Four counts for
+   today: waiting, called, answered, no answer. The page refreshes itself every 10 s while
+   anything is waiting or on the line.
+3. **Who owes**, right under it, because it is the job: one row per phone number (a couple on one
+   phone is one ring; an owner of two flats is one call about both), five columns:
+   - the tenant: tick box, name, phone;
+   - the building and flats;
+   - the amount, with "8 months · Jan–Oct 2026" under it (every month in the tooltip);
+   - where they stand: today's call (a pill, and its result or reason), else why they cannot be
+     called (do-not-call, 4 tries), else the last call's result and date, else "not called yet";
+     the tries used underneath;
+   - Call, only for a tenant who can be called now.
+   Filter by month, search by name, phone or building, 10, 25 or 50 rows a page. Every unpaid
+   charge counts; the month filter only picks who is shown. No row needs sideways scrolling, at a
+   desk or on a phone (where each row is a card).
+4. **Today's calls**, below the list: each press of today with its status and result (the agent's
+   outcome, or why it did not ring), the time and the try, who pressed, and a link to the call's
+   page once it has one.
+5. **A press:** tick rows (or the whole page, which ticks only the callable ones) and press
+   "חייג למסומנים" (it shows how many are ticked, and is off at none), or press "חייג" on one
    row. Each becomes a waiting row in `dialer_calls` (`dialer_queue`), or a reason it did not:
    not an Israeli number, already queued, already called today, no tenant on the number,
    do-not-call, owes nothing, or four tries on every open month. A press outside calling hours
@@ -95,7 +106,8 @@ section there not just the dialer test"*.
   pushes the Tokomni pair on a hand `--apply`.
 - `dashboard/app/(app)/dialer/page.tsx`, `loading.tsx`, `tabs.tsx`; `dialer/test/` (feature 20,
   moved); `dashboard/lib/dialer-queue.ts` (server), `dialer-board.ts` (pure);
-  `components/select-all.tsx`, `auto-refresh.tsx`, `pending-button.tsx` (name and value).
+  `components/select-all.tsx`, `call-selected.tsx` (the count on "Call selected"),
+  `auto-refresh.tsx`, `pending-button.tsx` (name and value).
 - `scripts/check_dialer_queue.test.ts`: the tick's rules beside the test page's, and the list.
 
 ## Acceptance

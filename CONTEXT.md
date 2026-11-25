@@ -6330,3 +6330,12 @@ fact.** The cleaner-frequency question is named almost verbatim in
 therefore worth reading as a bug report about tool selection before it is
 believed — and the prompt now tells the model to check the tool before
 professing ignorance.
+
+## In a dashboard table the value carries its direction; the cell keeps the page's (25 Nov)
+
+A block with its own `dir` (a `<b dir="auto">` set to `display: block`, a `.sub` line with
+`dir="ltr"`) aligns to its own start. So in English a Hebrew name sat at the far side of its cell,
+and in Hebrew a phone sat on the left. Chrome has no `text-align: match-parent` to pull it back
+(`CSS.supports` is false). Put the value in a `<bdi>` (`<bdi dir="ltr">` for a phone, a time or a
+code) inside a block that has no `dir`. Inline spans with `dir` are fine. Found on `/dialer`
+(PR #24); the other pages still put `dir="auto"` on some cells and show the same drift in English.
