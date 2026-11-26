@@ -18,7 +18,8 @@ conversation that produced it.
 - **The switch, 14:09:48-14:10:48 UTC, green:** inbox 1 on their number (id …8637, account …0527, their key, 6 templates), their app's own webhook active (messages), the override on Chatwoot, subscribed apps HOMIES only. No `--manychat-is-off` was needed, since nothing else is connected.
 - **The typing dots, 14:11:08 UTC:** `n8n_whatsapp_tohomies.py`, gate on the candidate 740/740.
 - **ManyChat no longer answers the number.** Its app is off the account; the plan stays Yariv's to cancel.
-- **Proof owed:** a message to 077-668-7949 answered with WhatsApp's id (a watch is running).
+- **Proven 14:12:41 UTC:** the owner's "היי" to 077-668-7949 (conversation 108) got Michael's greeting, "היי, צהריים טובים 👋 כאן מיכאל מהומי'ז. במה אוכל לעזור לך היום?", with WhatsApp's id, read on the handset.
+- **Still open:** a template from their account (the first one will show whether their WhatsApp account has a payment method; replies are free); `check_whatsapp_rules.py --watch 2026-11-26T14:10:48Z` tomorrow; Homies' four ManyChat scenarios in Make now have no ManyChat (two replaced by OXS, two theirs to decide); Yariv cancels the ManyChat plan; the AI wallet ($29.96).
 
 ### 13:57 UTC: rolled back; Homies' number stays on ManyChat, because Meta refuses our app's sends (the owner: "roll back for now")
 - **After the 13:19 switch:** the owner's "היי" arrived at 13:25:33 and Michael's reply failed in Chatwoot with "Application does not have permission for this action". A harmless mark-as-read with CLIX's key got Meta's full answer: code 10, subcode 2593181, "You do not have the necessary permissions to send messages on behalf of this WhatsApp Business Account" (Permission Denied). Incoming worked; every send was refused.
