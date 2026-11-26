@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-11-26
 
+### Michael calls Homies "חברה לניהול ואחזקת בניינים" (WhatsApp epoch 117, LIVE 10:08:02 UTC)
+- **The ask** (Homies, forwarded by the owner with "lets implement this"): "אפשר לבקש ממיכאל שלא יגיד 'אנחנו חברה לניהול ועד בית' אלא, 'אנחנו חברה לניהול ואחזקת בניינים'".
+- **Where he said it:** WhatsApp, 24 Nov 08:26 UTC, to a massage clinic's own bot that had written to the number by mistake ("הגעת למספר של הומי'ז, אנחנו חברה לניהול ועד בית"). Once more on 4 Nov ("חברת ניהול ועד בית ותחזוקת מבנים"). No text in the workflow says it: the prompt's first line called Homies "חברת ניהול בתים משותפים", the only place it says what the company is, and the model put it in its own words.
+- **The fix, one phrase and nothing added:** the first line now reads "אתה מיכאל מצוות השירות של הומי'ז, חברה לניהול ואחזקת בניינים." No rule, and the old phrase is quoted nowhere a model reads. Prompt 89c2cc1bd0cd -> a70004f02b0e (27,643 chars); tools unchanged. `Worth a word?` keeps its own identity line: it only decides whether a message asks for a payment link and never says what Homies is.
+- **Shipped by** `scripts/n8n_whatsapp_company.py`, MEMORY_EPOCH 116 -> 117 (every buffer starts fresh). Gate: 731/731 on the candidate and on live (24 new cases: the line goes out whole through Send and every Reply usable? guard); the replay changed nothing; the idle check as on live before (the same four patchers would write: batch, firstword, tohomies, typing). No Claude round, as on 19 Nov: one phrase, and Gemini's choice of words is the handset's to show. Snapshot `local/n8n-whatsapp-live-26nov-before-company.json`; `--restore` puts it back.
+- **Watch:** 0 tenant turns since 10:08:02 UTC at the time of writing; run `check_whatsapp_rules.py --watch 2026-11-26T10:08:02Z` again tomorrow.
+- **Owed (chatbot first):** both phone agents still call Homies "חברת ניהול בתים משותפים בישראל" (`docs/assistant/demo-inbound.md`, the debt agent's `docs/features/10-debt-followup/prompt.md`); the same line goes to them on the owner's word.
+
+### The dashboard's menu drops "Voice Agent call" (PR #28, `main` 9f6ea4d, LIVE)
+- **The ask:** the owner, on a screenshot of the menu's "Voice Agent call": "remove this in the dashboard".
+- **What changed:** the menu is the Dialer and Phone calls; `/voice` left `SHOWN` in `dashboard/lib/sections.ts`, so it sends a signed-in visitor to the Dialer like every other hidden page. The page's code stays.
+- **Checked:** `check_sections.test.ts` (3/3, `/voice` now among the hidden paths), `tsc --noEmit`, CI `checks` green; Vercel's production deploy of 9f6ea4d completed.
+
 ### The owner's Dialer call to Ido, read (the owner: "check the recent call i made with ido"), read only, 10:0x UTC
 - **The Dialer's first real press, end to end.** Pressed 09:38:46 UTC by the office login; sent to Omni 09:38:56 ("200: inserted 1"); answered 09:39:24; the router gave the debt agent (`4bc03b57`); done 09:40:40 with `authorized`. 70 s, $0.15, ended by the agent.
 - **What Michael did:**

@@ -2231,6 +2231,25 @@ function cases(E) {
     expect('a reply with no link is untouched (blank lines still become a space)',
       say({ reply: NOLINK, said: 'roof' }), 'פתחתי לך קריאה, מספר 255-1339-26. יש עוד משהו שאוכל לעזור בו?');
   }
+  // 26 Nov (scripts/n8n_whatsapp_company.py, epoch 117). Homies, forwarded by the owner: Michael says what Homies is in
+  // Homies' own words, "חברה לניהול ואחזקת בניינים" (24 Nov, 08:26 UTC, a massage clinic's bot that wrote by mistake
+  // heard another description). The words are the prompt's; these cases hold the handset to them: Send and every
+  // Reply usable? guard let the line through whole.
+  {
+    console.log(NL + '--- 26 Nov: what Homies is reaches the handset whole, in Homies\' own words ---');
+    const WRONG = 'מעונייןלתאם תור ?';
+    const COA = "אה, הבנתי 🙂 הגעת למספר של הומי'ז, אנחנו חברה לניהול ואחזקת בניינים, אז תור לעיסוי זה לא אצלנו. יש משהו בבניין שאוכל לעזור לך בו?";
+    const WHO = 'מי אתם בעצם? מה החברה הזאת?';
+    const COB = "אני מיכאל מצוות השירות של הומי'ז. אנחנו חברה לניהול ואחזקת בניינים. יש משהו בבניין שאוכל לעזור לך בו?";
+    expect('the wrong number hears what Homies is, whole', say({ reply: COA, said: WRONG }), COA);
+    expect('"who are you?" hears it whole', say({ reply: COB, said: WHO }), COB);
+    for (const id of Object.keys(E.reply)) {
+      expect('Reply usable? ' + id + ' lets the wrong-number line through',
+        () => E.reply[id]({ output: COA, intermediateSteps: [] }, 0, turn({ steps: [], said: WRONG }).$), true);
+      expect('Reply usable? ' + id + ' lets the "who are you" line through',
+        () => E.reply[id]({ output: COB, intermediateSteps: [] }, 0, turn({ steps: [], said: WHO }).$), true);
+    }
+  }
   console.log(NL + (fails ? fails + ' of ' + n + ' FAILED' : 'all ' + n + ' cases pass'));
   return fails;
 }

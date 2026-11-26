@@ -26,7 +26,7 @@ The user is the builder. The client is Homies.
 ## Standing decisions. Do not relitigate these.
 
 **The dashboard shows the dialer and the calls only (25 Nov; the owner: *"in the dashboard i want everything gone only the dialer and call related should be seen here"*).** PR #25, `main` `954fafe`.
-- **The menu** is the Dialer (with its Test calls tab), Phone calls and the Voice agent call, in the desk sidebar and the phone's tab bar. The dashboard and the sign-in open on the Dialer.
+- **The menu** is the Dialer (with its Test calls tab) and Phone calls, in the desk sidebar and the phone's tab bar. The dashboard and the sign-in open on the Dialer. The Voice agent call left the menu on 26 Nov (the owner: *"remove this in the dashboard"*; PR #28), so `/voice` sends to the Dialer too.
 - **Every other page sends a signed-in visitor to the Dialer** (the middleware, reading `dashboard/lib/sections.ts`): the overview at `/`, tickets, debts, WhatsApp conversations, search, import. The pages are still in the code, untouched. One comes back only on the owner's word: its path in `SHOWN` and its row in the layout's `NAV`.
 - **Gone from the chrome:** the top bar's search box (it searched what is hidden) and the phone's search, dialer and import icons. Settings stays behind the gear and the name in the corner. The reviewers' pages (`/review`) and the API routes are not affected.
 - **So a change to a hidden page reaches nobody.** Say so before building one.
@@ -4016,6 +4016,7 @@ the reason for Claude-played runs is the owner's rule on OpenRouter credit, not 
   - **`--watch` reads the new path:** an info line when `Mend the reply` ran (what it did, the rescue ticket's number), a flag when it ran and nothing went out, and an info line for any sent ticket claim whose number no tool gave that turn, to be read for the gap above.
 - **What Michael says, decided by the owner on 5 Oct (fix 4, prompt epoch 74, `n8n_whatsapp_straight.py`; LIVE 5 Oct 16:31 UTC).** These are meanings in the prompt, not fixed sentences.
   - **Who he is:** "מצוות השירות של הומי'ז". Asked straight out whether he is a bot, he is the digital assistant on that team and offers a person; choosing a person is a team note. Never "a real person", never who built him or what model.
+    - **What Homies is, in his words (26 Nov, Homies through the owner; WhatsApp epoch 117):** "חברה לניהול ואחזקת בניינים", Homies' own words, never "חברה לניהול ועד בית". The prompt's first line carries them; the model had turned the old "חברת ניהול בתים משותפים" into the other one (24 Nov). The phone agents' twin is owed.
   - **Danger:** the urgent ticket and its number, nothing else. No advice, no numbers, no call offer, no promise. If pushed, the ticket with its number and "that is the only thing I can do from here", with no question after it. The number is required: fix 1's `phantom` sends a ticket claim without one back. This and the payment link are the only replies that end without a question. The team note still goes out.
   - **"When?":** no date, said plainly, and the ticket is open (or the team knows) and will be handled. The 4h / 3-day line is gone from the facts.
   - **"Anything else?":** only once his matter is done; until then the closing question carries his matter on.

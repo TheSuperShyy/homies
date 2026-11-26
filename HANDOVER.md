@@ -1,6 +1,6 @@
 # HANDOVER — Homies, everything you need to take over
 
-**Current as of 2026-11-25.** If you have just been told "read the handover",
+**Current as of 2026-11-26.** If you have just been told "read the handover",
 this file plus `CONTEXT.md` is the whole briefing. Read both, then start
 working. Go to `docs/WORKLOG.md` only when you need to know *why* something
 was decided — it is the chronology with full reasoning, newest first.
@@ -8,6 +8,13 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 26 Nov, 10:08:02 UTC: WHATSAPP EPOCH 117: MICHAEL CALLS HOMIES "חברה לניהול ואחזקת בניינים"** (Homies, forwarded by the owner: not "אנחנו חברה לניהול ועד בית"; WORKLOG 26 Nov).
+> - **Why:** on 24 Nov he told a massage clinic's bot "אנחנו חברה לניהול ועד בית". No text said it; the prompt's first line ("חברת ניהול בתים משותפים") was put in the model's own words. That line now carries Homies' words, and nothing else changed.
+> - **Shipped by** `scripts/n8n_whatsapp_company.py` (prompt a70004f02b0e, tools unchanged, memory 116 -> 117). Gate 731/731 on live; the replay unchanged. **Owed:** the owner's handset (e.g. "מי אתם בעצם?") and `check_whatsapp_rules.py --watch 2026-11-26T10:08:02Z` tomorrow. **Rollback:** `--restore`, then the epoch back in the repo.
+> - **Twin owed (chatbot first):** both phone agents still say "חברת ניהול בתים משותפים בישראל"; they get the same line on the owner's word.
+>
+> **LIVE 26 Nov: THE DASHBOARD'S MENU DROPS "VOICE AGENT CALL"** (the owner: "remove this in the dashboard"; PR #28, `main` `9f6ea4d`). The menu is the Dialer and Phone calls; `/voice` sends a signed-in visitor to the Dialer. The page's code stays (`dashboard/lib/sections.ts` brings it back).
+>
 > **LIVE 26 Nov: EACH CALL'S PAGE PLAYS ITS RECORDING** (PR #27, `main` `e14fa7c`; WORKLOG 26 Nov). The saved `audio_url` never plays (Vapi's private bucket), so `dashboard/lib/recording.ts` asks Vapi for a signed link (`presignedMonoUrl`, about 30 minutes) each time the page opens. Only what Vapi still keeps plays; nothing of ours stores a copy.
 >
 > **LIVE 25 Nov, 16:27 UTC: THE DIALER'S AMOUNTS ARE OXS'S OWN DEBT, AND A NUMBER CAN BE TYPED AND CALLED** (the owner: "i need it to be accurate and has an option to manually call the input number"; feature 24, `docs/features/24-oxs-live-debts/`; PR #26, `main` `ec2e19f`; WORKLOG and CONTEXT 25 Nov).
@@ -31,7 +38,7 @@ appended to.
 > **The dialer dashboard's video guide (26 Nov, local, gitignored):** `local/dialer-video/homies-dialer-guide-he.mp4` (3:29, Hebrew, Ayala on the Ronit guides' Cartesia key; invented data only). It covers why the dashboard is needed and how to use it, including where the amounts come from (OXS, special payments) and the "חיוג למספר" box. The 25 Nov Hila cut is beside it, outdated. To rebuild after a page change: `python local/dialer-video/build.py` against a throwaway worktree of `main` with `demo-preview.patch` and `demo-db.ts` (port 3124, `DEMO=1`); WORKLOG 26 Nov.
 >
 > **LIVE 25 Nov: THE DASHBOARD SHOWS ONLY THE DIALER AND THE CALLS** (the owner: "in the dashboard i want everything gone only the dialer and call related should be seen here"; PR #25, `main` `954fafe`; CONTEXT, Standing decisions; WORKLOG 25 Nov).
-> - **Menu:** Dialer (with Test calls), Phone calls, Voice agent call. It opens on the Dialer, and so does the sign-in.
+> - **Menu:** Dialer (with Test calls), Phone calls. It opens on the Dialer, and so does the sign-in. (Voice agent call left it on 26 Nov, PR #28.)
 > - **Everything else** (overview, tickets, debts, WhatsApp conversations, search, import) sends a signed-in visitor to the Dialer. One list, `dashboard/lib/sections.ts`, is read by the menu and the middleware; the pages are in the code, untouched.
 > - **Chrome:** the top bar's search box and the phone's search, dialer and import icons are gone; Settings stays behind the gear.
 >

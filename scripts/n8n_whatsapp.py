@@ -230,7 +230,9 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 116
+MEMORY_EPOCH = 117
+# 116 -> 117, 26 Nov (n8n_whatsapp_company.py): Homies, forwarded by the owner: Michael calls Homies "חברה לניהול
+# ואחזקת בניינים" (he had told a wrong number "חברה לניהול ועד בית", 24 Nov); the prompt's first line carries the words.
 # 115 -> 116, 19 Nov, later (n8n_whatsapp_cardwords.py): the owner's Grok run of 115; cheques' "will write to you here"
 # (Send cut "will get back to you"), the standing order's number also when already recorded, no Service note for it.
 # 114 -> 115, 19 Nov (n8n_whatsapp_cardonly.py): Yariv, forwarded by the owner: the link is for paying by credit card
@@ -848,7 +850,8 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "89c2cc1bd0cd",   # docs/features/11-whatsapp-bot/prompt.md (19 Nov, later, epoch 116: cheques' "will
+    "prompt": "a70004f02b0e",   # docs/features/11-whatsapp-bot/prompt.md (26 Nov, epoch 117: Homies is "חברה לניהול
+    # ואחזקת בניינים", Homies' own words, in the first line). Before: 89c2cc1bd0cd (19 Nov, later, epoch 116: cheques' "will
     # write to you here", which Send keeps). Before: 6eceba0a40ef (19 Nov, epoch 115, the link is for paying
     # by credit card only, and another way goes to collections only when asked; Yariv). Before: 7960ab31d1a1
     # (18 Nov, epoch 111, a bank transfer goes to

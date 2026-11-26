@@ -271,7 +271,11 @@ PINS = {
     # standing order's number is given also when it was already recorded (193126). Checked by the cases: the line
     # goes out whole through Send and every Reply usable? guard; no Claude round (one phrase, and Gemini's choice
     # of words is the owner's Grok rerun to show).
-    'Answer the resident / system': '89c2cc1bd0cd',
+    # 26 Nov (n8n_whatsapp_company.py, epoch 117): Homies, forwarded by the owner. The first line calls Homies
+    # "חברה לניהול ואחזקת בניינים", Homies' own words. Checked by the cases (the line goes out whole through Send
+    # and every Reply usable? guard) and the replay (nothing changed); no Claude round, as on 19 Nov: one phrase,
+    # and Gemini's choice of words is the handset's to show.
+    'Answer the resident / system': 'a70004f02b0e',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
