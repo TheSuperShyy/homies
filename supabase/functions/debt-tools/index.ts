@@ -57,7 +57,8 @@ import {
 // How long the caller waits for the debt call's payment link (10 Nov). Pure, so
 // Node can test it: scripts/check_paylink.test.ts.
 import {
-  DELIVERY_WAITS_MS, ON_ITS_WAY, claimOnce, freeTextAllowed, pollUntil, stopwatch, windowOpen,
+  DELIVERY_WAITS_MS, EMAIL_ON_ITS_WAY, ON_ITS_WAY, claimOnce, emailMessage, freeTextAllowed, pollUntil,
+  stopwatch, windowOpen,
 } from "./paylink.ts";
 // Which agent answers a call on the 208 line (feature 18, 25 Oct). Pure, so
 // Node can test it: scripts/check_route.test.ts.
@@ -381,6 +382,11 @@ const TEST_PREFIXES = ["+972599", "+9725000000"];
 // Wording lives in docs/features/11-whatsapp-bot/templates.md, which is what
 // `scripts/wa_templates.py` submits; this name has to match it exactly.
 const PAYMENT_TEMPLATE = "payment_link_he";
+
+// 26 Nov: the office email for a receipt, written out, for a tenant who could not catch it on the
+// phone (send_email_address). Its template carries it across the window, the way the link's does.
+const EMAIL_TEMPLATE = "receipt_email_he";
+const OFFICE_EMAIL = Deno.env.get("HOMIES_VERIFICATION_EMAIL") ?? "Office@homies-management.co.il";
 
 // Why a payment link did not reach WhatsApp, in the words the office reads on
 // the ticket (22 Sep). A reason not listed here is written as it came.
@@ -2344,6 +2350,9 @@ function background(p: Promise<unknown>): void {
 /** Interaction ids whose payment link is being sent right now (claimOnce). */
 const SENDING = new Set<string>();
 
+/** Calls whose office email went to WhatsApp (send_email_address): once per call, on this worker. */
+const EMAIL_SENT = new Set<string>();
+
 // ---------------------------------------------------------------------------
 // The tools
 // ---------------------------------------------------------------------------
@@ -2636,6 +2645,68 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
         .finally(() => { if (key) SENDING.delete(key); }),
     );
     return { ok: true, sent: true, to_last4: last4, note: ON_ITS_WAY };
+  },
+
+  /**
+   * 26 Nov (the owner, after the call to Ido: "say it in one go and if asked say it again spell it
+   * slowly and if you want i can send it via whatsapp"): the office email for a receipt, written
+   * out on WhatsApp. On that call the tenant could not catch the address, asked for it on WhatsApp,
+   * and heard that it could not be sent. It goes to the number Homies has on file, the payment
+   * link's way: free text while the tenant's 24 hours are open, else the `receipt_email_he` template
+   * into the same conversation.
+   *
+   * The tenant hears "on its way" only when it can go. No number, a test number, or a shut window
+   * while the template is not approved and synced yet answer `sent: false` at once, and the agent
+   * says the address again slowly. The send itself runs after the answer, so the line never waits
+   * on Chatwoot. Logs ids and last digits, never the text.
+   */
+  async send_email_address(_args, ctx) {
+    const miss = (reason: string) => ({ ok: true, sent: false, reason,
+      note: "It was not sent. Say the email once more, slowly and spelled, and do not offer WhatsApp again; "
+        + "do not say why." });
+    const admin = Deno.env.get("CHATWOOT_API_TOKEN") ?? "";
+    const bot = Deno.env.get("CHATWOOT_BOT_TOKEN") ?? "";
+    if (viaUchat() || !admin || !bot) return miss("unavailable");
+
+    let residentId = String(ctx.residentId ?? "").trim() || null;
+    if (!residentId && ctx.charges.length) {
+      const { data: c } = await db.from("charges").select("resident_id")
+        .eq("id", ctx.charges[0].charge_id).maybeSingle();
+      residentId = c?.resident_id ?? null;
+    }
+    if (!residentId) return miss("no_resident");
+    const { data: r } = await db.from("residents").select("phone,full_name").eq("id", residentId).maybeSingle();
+    if (!r?.phone) return miss("no_resident");
+    const phone = String(r.phone);
+    const name = String(r.full_name ?? "");
+    const last4 = phone.replace(/\D+/g, "").slice(-4);
+    if (TEST_PREFIXES.some((p) => phone.startsWith(p))) return miss("test_number");
+
+    const key = "email:" + String(ctx.callId ?? "");
+    if (EMAIL_SENT.has(key)) return { ok: true, sent: true, again: true, to_last4: last4, note: EMAIL_ON_ITS_WAY };
+
+    // Without the template the address can only go inside the window, and only Chatwoot knows that.
+    const t = (await syncedTemplates(admin))[EMAIL_TEMPLATE];
+    if (!t) {
+      const conv = await chatwootConversationFor(admin, phone, name);
+      if (!conv.ok) return miss(conv.reason);
+      const meta = await cw(admin, "GET", `/conversations/${conv.convId}`).catch(() => null);
+      if (!meta || meta.status >= 300 || !freeTextAllowed(meta.j)) return miss("no_template");
+    }
+    EMAIL_SENT.add(key);
+
+    background((async () => {
+      let d = await whatsappDeliver(phone, name, emailMessage(OFFICE_EMAIL));
+      let how = "text";
+      if (!d.sent && d.reason === "outside_window" && d.conversationId && t) {
+        how = "template";
+        const s = await sendTemplate(admin, bot, d.conversationId, EMAIL_TEMPLATE, t, { "1": OFFICE_EMAIL });
+        if (s.sent) d = { sent: true, conversationId: d.conversationId };
+        else console.error("email address template refused", d.conversationId, last4, s.reason.slice(0, 80));
+      }
+      console.log("email address", last4, d.sent ? how : d.reason);
+    })().catch((e) => console.error("email address delivery threw", last4, String(e).slice(0, 120))));
+    return { ok: true, sent: true, to_last4: last4, note: EMAIL_ON_ITS_WAY };
   },
 
   /**
@@ -5453,6 +5524,8 @@ async function assistantFor(message: any): Promise<Record<string, unknown>> {
     const fixed = {
       callback_number: Deno.env.get("HOMIES_CALLBACK_NUMBER") ?? FIXED_DEFAULTS.callback_number,
       verification_email: Deno.env.get("HOMIES_VERIFICATION_EMAIL_SAY") ?? FIXED_DEFAULTS.verification_email,
+      verification_email_spelled:
+        Deno.env.get("HOMIES_VERIFICATION_EMAIL_SPELLED") ?? FIXED_DEFAULTS.verification_email_spelled,
       alt_payment: Deno.env.get("HOMIES_ALT_PAYMENT") ?? FIXED_DEFAULTS.alt_payment,
     };
     const variableValues = debtVariables(route.row, route.phone, fixed);

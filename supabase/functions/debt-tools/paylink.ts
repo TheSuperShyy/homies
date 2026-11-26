@@ -55,6 +55,23 @@ export const ON_ITS_WAY = "The link is on its way to their WhatsApp, to the numb
   + "way and ask them to finish the payment when it arrives; do not say it has already arrived.";
 
 /**
+ * 26 Nov (the owner, after the call to Ido: "if you want i can send it via whatsapp"): the office
+ * email for a receipt, written out on WhatsApp for a tenant who could not catch it on the phone.
+ * The same words go as free text inside the window and as the `receipt_email_he` template outside
+ * it, so this is the template's body with `{{1}}` filled in. docs/features/11-whatsapp-bot/templates.md
+ * holds that body, and scripts/check_paylink.test.ts checks that the two match.
+ */
+export const EMAIL_BODY = "שלום, כאן מיכאל מהומי'ז. כמו שסיכמנו בשיחה, זאת כתובת המייל לשליחת "
+  + "אסמכתא על התשלום: {{1}} תודה, ואם משהו לא ברור אפשר לכתוב לנו כאן.";
+
+export function emailMessage(address: string): string {
+  return EMAIL_BODY.replace("{{1}}", address);
+}
+
+export const EMAIL_ON_ITS_WAY = "The email address is on its way to their WhatsApp, to the number we have. "
+  + "Say so in your own words; do not say it has already arrived, and do not spell it out again unless they ask.";
+
+/**
  * One send per call while it is still going: a second ask in the same call is
  * told the link is on its way instead of sending it twice (the row that says
  * "sent" is only written when the send is done). `key` is the call's
