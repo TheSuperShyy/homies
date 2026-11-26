@@ -95,6 +95,9 @@ variable, which Meta's reviewers read).
 
 ## homies_hello_he
 
+- **TO BE DELETED on Homies' account, by hand in WhatsApp Manager** (our CLIX key creates templates but may not delete them: "(#100) Need permission on either WhatsApp Business Account or owner/shared business", 26 Nov). Homies, through the owner: "the attached image - 'company for
+  managing shared buildings' - this needs to be deleted", then "delete what needs to be deleted"). It said
+  "חברה לניהול בתים משותפים". Its successor is `homies_hello_he_v2` below; the section stays as the record.
 - **What:** a general first message a staff member sends from Chatwoot to open a
   WhatsApp chat with any number that has not written to us in 24 hours: a tenant,
   or someone with no tie to Homies yet. Once they reply, the staff member writes
@@ -117,6 +120,48 @@ variable, which Meta's reviewers read).
 
 ```
 שלום, כאן צוות השירות של הומי'ז, חברה לניהול בתים משותפים. רצינו ליצור איתך קשר, נוח לך שנדבר כאן?
+```
+
+- **variables:** none
+
+---
+
+## homies_hello_he_v2
+
+- **What:** `homies_hello_he` without "חברה לניהול בתים משותפים": the fixed first message a staff member
+  sends from Chatwoot to open a WhatsApp chat with a number that has not written in 24 hours.
+- **Decided:** Homies, through the owner, 26 Nov 2026: *"שלום כאן צוות השירות של הומי׳ז,רצינו ליצור איתך
+  קשר ,נוח לך שנדבר כאן?"* (punctuation set the way the other templates write it).
+- **Sender:** a staff member, by hand, from Chatwoot. Nothing automatic sends it.
+- **Accounts:** Homies' own (`--account homies`), where the number lives since 26 Nov.
+- **Why MARKETING:** as for `homies_hello_he`, tied to no transaction.
+- **category:** MARKETING
+- **language:** he
+- **body:**
+
+```
+שלום, כאן צוות השירות של הומי'ז. רצינו ליצור איתך קשר, נוח לך שנדבר כאן?
+```
+
+- **variables:** none
+
+---
+
+## homies_hi_he
+
+- **What:** the shortest opener, a plain hello a staff member sends from Chatwoot to start a chat.
+- **Decided:** Homies, through the owner, 26 Nov 2026 ("You didn't add 'Hi'"): *"היי מה קורה ?"*
+  (the comma and the question mark set the usual way).
+- **Sender:** a staff member, by hand, from Chatwoot. Nothing automatic sends it.
+- **Accounts:** Homies' own (`--account homies`).
+- **Why MARKETING:** a greeting, tied to no transaction. Meta may find it too thin to approve; if so, the
+  rejection reason says, and Homies chooses a longer line.
+- **category:** MARKETING
+- **language:** he
+- **body:**
+
+```
+היי, מה קורה?
 ```
 
 - **variables:** none

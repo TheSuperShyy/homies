@@ -11,6 +11,12 @@ conversation that produced it.
 
 ## 2026-11-26
 
+### Two new staff openers on Homies' account, and the old one to delete (the owner, passing on Homies' review: "1- היי מה קורה ? 2-שלום כאן צוות השירות של הומי׳ז,רצינו ליצור איתך קשר ,נוח לך שנדבר כאן? ... delete what needs to be deleted")
+- **Submitted to their WABA, PENDING at Meta:** `homies_hello_he_v2` ("שלום, כאן צוות השירות של הומי'ז. רצינו ליצור איתך קשר, נוח לך שנדבר כאן?", without "חברה לניהול בתים משותפים") and `homies_hi_he` ("היי, מה קורה?"). Both MARKETING, he, no variables; `templates.md` holds both.
+- **My first reading was wrong:** I took "You didn't add 'Hi'" as "open every template with היי". Homies wanted a separate "היי מה קורה" template.
+- **The old `homies_hello_he` was not deleted:** DELETE /{waba}/message_templates with their CLIX key answered "(#100) Need permission on either WhatsApp Business Account or owner/shared business". Someone in their WhatsApp Manager deletes it by hand. Until then staff can still pick it in Chatwoot.
+- **Owed:** Meta's verdict on both (`wa_templates.py --account homies list`), then a template sync into inbox 1 so staff see them, and the old one's deletion by hand.
+
 ### The Dialer drops its "Test calls" tab (PR #33, `main` c45bf50, LIVE; the owner: "remove the test calls its not relevant")
 - The Dialer page has no tab bar now (one tab was left), and its loading skeleton loses the tabs' placeholder. `/dialer/test` is hidden although it sits under the shown `/dialer` (`HIDDEN` in `lib/sections.ts`), so a signed-in visitor lands on the Dialer. The page's code stays (feature 20).
 - Checked: `check_sections.test.ts` 3/3, `check_dialer.test.ts` 10/10, `tsc` clean, CI green, Vercel's production deploy of c45bf50 completed.
