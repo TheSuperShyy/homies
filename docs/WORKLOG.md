@@ -11,6 +11,10 @@ conversation that produced it.
 
 ## 2026-11-26
 
+### "What went wrong on the calls" (the owner asked), answered, 10:3x UTC
+- **Only one call today:** the Ido call (Vapi's list since 25 Nov has it and a 14 s web call of 25 Nov).
+- **Answered from the 26 Nov read:** permission asked twice, "יתפספס", and the failed free text before the delivered template. Also that the amount is test data, and Ido is at 4 of 4 tries. Nothing new found, nothing changed.
+
 ### The dialer video brought in line with PR #28's menu (homie-1b's FYI: "Voice Agent call" left the menu), 10:4x UTC
 - **Outdated in the 26 Nov cut:** the menu line said three items, and a whole scene showed the agent's browser call, which now redirects to the Dialer.
 - **Now:** the menu line says two items ("בתפריט יש שני דברים: החייגן, ושיחות הטלפון"), voiced again in Ayala on the Ronit key and heard right by local Whisper. The browser-call scene is out.
