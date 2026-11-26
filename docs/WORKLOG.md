@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-26
 
+### The 11/26 report (in chat, `/reporter`, about 23:55 Philippine time), 15:55 UTC
+- **Span:** 26 Nov in the owner's clock, from Gila's invite (15:51) to the Grok noise brief (23:24), every session's work (the 00:0x-00:38 commits were 25 Nov's sitting and its report).
+- **Given:** 10 done bullets and 4 Will lines.
+  - **Done:** the bot on Homies' own number in place of ManyChat; price quotes asked about, passed to Management and emailed; the company line and "what is Homies?" on WhatsApp and the phone line; the old urgent ticket kept out of a new conversation; the Dialer's first real call and its failed free text; the office email in the debt call; the recordings and the two pages removed; the two staff openers; Gila and the workspace's name; the video guide.
+  - **Will:** the card on their WhatsApp account; ManyChat's plan and the two Make scenarios; the noise test and tomorrow's watch; the old opener deleted by hand.
+- **Before the report:** `homies_hi_he` read APPROVED on their account (`wa_templates.py --account homies list`), while inbox 1 still held it as PENDING. POST `/inboxes/1/sync_templates` answered 200, and `wa_templates.py chatwoot` now lists both new openers APPROVED (the step promised with the templates). The old `homies_hello_he` is still on their account and in inbox 1.
+
 ### A Grok brief for danger v11 (the owner: "give me grok instructions for it"), written, not run
 - `docs/features/11-whatsapp-bot/grok-noise-test.md`: N1 noise from the building (understand first, no ticket number and no `הקריאה הדחופה` line before a yes, then a ticket with building and flat), N2 a neighbour's music (no service call, never the police). Six messages, from the owner's number. Its chat has no old urgent ticket, so the exact 211121 condition stays Yariv's to repeat by hand (the phone steps given before).
 
