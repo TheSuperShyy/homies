@@ -9,6 +9,14 @@ conversation that produced it.
 
 ---
 
+## 2026-11-26
+
+### Chatwoot's workspace renamed from "CLIX" to "Homies" (the owner: "rename the workspace to Homies")
+- **Why:** Homies' staff asked whether the invite in their service mailbox was "a password change request". The invite read "You're invited to join CLIX", from Assaf Clix, sent from testclix46@gmail.com. It was the 24 Nov invite for #24 מחלקת גבייה כללי, the shared collections & service login on Yariv's list, which uses the service mailbox; still not accepted.
+- **Done:** `PATCH /api/v1/accounts/2` `{"name": "Homies"}`, HTTP 200, read back "Homies" (locale `en` unchanged). The bot reads no Chatwoot wording, so nothing else moves; `check_sandbox_fingerprint.py`'s "CLIX" is test data only.
+- **Still CLIX-looking in invites:** the inviter's name (the admin profile "Assaf Clix") and the Gmail sender. Not changed.
+- **Seen:** a new login #26 גילה (agent, not accepted), not from Yariv's list.
+
 ## 2026-11-25
 
 ### LIVE about 16:55 UTC: Gila invited to the staff inbox (the owner: "invite her to the staff inbox")
