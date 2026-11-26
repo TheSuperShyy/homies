@@ -8,7 +8,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  DELIVERY_WAITS_MS, ON_ITS_WAY, WINDOW_MS, claimOnce, freeTextAllowed, pollUntil, stopwatch, windowOpen,
+  DELIVERY_WAITS_MS, EMAIL_BODY, EMAIL_ON_ITS_WAY, ON_ITS_WAY, WINDOW_MS, claimOnce, emailMessage, freeTextAllowed,
+  pollUntil, stopwatch, windowOpen,
 } from "../supabase/functions/debt-tools/paylink.ts";
 
 // 26 Nov, the owner's call to Ido: the link went as free text into a window shut for 14 days,
@@ -109,4 +110,21 @@ test("stopwatch gives each step's time and the total, for one log line", () => {
   t += 88;
   assert.equal(sw.text(), "lookups 412, template 1530, total 2030");
   assert.equal(sw.total(), 2030);
+});
+
+// 26 Nov, the owner, after the call to Ido: the office email goes to WhatsApp when the tenant asks.
+// The free text and the template are the same words, so the body is the template's, filled in.
+test("emailMessage: the address fills the template's one blank, which neither opens nor closes the body", () => {
+  const address = "Office@homies-management.co.il";
+  const text = emailMessage(address);
+  assert.equal((EMAIL_BODY.match(/\{\{\d+\}\}/g) ?? []).join(), "{{1}}");
+  assert.ok(!EMAIL_BODY.trim().startsWith("{{") && !EMAIL_BODY.trim().endsWith("}}"), "Meta refuses a blank at either end");
+  assert.ok(text.includes(" " + address + " "), "the address stands alone, so WhatsApp links it");
+  assert.ok(!text.includes("{{"), "nothing left unfilled");
+  assert.ok(text.length < 1024, "under Meta's body limit");
+});
+
+test("EMAIL_ON_ITS_WAY never tells the tenant it already arrived", () => {
+  assert.match(EMAIL_ON_ITS_WAY, /on its way/);
+  assert.match(EMAIL_ON_ITS_WAY, /do not say it has already arrived/);
 });

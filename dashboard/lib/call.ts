@@ -39,13 +39,18 @@ const DEBT_HE = '14d502fc-95a9-4fb1-8d93-944dd7e00211'; // Homies — Debt Follo
 
 // The office number and email are Homies' own, from docs/reference/homies-faq.txt;
 // the bank-transfer line is still the demo's until Homies confirms one. Overridable without a deploy.
-// verification_email is the SPOKEN form — the TTS reads it letter by letter —
-// which is why it is not an address.
+// The email is in two SPOKEN forms, not as an address, because the TTS reads what is written
+// (26 Nov, the owner): verification_email is said in one go; verification_email_spelled is
+// said slowly, with the name spelled, for whoever asks to hear it again. ".il" is the word
+// אִיל, pointed: spelled as the letters איי, אל it came out as "al".
 const FIXED = {
   callback_number: process.env.HOMIES_CALLBACK_NUMBER ?? '077-6687949',
   verification_email:
     process.env.HOMIES_VERIFICATION_EMAIL_SAY
-    ?? 'אופיס, שטרודל, הומיז, מקף, מנג\'מנט, נקודה, סי, או, נקודה, איי, אל',
+    ?? 'אופיס שטרודל הומיז מקף מנג\'מנט נקודה קו נקודה אִיל',
+  verification_email_spelled:
+    process.env.HOMIES_VERIFICATION_EMAIL_SPELLED
+    ?? 'אופיס, שטרודל, הומיז, אֵייץ\', אוֹ, אֶם, אַיי, אִי, אֶס, מקף, מנג\'מנט, נקודה, קו, נקודה, אִיל',
   alt_payment: process.env.HOMIES_ALT_PAYMENT ?? 'none',
 };
 

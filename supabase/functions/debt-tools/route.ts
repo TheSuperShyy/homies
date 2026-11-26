@@ -78,7 +78,9 @@ export function routeOf(call: any, rows: unknown): Route {
 export const FIXED_DEFAULTS: Record<string, string> = {
   callback_number: '077-6687949',
   verification_email:
-    'אופיס, שטרודל, הומיז, מקף, מנג\'מנט, נקודה, סי, או, נקודה, איי, אל',
+    'אופיס שטרודל הומיז מקף מנג\'מנט נקודה קו נקודה אִיל',
+  verification_email_spelled:
+    'אופיס, שטרודל, הומיז, אֵייץ\', אוֹ, אֶם, אַיי, אִי, אֶס, מקף, מנג\'מנט, נקודה, קו, נקודה, אִיל',
   alt_payment: 'none',
 };
 
