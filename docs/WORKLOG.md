@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-26
 
+### The dialer video brought in line with PR #28's menu (homie-1b's FYI: "Voice Agent call" left the menu), 10:4x UTC
+- **Outdated in the 26 Nov cut:** the menu line said three items, and a whole scene showed the agent's browser call, which now redirects to the Dialer.
+- **Now:** the menu line says two items ("בתפריט יש שני דברים: החייגן, ושיחות הטלפון"), voiced again in Ayala on the Ronit key and heard right by local Whisper. The browser-call scene is out.
+- **Recorded from** a throwaway worktree of `main` `9f6ea4d` (the same `demo-preview.patch` and `demo-db.ts`), removed after. 3:21, 19 lines, `local/dialer-video/homies-dialer-guide-he.mp4`.
+- **Not done:** syncing the debt agent for the Ido-call fixes, which homie-1b called safe. The owner asked for the check only.
+- **Briefing:** HANDOVER's video line updated. CONTEXT needs nothing, since a local video carries no standing decision.
+
 ### LIVE 10:16:12 UTC: the phone line calls Homies "חברה לניהול ואחזקת בניינים" too (the owner: "apply it to the phone line as well")
 - **Read first:** the live incoming agent `10ae859a` equalled the repo field by field (every field the sync sends; last written 24 Nov 08:23 UTC). Snapshot `local/vapi-inbound-live-26nov-before-company.json`. The compare was rebuilt in the scratchpad (`vapi_drift.py`: build the sync's payload, GET the agent, compare).
 - **The change:** one phrase in `docs/assistant/demo-inbound.md`, the first line's "חברת ניהול בתים משותפים בישראל" -> "חברה לניהול ואחזקת בניינים בישראל" ("בישראל" kept). Fence 15,724 -> 15,727 characters. The drift before the push was exactly that line.
