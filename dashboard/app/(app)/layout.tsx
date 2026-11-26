@@ -56,15 +56,15 @@ async function setTheme(formData: FormData) {
 // filtering a view.
 //
 // 25 Nov, the owner: "in the dashboard i want everything gone only the dialer and call related
-// should be seen here". So the menu is the dialer, the phone calls and the agent's browser call;
-// every other page sends you to the dialer (lib/sections.ts, read by the middleware). The account's
+// should be seen here". So the menu is the dialer and the phone calls; every other page sends you
+// to the dialer (lib/sections.ts, read by the middleware). 26 Nov: "Voice Agent call" (the agent's
+// browser call) left the menu too, on the owner's "remove this in the dashboard". The account's
 // settings stay behind the gear and the name in the corner. Putting a page back is its row here
 // and its path in lib/sections.ts.
 const NAV = [
   ['nav.group.main', [
     ['dialer', '/dialer'],
     ['calls', '/calls'],
-    ['voice', '/voice'],
   ]],
 ] as const;
 
