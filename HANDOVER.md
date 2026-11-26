@@ -42,7 +42,7 @@ appended to.
 > **LIVE 24 Nov 16:37 UTC: Chatwoot invites sent to Yariv's staff list** (WORKLOG 24 Nov).
 > - #18-#25: 8 people from `local/golive/homies-staff-2026-11-15.csv`.
 > - Everyone, Yariv #17 included, is in inboxes 1 and 2 and in their department's team (`chatwoot_teams.py`).
-> - **25 Nov:** #26 גילה (gila@, agent) invited at the owner's ask and seated in both inboxes. Her department is not known, so she is in no team yet.
+> - **25 Nov:** #26 גילה (gila@, agent) invited at the owner's ask and seated in both inboxes. In the Service and Collections teams (read back).
 > - The 8 invite mails went out through Gmail. Yonatan (#25) has set a password, as had Yariv; the other 7 have not (read 25 Nov).
 > - Until the switch, test hand-overs now reach these people.
 >
