@@ -56,7 +56,9 @@ import {
 } from "./identity.ts";
 // How long the caller waits for the debt call's payment link (10 Nov). Pure, so
 // Node can test it: scripts/check_paylink.test.ts.
-import { DELIVERY_WAITS_MS, ON_ITS_WAY, claimOnce, pollUntil, stopwatch, windowOpen } from "./paylink.ts";
+import {
+  DELIVERY_WAITS_MS, ON_ITS_WAY, claimOnce, freeTextAllowed, pollUntil, stopwatch, windowOpen,
+} from "./paylink.ts";
 // Which agent answers a call on the 208 line (feature 18, 25 Oct). Pure, so
 // Node can test it: scripts/check_route.test.ts.
 import { callDirection, debtVariables, FEMININE_DICT, FIXED_DEFAULTS, isDialerCall, routeOf, voiceForGender } from "./route.ts";
@@ -2047,7 +2049,9 @@ async function chatwootConversationFor(
   return { ok: true, convId };
 }
 
-async function whatsappDeliver(toE164: string, name: string, text: string): Promise<Delivery> {
+async function whatsappDeliver(
+  toE164: string, name: string, text: string | (() => Promise<string>),
+): Promise<Delivery> {
   const admin = Deno.env.get("CHATWOOT_API_TOKEN") ?? "";
   const bot = Deno.env.get("CHATWOOT_BOT_TOKEN") ?? "";
   if (!admin || !bot) {
@@ -2059,8 +2063,24 @@ async function whatsappDeliver(toE164: string, name: string, text: string): Prom
     const conv = await chatwootConversationFor(admin, toE164, name);
     if (!conv.ok) return { sent: false, reason: conv.reason };
     const convId = conv.convId;
+    // 26 Nov: ask Chatwoot whether the 24-hour window is open before writing anything
+    // (paylink.ts, freeTextAllowed). Shut, the template goes straight away: no failed
+    // message in the conversation, no 1.5 s wait, and no model line nobody sees.
+    // A read that fails or times out keeps the old way: free text, then the template after a refusal.
+    let shut = false;
+    try {
+      const meta = await cw(admin, "GET", `/conversations/${convId}`);
+      shut = meta.status < 300 && !freeTextAllowed(meta.j);
+    } catch {
+      shut = false;
+    }
+    if (shut) {
+      console.log("whatsapp delivery: window shut, template next", convId, last4);
+      return { sent: false, reason: "outside_window", conversationId: convId };
+    }
+    const body = typeof text === "function" ? await text() : text;
     const m = await cw(bot, "POST", `/conversations/${convId}/messages`,
-      { content: text, message_type: "outgoing", private: false });
+      { content: body, message_type: "outgoing", private: false });
     const msgId = m.j?.id ?? null;
     if (m.status >= 300 || !msgId) {
       console.error("whatsapp delivery: post refused", m.status, convId);
@@ -2509,7 +2529,8 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       };
       let d: Delivery;
       if (!uchat) {
-        d = await whatsappDeliver(String(r.phone), String(r.full_name ?? ""), await withLine());
+        // The line is written only if the window is open (whatsappDeliver asks Chatwoot first).
+        d = await whatsappDeliver(String(r.phone), String(r.full_name ?? ""), withLine);
         sw.lap("text");
       } else if (!uchatOn) {
         console.warn("whatsapp delivery OFF: UCHAT_API_KEY unset");
