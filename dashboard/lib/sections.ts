@@ -11,10 +11,14 @@
 /** Where the dashboard opens, and where a hidden page sends you. */
 export const HOME = '/dialer';
 
-/** The pages that stay: the dialer (and its test calls), the phone calls, and the account's own
+/** The pages that stay: the dialer, the phone calls, and the account's own
  *  settings (reached from the gear, not the menu). 26 Nov, the owner, of the menu's "Voice Agent
  *  call": "remove this in the dashboard", so the agent's browser call (/voice) went the same way. */
 export const SHOWN = ['/dialer', '/calls', '/settings'] as const;
+
+/** Hidden although under a shown page. 26 Nov, the owner: "remove the test calls its not relevant":
+ *  the dialer's "Test calls" tab (feature 20) left the page, and its address goes to the Dialer. */
+const HIDDEN = ['/dialer/test'] as const;
 
 /** Not dashboard pages at all: the sign-in, the reviewers' key-only pages, the API routes. */
 const PASS = ['/login', '/review', '/api'] as const;
@@ -22,5 +26,6 @@ const PASS = ['/login', '/review', '/api'] as const;
 /** A path the dashboard no longer shows, so it goes to HOME instead. */
 export function hiddenPath(path: string): boolean {
   const under = (p: string) => path === p || path.startsWith(p + '/');
+  if (HIDDEN.some(under)) return true;
   return !(PASS.some(under) || SHOWN.some(under));
 }
