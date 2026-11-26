@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-11-26
 
+### LIVE 13:0x UTC: the phone line gets "what is Homies?" answered too (PR #32, `main` 673b5f1; the owner: "apply the overview fix to the phone line as well")
+- **The change:** `get_service_info` hands `OVERVIEW` to an unmatched question from the incoming agent as well as from WhatsApp (`channel(ctx) === "whatsapp" || isIntake(ctx)`). The debt agent has no `get_service_info`. A probe with no assistant id keeps found:false, which is `check_tools.py`'s "not in the catalogue" case. The phone's tool text needs no change, because found:true with topics is its ordinary case. No Vapi sync.
+- **Checked:** syntax ok, `check_knowledge.py` 29/29, CI green, deployed from `main`. Probed live, read-only: as the incoming agent (`10ae859a`) "מה הומי'ז עושה" gets the overview; a probe with no agent gets found:false; WhatsApp gets the overview; the phone's "הדברה" gets pest control, as before. `index.ts` on feature/chatbot equals main's.
+- **No incoming twin is owed now.** The debt agent is untouched.
+
 ### LIVE 12:38:43 UTC: a WhatsApp price quote is asked about first, then passed to the management team, and emailed to them (epoch 118; "Hand to a person" 12:3x)
 - **The ask (the owner, after the Grok quote run, conversation 108):** *"Price quotation should ask questions in general like what would you like to inquire and stuff and what are the items and stuff then will say the management team will get back to you i took note of this one and forwarded it to them then the bot will send a summary of what happened in the email of yariv, eden and assaf"*.
 - **Before:** a quote was noted at once (210508, the run's Q1), then Michael asked what was missing, and named nobody (29 Oct, "only I"). homie-1b, the session that read that run, confirmed both items were this session's, and flagged three things that shaped the change: Send's promise cutter (v8) cuts "יחזור אליך" outside a recorded standing order; the n8n router stores every WhatsApp note as `caller_request` (already in HANDOVER, found, not fixed); and `grok-quote-test.md` goes stale.

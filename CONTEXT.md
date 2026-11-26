@@ -5347,9 +5347,10 @@ agents already state them), prices (quoted per building — that is
 (26 Nov, PR #30).** "What is Homies, what do you do?" matched no topic, and
 found:false sent a tenant to the office for the most basic question there is.
 On WhatsApp an unmatched question now gets `OVERVIEW`: the company in Homies'
-own words, the service names from `SERVICES`, and the areas. found:false is
-still the answer on the phone line and for anything specific the catalogue
-lacks.
+own words, the service names from `SERVICES`, and the areas. The phone line
+gets it too since PR #32 (the incoming agent, by its id). found:false is still
+the answer for a probe with no assistant id and for anything specific the
+catalogue lacks.
 
 **Hebrew matching needs the definite article dropped and short words bounded
 (16 Sep).** Hebrew puts ה INSIDE a phrase — אב בית is said אב הבית — so a

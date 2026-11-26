@@ -393,6 +393,8 @@ field (snapshot `local/vapi-inbound-live-26nov-before-company.json`, last writte
 same, with the voice, first message, transcriber, timing and model settings equal to the snapshot. The debt agent is
 untouched and still says "חברת ניהול בתים משותפים בישראל". No test call: one phrase, and a real call shows it.
 
+**The same day, the services tool's overview (PR #32, the owner: "apply the overview fix to the phone line as well").** A question that names no one service, such as "what is Homies, what do you do?", used to get found:false and "offer the office". Now `get_service_info` gives this agent `OVERVIEW`: "הומי'ז היא חברה לניהול ואחזקת בניינים", the service names and the areas. The change is server-side only; this prompt and the tool text are unchanged.
+
 ## 23 Nov — an emergency gets our line only, and a request opens only after a yes, as on WhatsApp
 
 The owner: *"ok apply the emergency and ticket rules to the phone line"*, after reading what this agent was behind
