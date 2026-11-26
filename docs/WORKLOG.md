@@ -11,6 +11,13 @@ conversation that produced it.
 
 ## 2026-11-26
 
+### Their card is on their WhatsApp account and ManyChat's plan is cancelled (the owner: "the payment method has been added", "we also cancelled manychat subscription"), read only, 16:07 UTC
+- **Meta's health check** (`health_status` on their WABA and number): the WABA AVAILABLE, with no 141006, the error Meta gives a WhatsApp account without a working payment method (our test account, 3 Nov). The overall LIMITED is the business only (141010, not verified: 250 people a day for messages we start).
+- **The number after the cancellation:** CONNECTED, GREEN, Cloud API; subscribed apps HOMIES only.
+- **Since the 14:10:48 UTC move:** inbox 1 has 4 active conversations and 11 replies out, all delivered or read. No template has gone yet, so the first ticket-closed notice or payment link is the proof; `failed` on it in Chatwoot would mean the card is not taken.
+- **The report updated in chat:** the card and the cancellation became done bullets (Gila and the two openers share one), 10 done and 3 Will lines.
+- **Still open:** Homies' two Make scenarios (887490 quote leads to Monday, 881814 the lift-call email), which now receive nothing for good; the old `homies_hello_he` deleted by hand; the AI wallet; business verification.
+
 ### The 11/26 report (in chat, `/reporter`, about 23:55 Philippine time), 15:55 UTC
 - **Span:** 26 Nov in the owner's clock, from Gila's invite (15:51) to the Grok noise brief (23:24), every session's work (the 00:0x-00:38 commits were 25 Nov's sitting and its report).
 - **Given:** 10 done bullets and 5 Will lines.

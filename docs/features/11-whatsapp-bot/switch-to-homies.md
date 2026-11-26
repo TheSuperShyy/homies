@@ -31,6 +31,12 @@ The first `--apply` failed at the phone-level override (Meta #100: the app must 
 
 ## ManyChat comes off later, not on the night
 
+**All three done on 26 Nov 2026.** Their WhatsApp account was funded by ManyChat: once ManyChat left, their WhatsApp
+Manager showed "No valid payment method". The owner removed ManyChat as a partner (about 14:00 UTC), their card went on
+the account (about 16:00 UTC; Meta's `health_status` read the WABA AVAILABLE at 16:07 UTC), and the plan was cancelled
+(the owner: "we also cancelled manychat subscription"). The order below did not hold: the partner had to go first,
+since Meta refused our sends while ManyChat was on the account (code 10, subcode 2593181).
+
 1. **Who pays for WhatsApp on their account,** in their WhatsApp Manager's payment settings: Homies' own card, or a
    credit line from ManyChat. Meta does not show the funding to our app. If it is ManyChat's, Homies adds its own
    card first. Otherwise, once ManyChat is cancelled, the messages we start stop (closed-ticket notices, payment
