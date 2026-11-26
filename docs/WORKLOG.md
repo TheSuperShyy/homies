@@ -11,6 +11,17 @@ conversation that produced it.
 
 ## 2026-11-26
 
+### LIVE about 11:0x UTC: the debt call's payment link goes as the template when the window is shut (PR #29, `main` `cb8e448`; the owner: "why did the whatsapp message did not send we have a template message on it")
+- **The answer:** the template did send and was delivered. What failed was a free-text try before it.
+- **The cause (correcting this morning's "the window check judged it open"):** on the Chatwoot route there was no window check. `send_payment_link` always posted free text first, with a model-written line, waited 1.5 s, read the status back, and sent `payment_link_he` only after Meta's refusal. Only the UChat route checked the window. A debt call rings someone who usually has not written in a day, so nearly every link would leave a failed message.
+- **The fix:** `whatsappDeliver` reads `can_reply` on the conversation first.
+  - Chatwoot 4.16's `MessageWindowService` sets it for a WhatsApp inbox by Meta's 24-hour rule, read on the box. Live on Ido's conversation it was false.
+  - Shut, the template goes straight away, and the model line is written only when the window is open.
+  - A failed read keeps the old way. `freeTextAllowed` is in `paylink.ts`, tested.
+- **Shipped:** CI green, merged, the pipeline deployed the function (keep-warm 200 after). The same commit is on `feature/chatbot` as `a31164e`.
+- **Not yet seen on a real call.** The next Dialer call shows it as one delivered template and no failed message.
+- **Briefing:** CONTEXT's window paragraph rewritten to the cause and the fix; HANDOVER's defect marked fixed.
+
 ### "What went wrong on the calls" (the owner asked), answered, 10:3x UTC
 - **Only one call today:** the Ido call (Vapi's list since 25 Nov has it and a 14 s web call of 25 Nov).
 - **Answered from the 26 Nov read:** permission asked twice, "יתפספס", and the failed free text before the delivered template. Also that the amount is test data, and Ido is at 4 of 4 tries. Nothing new found, nothing changed.

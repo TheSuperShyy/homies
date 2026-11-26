@@ -6216,12 +6216,19 @@ tool returned `sent: false, reason: "outside_window"` for this send, which reads
 as "the template never ran". It did run — the tool reports the *first* attempt's
 reason and the retry's outcome only changes `note` when it succeeds. The two
 messages in the conversation are the real record.
-**The free text is tried even with the window shut (26 Nov, the first Dialer call).**
-- Ido last wrote to the number 14 days before the call, yet the link went first as free text.
-- Meta refused it: "the WhatsApp 24-hour customer service window is closed" (Chatwoot msg 3642, `failed`).
-- The template followed 3 s later and was delivered (msg 3643), and the tool answered `sent: true`.
-- So the window check judged it open. Until that is traced, a failed message above the delivered one is expected
-  on a link to anyone who has not written in a day, and it is not a lost link.
+**Since 26 Nov the Chatwoot route asks for the window before sending (PR #29, `main` `cb8e448`).**
+- **The first Dialer call showed the gap:** Ido had last written 14 days earlier, but the link still went first as
+  free text. Meta refused it ("24-hour customer service window is closed", Chatwoot msg 3642). The template followed
+  3 s later and was delivered (msg 3643).
+- **The cause:** on the Chatwoot route there was no window check at all. Free text first, then the template after a
+  refusal. Only the UChat route checked.
+- **Now:** `whatsappDeliver` reads the conversation's `can_reply` first (`paylink.ts`, `freeTextAllowed`).
+  - For a WhatsApp inbox, Chatwoot 4.16 computes it by Meta's rule: the contact's last incoming message in that
+    conversation is under 24 hours old (`Conversations::MessageWindowService`).
+  - Shut: the template goes at once, and no model line is written.
+  - A failed read keeps the old way.
+  - A tenant who wrote in another conversation of theirs within 24 hours gets the template too, which is allowed at
+    any time.
 
 **A tenant's phone in OXS is not necessarily their WhatsApp (24 Sep).** The
 mobile on Ido's OXS tenant record resolved to a Chatwoot contact named "Clix

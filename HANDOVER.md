@@ -51,7 +51,7 @@ appended to.
 > - **Seen on that call, open:**
 >   - Michael asked permission twice ("בזמן נוח?", then "יש לך דקה קטנה?" after "מה צריך?").
 >   - One wrong word: "יתפספס", meant "התפספס".
->   - The link's free text was tried first and failed (Ido last wrote 14 days earlier, so the 24-hour window was closed) before the template delivered 3 s later. It leaves a failed message in the conversation; the window check's cause is not traced yet.
+>   - ~~The link's free text tried with the window shut~~ **fixed 26 Nov (PR #29, `main` `cb8e448`, function deployed):** the Chatwoot route had no window check. It now reads Chatwoot's `can_reply` first, and a shut window gets the template at once. Not yet seen on a real call.
 > - **Owed:** the legal calling hours, Homies' to confirm before real tenants (PRD §13 #6).
 > - **Kill switch:** `python scripts/dialer_setup.py --off`. **Rollback:** `git revert` 6cb70ec through a PR, then `--off`.
 >
