@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-11-26
 
+### 14:10 UTC: switched again after the owner removed ManyChat as a partner, and our sends now pass
+- **The fix was ManyChat.** Grok's list (the owner pasted it) had one step we had not done: remove ManyChat's access. The owner removed ManyChat as a partner of their WhatsApp account at about 14:00 UTC ("ok i removed manychat").
+  - At 14:02 and 14:03 the send test was still refused, and Meta still listed ManyChat's app on the account; its old bot still answered the owner's "hi".
+  - At 14:09:33 the subscribed apps were empty and the send test passed (`success: true`). So ManyChat's presence on the account, as a partner with its app subscribed, was what Meta meant by "no permission to send on behalf of this WhatsApp Business Account" (code 10, subcode 2593181). The removal takes a few minutes to reach the subscription.
+- **The switch, 14:09:48-14:10:48 UTC, green:** inbox 1 on their number (id …8637, account …0527, their key, 6 templates), their app's own webhook active (messages), the override on Chatwoot, subscribed apps HOMIES only. No `--manychat-is-off` was needed, since nothing else is connected.
+- **The typing dots, 14:11:08 UTC:** `n8n_whatsapp_tohomies.py`, gate on the candidate 740/740.
+- **ManyChat no longer answers the number.** Its app is off the account; the plan stays Yariv's to cancel.
+- **Proof owed:** a message to 077-668-7949 answered with WhatsApp's id (a watch is running).
+
 ### 13:57 UTC: rolled back; Homies' number stays on ManyChat, because Meta refuses our app's sends (the owner: "roll back for now")
 - **After the 13:19 switch:** the owner's "היי" arrived at 13:25:33 and Michael's reply failed in Chatwoot with "Application does not have permission for this action". A harmless mark-as-read with CLIX's key got Meta's full answer: code 10, subcode 2593181, "You do not have the necessary permissions to send messages on behalf of this WhatsApp Business Account" (Permission Denied). Incoming worked; every send was refused.
 - **ManyChat answered throughout.** Its auto-replies were not fully off (the owner's screenshot: its "call router" menu at 13:25). Our bot also took 8 messages in 2 chats, and one `notify_team` note tagged a team.

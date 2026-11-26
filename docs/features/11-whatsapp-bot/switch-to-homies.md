@@ -3,6 +3,10 @@
 Prepared 23 Nov 2026. The owner: *"so right now just prepare everything but dont disconnect everything"*. Only the
 read-only checks below have run. ManyChat still answers on Homies' number, and our bot is still on the test number.
 
+## 26 Nov, 14:10 UTC: switched for good, after ManyChat was removed as a partner
+
+Meta refused our app's sends while ManyChat was a partner on their account (code 10, subcode 2593181). The owner removed it; a few minutes later its app was gone from `subscribed_apps` and the send test passed. Then `--apply --app-is-published` (no ManyChat flag needed) and the typing dots.
+
 ## 26 Nov: switched at 13:19 UTC, rolled back at 13:57 (sends refused)
 
 Incoming reached Chatwoot, but Meta refused every send from their number with CLIX's key (code 10, subcode 2593181). **New step 0b: before ManyChat goes off, a send test with their key must pass** (POST /{their number}/messages, `status: read` on a message the number received: it sends nobody anything). The leads are in HANDOVER.
