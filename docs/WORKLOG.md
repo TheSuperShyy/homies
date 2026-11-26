@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-11-26
 
+### A Grok brief for a quote request (the owner: "give me instructions to grok"), written, not run
+- **Why:** the owner asked how Michael handles a quotation, then for a sample of how he talks. No `quote` note exists in `call_outcomes` on either channel, real or test, so the path has never run; a live run is the honest sample.
+- **The brief:** `docs/features/11-whatsapp-bot/grok-quote-test.md`, two conversations, six messages: a quote for lobby cameras (no price, "recorded" in his words, one missing detail at a time, only "I", no time or call-back, no service call), then "what is Homies?" for epoch 117's "חברה לניהול ואחזקת בניינים" (the handset check that change owes).
+- **Before a run, for the owner:** about 4 cents a reply (about 25 cents); the quote note is real and tags the Management team in Chatwoot, so Yariv and עדן ממן are notified (and our Assaf Clix login). A note is not a ticket, so nothing reaches OXS unless Michael wrongly opens one (Q7).
+
 ### LIVE about 11:0x UTC: the debt call's payment link goes as the template when the window is shut (PR #29, `main` `cb8e448`; the owner: "why did the whatsapp message did not send we have a template message on it")
 - **The answer:** the template did send and was delivered. What failed was a free-text try before it.
 - **The cause (correcting this morning's "the window check judged it open"):** on the Chatwoot route there was no window check. `send_payment_link` always posted free text first, with a model-written line, waited 1.5 s, read the status back, and sent `payment_link_he` only after Meta's refusal. Only the UChat route checked the window. A debt call rings someone who usually has not written in a day, so nearly every link would leave a failed message.
