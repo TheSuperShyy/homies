@@ -11,9 +11,10 @@
 /** Where the dashboard opens, and where a hidden page sends you. */
 export const HOME = '/dialer';
 
-/** The pages that stay: the dialer (and its test calls), the phone calls, the agent's browser call,
- *  and the account's own settings (reached from the gear, not the menu). */
-export const SHOWN = ['/dialer', '/calls', '/voice', '/settings'] as const;
+/** The pages that stay: the dialer (and its test calls), the phone calls, and the account's own
+ *  settings (reached from the gear, not the menu). 26 Nov, the owner, of the menu's "Voice Agent
+ *  call": "remove this in the dashboard", so the agent's browser call (/voice) went the same way. */
+export const SHOWN = ['/dialer', '/calls', '/settings'] as const;
 
 /** Not dashboard pages at all: the sign-in, the reviewers' key-only pages, the API routes. */
 const PASS = ['/login', '/review', '/api'] as const;
