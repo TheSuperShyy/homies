@@ -11,6 +11,9 @@ conversation that produced it.
 
 ## 2026-11-26
 
+### A Grok brief for danger v11 (the owner: "give me grok instructions for it"), written, not run
+- `docs/features/11-whatsapp-bot/grok-noise-test.md`: N1 noise from the building (understand first, no ticket number and no `הקריאה הדחופה` line before a yes, then a ticket with building and flat), N2 a neighbour's music (no service call, never the police). Six messages, from the owner's number. Its chat has no old urgent ticket, so the exact 211121 condition stays Yariv's to repeat by hand (the phone steps given before).
+
 ### LIVE 15:21:25 UTC: an urgent ticket from an earlier conversation no longer puts Send into emergency mode (danger v11; the owner, on Yariv's chat: "wtf is this why is there no like elaboration?")
 - **What Yariv got (run 211121, 15:09 UTC, conversation 54, on Homies' number):** "יש לי בעיה יש כאן רעש בבניין מה ניתן לעשות?" got "אוי, רעש זה באמת מפריע. זה משהו מהמערכות של הבניין או ממקור אחר? הקריאה הדחופה שלך פתוחה, מספר 255-1445-26."
 - **What the model wrote:** "אוי, רעש זה באמת מפריע. מאיפה נשמע שהוא מגיע? זה משהו מהמערכות של הבניין או ממקור אחר?", with no tool.
