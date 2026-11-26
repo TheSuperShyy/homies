@@ -8,8 +8,17 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  DELIVERY_WAITS_MS, ON_ITS_WAY, WINDOW_MS, claimOnce, pollUntil, stopwatch, windowOpen,
+  DELIVERY_WAITS_MS, ON_ITS_WAY, WINDOW_MS, claimOnce, freeTextAllowed, pollUntil, stopwatch, windowOpen,
 } from "../supabase/functions/debt-tools/paylink.ts";
+
+// 26 Nov, the owner's call to Ido: the link went as free text into a window shut for 14 days,
+// Meta refused it, and the template followed. Chatwoot's can_reply says shut before anything is sent.
+test("freeTextAllowed: only Chatwoot's explicit false shuts the window", () => {
+  assert.equal(freeTextAllowed({ id: 94, can_reply: false }), false);
+  assert.equal(freeTextAllowed({ id: 94, can_reply: true }), true);
+  assert.equal(freeTextAllowed({ id: 94 }), true);   // an older Chatwoot: the old way
+  assert.equal(freeTextAllowed(null), true);         // a read that failed: the old way
+});
 
 // 17 Nov: the tenant no longer waits on the line for WhatsApp (the owner's test
 // call waited about 8 s here). The tool answers once the link exists, so what it

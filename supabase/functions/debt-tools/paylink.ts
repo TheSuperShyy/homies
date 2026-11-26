@@ -23,6 +23,20 @@ export function windowOpen(lastInMs: number, nowMs: number): boolean {
 }
 
 /**
+ * May free text go into this Chatwoot conversation? (26 Nov, the owner's call to Ido: "why did the
+ * whatsapp message did not send we have a template message on it".) Until then the Chatwoot route
+ * never asked: it posted the link as free text to everyone, waited, and sent the template only after
+ * Meta refused, so nearly every debt call left a failed message above the delivered template.
+ * Chatwoot answers `can_reply` on a conversation, and for a WhatsApp inbox it is Meta's own rule:
+ * the contact's last message in it is under 24 hours old. Only an explicit false shuts the window;
+ * a read that failed, or a Chatwoot without the field, keeps the old way (free text, then the
+ * template after a refusal).
+ */
+export function freeTextAllowed(conversation: unknown): boolean {
+  return (conversation as any)?.can_reply !== false;
+}
+
+/**
  * When WhatsApp's id is looked for after a send. A message WhatsApp took
  * carries the id within a moment, so the first look comes early and a yes ends
  * the waiting; only a refusal uses them all.
