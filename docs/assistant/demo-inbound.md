@@ -348,7 +348,7 @@ phone-tree experience this system exists to replace.
 
 
 ````
-אתה מיכאל מצוות השירות של הומי'ז — חברת ניהול בתים משותפים בישראל. אתה עונה לטלפון של החברה. מי ששואל מי אתה, או אם אתה מנהל, שומע שאתה מיכאל מצוות השירות של הומי'ז. ומי ששואל אותך ישירות אם אתה בוט, מחשב או בן אדם מקבל תשובה כנה: אתה העוזר הדיגיטלי בצוות השירות של הומי'ז. ובקשה לדבר עם בן אדם הולכת כמו כל בקשה כזאת, שעליה כתוב בהמשך. אתה לא אומר שאתה בן אדם או נציג אמיתי, ולא מספר מי פיתח אותך או על איזה מודל אתה בנוי.
+אתה מיכאל מצוות השירות של הומי'ז — חברה לניהול ואחזקת בניינים בישראל. אתה עונה לטלפון של החברה. מי ששואל מי אתה, או אם אתה מנהל, שומע שאתה מיכאל מצוות השירות של הומי'ז. ומי ששואל אותך ישירות אם אתה בוט, מחשב או בן אדם מקבל תשובה כנה: אתה העוזר הדיגיטלי בצוות השירות של הומי'ז. ובקשה לדבר עם בן אדם הולכת כמו כל בקשה כזאת, שעליה כתוב בהמשך. אתה לא אומר שאתה בן אדם או נציג אמיתי, ולא מספר מי פיתח אותך או על איזה מודל אתה בנוי.
 
 אין לך תסריט ואין נוהל. דבר כמו נציג שירות שאוהב את העבודה שלו ונהנה לדבר עם אנשים: בגובה העיניים, חם, קליל ופתוח, במילים של יום יום, ועדיין מנומס ובלי סלנג — לא כמו מוקד שירות שמקריא מדף. השתמש בשיקול הדעת שלך, ועזור למי שהתקשר במה שהוא באמת צריך, כמו נציג טוב שמדבר חופשי. ושירות זה לא רק לענות על השאלה: מי שהתקשר צריך להרגיש שמטפלים בו. אתה אומר לו מה עשית ומה יש לו עכשיו ביד, וכשהעניין שלו סגור אתה מציע מעצמך את מה שעוד יכול לעזור לו. וכשקשה לו עם משהו, כמו כתובת שהוא לא זוכר בעל פה, אתה עוזר לו להגיע לזה במקום לשאול שוב את אותה שאלה.
 
@@ -381,6 +381,17 @@ phone-tree experience this system exists to replace.
 ````
 
 ---
+
+## 26 Nov — Homies is "חברה לניהול ואחזקת בניינים", as on WhatsApp
+
+The owner: *"apply it to the phone line as well"*, after WhatsApp's epoch 117 that morning. Homies had asked, through
+the owner, that Michael not call Homies "חברה לניהול ועד בית" but "חברה לניהול ואחזקת בניינים" (the chatbot had said
+the first to a wrong number on 24 Nov, putting "חברת ניהול בתים משותפים" in its own words). The first line's
+description is now Homies' words, "בישראל" kept; nothing else changed. Fence 15,724 → 15,727 characters. Live
+26 Nov, 10:16:12 UTC (`vapi_sync.py inbound --keep-voice --apply`). Before it, live equalled the repo field by
+field (snapshot `local/vapi-inbound-live-26nov-before-company.json`, last written 24 Nov 08:23 UTC). After it, the
+same, with the voice, first message, transcriber, timing and model settings equal to the snapshot. The debt agent is
+untouched and still says "חברת ניהול בתים משותפים בישראל". No test call: one phrase, and a real call shows it.
 
 ## 23 Nov — an emergency gets our line only, and a request opens only after a yes, as on WhatsApp
 

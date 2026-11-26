@@ -11,6 +11,12 @@ conversation that produced it.
 
 ## 2026-11-26
 
+### LIVE 10:16:12 UTC: the phone line calls Homies "חברה לניהול ואחזקת בניינים" too (the owner: "apply it to the phone line as well")
+- **Read first:** the live incoming agent `10ae859a` equalled the repo field by field (every field the sync sends; last written 24 Nov 08:23 UTC). Snapshot `local/vapi-inbound-live-26nov-before-company.json`. The compare was rebuilt in the scratchpad (`vapi_drift.py`: build the sync's payload, GET the agent, compare).
+- **The change:** one phrase in `docs/assistant/demo-inbound.md`, the first line's "חברת ניהול בתים משותפים בישראל" -> "חברה לניהול ואחזקת בניינים בישראל" ("בישראל" kept). Fence 15,724 -> 15,727 characters. The drift before the push was exactly that line.
+- **Live:** `N8N_BASE_URL= python scripts/vapi_sync.py inbound --keep-voice --apply`. Read back: equal to the repo; the voice, first message, transcriber, timing, server and model settings equal to the snapshot. The debt agent is untouched (24 Nov 08:23:18 UTC) and still says "חברת ניהול בתים משותפים בישראל".
+- **Checked:** `check_name_flow_test.py` 10/10. `facts_check.py` lists 17 misses (fees, hours, payment methods, response times, the emergency line); none is about the company, and the edit touched none of them. No test call: one phrase, and a real call shows it.
+
 ### Michael calls Homies "חברה לניהול ואחזקת בניינים" (WhatsApp epoch 117, LIVE 10:08:02 UTC)
 - **The ask** (Homies, forwarded by the owner with "lets implement this"): "אפשר לבקש ממיכאל שלא יגיד 'אנחנו חברה לניהול ועד בית' אלא, 'אנחנו חברה לניהול ואחזקת בניינים'".
 - **Where he said it:** WhatsApp, 24 Nov 08:26 UTC, to a massage clinic's own bot that had written to the number by mistake ("הגעת למספר של הומי'ז, אנחנו חברה לניהול ועד בית"). Once more on 4 Nov ("חברת ניהול ועד בית ותחזוקת מבנים"). No text in the workflow says it: the prompt's first line called Homies "חברת ניהול בתים משותפים", the only place it says what the company is, and the model put it in its own words.

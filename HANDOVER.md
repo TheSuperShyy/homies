@@ -11,7 +11,7 @@ appended to.
 > **LIVE 26 Nov, 10:08:02 UTC: WHATSAPP EPOCH 117: MICHAEL CALLS HOMIES "חברה לניהול ואחזקת בניינים"** (Homies, forwarded by the owner: not "אנחנו חברה לניהול ועד בית"; WORKLOG 26 Nov).
 > - **Why:** on 24 Nov he told a massage clinic's bot "אנחנו חברה לניהול ועד בית". No text said it; the prompt's first line ("חברת ניהול בתים משותפים") was put in the model's own words. That line now carries Homies' words, and nothing else changed.
 > - **Shipped by** `scripts/n8n_whatsapp_company.py` (prompt a70004f02b0e, tools unchanged, memory 116 -> 117). Gate 731/731 on live; the replay unchanged. **Owed:** the owner's handset (e.g. "מי אתם בעצם?") and `check_whatsapp_rules.py --watch 2026-11-26T10:08:02Z` tomorrow. **Rollback:** `--restore`, then the epoch back in the repo.
-> - **Twin owed (chatbot first):** both phone agents still say "חברת ניהול בתים משותפים בישראל"; they get the same line on the owner's word.
+> - **The phone line too, LIVE 10:16:12 UTC** (the owner: "apply it to the phone line as well"): `docs/assistant/demo-inbound.md`'s first line, by `vapi_sync.py inbound --keep-voice --apply`; read back equal to the repo, the voice untouched. Snapshot `local/vapi-inbound-live-26nov-before-company.json`. The debt agent still says "חברת ניהול בתים משותפים בישראל", and changes only on the owner's word.
 >
 > **LIVE 26 Nov: THE DASHBOARD'S MENU DROPS "VOICE AGENT CALL"** (the owner: "remove this in the dashboard"; PR #28, `main` `9f6ea4d`). The menu is the Dialer and Phone calls; `/voice` sends a signed-in visitor to the Dialer. The page's code stays (`dashboard/lib/sections.ts` brings it back).
 >
