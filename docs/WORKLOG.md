@@ -11,6 +11,10 @@ conversation that produced it.
 
 ## 2026-11-26
 
+### 11:32 UTC: the owner's four open test chats resolved in Chatwoot (the owner: "ok go resolve them")
+- #102, #104, #105 and #106 (contact #1, inbox 1, each checked to be the test contact's before the write) went from `pending` to `resolved`, read back. The contact has no unresolved chat in the WhatsApp inbox, so its next message opens a fresh conversation, assigned to the agent bot, which Michael answers.
+- **Owed:** the owner's Grok quote run again, from the start.
+
 ### Why the bot did not answer the Grok quote run (the owner: "why is the bot not responding"), read only, 11:20 UTC
 - **What arrived:** Grok's three messages reached Chatwoot and the bot's workflow (11:03:10 the quote ask, 11:10:13 "אני די חדש בבניין", 11:13:44 "hey"), all in conversation #106. Sort answered each with `_handedOver: true`, so nothing was said (executions 210439, 210452, 210460).
 - **Why:** #106 is assigned to Assaf Clix, a User, and Sort keeps quiet when a person has the chat. #104, #105 and #106 were opened on 22 Nov by the owner's template tests from Chatwoot's "New conversation" form; each send opens a new conversation self-assigned to the sender. With `lock_to_single_conversation` off, a contact's new message goes to their newest unresolved conversation, #106.
