@@ -3,7 +3,11 @@
 Prepared 23 Nov 2026. The owner: *"so right now just prepare everything but dont disconnect everything"*. Only the
 read-only checks below have run. ManyChat still answers on Homies' number, and our bot is still on the test number.
 
-## DONE 26 Nov, 13:19 UTC: the bot answers on their number
+## 26 Nov: switched at 13:19 UTC, rolled back at 13:57 (sends refused)
+
+Incoming reached Chatwoot, but Meta refused every send from their number with CLIX's key (code 10, subcode 2593181). **New step 0b: before ManyChat goes off, a send test with their key must pass** (POST /{their number}/messages, `status: read` on a message the number received: it sends nobody anything). The leads are in HANDOVER.
+
+### What the 13:19 run did
 
 The first `--apply` failed at the phone-level override (Meta #100: the app must be subscribed to `messages` first) and rolled itself back. The script now moves inbox 1, then sets their app's own webhook, then runs `register_callback`; the second run was green. Then `n8n_whatsapp_tohomies.py` (740/740). ManyChat stays connected with its replies off until the removal below.
 

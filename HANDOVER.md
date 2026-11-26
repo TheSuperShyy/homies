@@ -25,7 +25,12 @@ appended to.
 > - **Shipped by** `scripts/n8n_whatsapp_company.py` (prompt a70004f02b0e, tools unchanged, memory 116 -> 117). Gate 731/731 on live; the replay unchanged. **Owed:** the owner's handset (e.g. "מי אתם בעצם?") and `check_whatsapp_rules.py --watch 2026-11-26T10:08:02Z` tomorrow. **Rollback:** `--restore`, then the epoch back in the repo.
 > - **The phone line too, LIVE 10:16:12 UTC** (the owner: "apply it to the phone line as well"): `docs/assistant/demo-inbound.md`'s first line, by `vapi_sync.py inbound --keep-voice --apply`; read back equal to the repo, the voice untouched. Snapshot `local/vapi-inbound-live-26nov-before-company.json`. The debt agent still says "חברת ניהול בתים משותפים בישראל", and changes only on the owner's word.
 >
-> **LIVE 26 Nov, 13:19 UTC: THE WHATSAPP BOT ANSWERS ON HOMIES' OWN NUMBER, 077-668-7949** (the owner's go, with ManyChat's auto-replies off; WORKLOG 26 Nov).
+> **ROLLED BACK 26 Nov, 13:57 UTC: HOMIES' NUMBER IS ON MANYCHAT AGAIN, AND OUR BOT IS ON "HADAS 1".** It was switched at 13:19. Incoming worked, but Meta refused every send from their number with CLIX's key: code 10, subcode 2593181, "You do not have the necessary permissions to send messages on behalf of this WhatsApp Business Account" (WORKLOG 26 Nov: what is ruled out, and the leads).
+> - **Leads, not checked yet:** ManyChat (partner with full control, it registered the number); the WhatsApp account's own payment method (billing hub, tab "חשבונות לניהול התכתבויות"); the pending key request on CLIX's page.
+> - **Before the next switch:** a send test from here with their key must pass first (a mark-as-read on a message the number received). Only then do ManyChat's replies go off and `switch_to_homies.py --apply` run.
+> - **What the first switch left, as it was before:** below.
+>
+> **(Undone at 13:57) 26 Nov, 13:19 UTC: the switch that ran** (the owner's go, with ManyChat's auto-replies off).
 > - **Where it runs:** Chatwoot inbox 1 on their number (id …8637, WABA …0527, their CLIX token, never expires), with six templates. Their HOMIES app's own webhook (messages) and the number's override both point at Chatwoot. Typing goes from their number (n8n credential 6JX0FzF9cGPbEYj6). Gate on live 740/740.
 > - **ManyChat is still connected** (subscribed apps: HOMIES and ManyChat), with its replies off. It comes off in a few days, in the order in the runbook: who pays for WhatsApp, then remove it in ManyChat and check Meta's partners, then cancel (Yariv asked the owner to help).
 > - **Every test now writes to the real number.** "hadas 1" no longer feeds inbox 1. The number watch still watches "hadas 1" and must never register their number: there is no PIN for it.

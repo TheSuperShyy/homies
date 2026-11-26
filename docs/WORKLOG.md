@@ -11,6 +11,24 @@ conversation that produced it.
 
 ## 2026-11-26
 
+### 13:57 UTC: rolled back; Homies' number stays on ManyChat, because Meta refuses our app's sends (the owner: "roll back for now")
+- **After the 13:19 switch:** the owner's "היי" arrived at 13:25:33 and Michael's reply failed in Chatwoot with "Application does not have permission for this action". A harmless mark-as-read with CLIX's key got Meta's full answer: code 10, subcode 2593181, "You do not have the necessary permissions to send messages on behalf of this WhatsApp Business Account" (Permission Denied). Incoming worked; every send was refused.
+- **ManyChat answered throughout.** Its auto-replies were not fully off (the owner's screenshot: its "call router" menu at 13:25). Our bot also took 8 messages in 2 chats, and one `notify_team` note tagged a team.
+- **Ruled out:**
+  - the key: valid, never expires, the four WhatsApp scopes, and no targets listed, the same as our working key;
+  - CLIX: administrator of the HOMIES app, and full control of the WhatsApp account (the owner's screenshot). `assigned_users` leaves system users out even on our own account, so that list proves nothing;
+  - the app: published, in the WABA's own portfolio (…2992), `whatsapp_business_messaging` "Ready for testing" with 0 calls, and Step 2 Production setup done;
+  - the WABA: owned by …2992, on behalf of SELF, APPROVED, not verified.
+- **Open leads:**
+  - ManyChat is a partner with full control of two same-named WhatsApp accounts, and it registered the number;
+  - the WhatsApp account's own payment method is not seen yet (the business has Visa ••2143 for every account; the tab "חשבונות לניהול התכתבויות" is unread);
+  - a pending token request on CLIX's page ("someone else must approve").
+- **The rollback, read back:**
+  - `n8n_whatsapp_tohomies.py --restore` put back the 13:19 snapshot (epoch 118; the typing nodes were the only difference);
+  - `switch_to_homies.py --restore`: inbox 1 on "hadas 1" with our key, their override cleared, HOMIES unsubscribed from their account, their app's webhook removed;
+  - their subscribed apps are ManyChat only, their number has no override, the test number's override is on Chatwoot, typing is on …077, and the gate on live is 740/740.
+- **Next, the owner with Yariv:** the billing tab; a send from Meta's own "Try it out" page; the pending request; or removing ManyChat as a partner (Yariv's call, and it can't be undone in a minute). **Before any new switch, a send test from here (mark-as-read with their key) must pass first.**
+
 ### LIVE 13:19 UTC: the WhatsApp bot answers on Homies' own number, 077-668-7949 (the owner: "ok go switch it now", then "its off now go")
 - **Before:** the owner confirmed ManyChat's WhatsApp auto-replies were off (Yariv). ManyChat stays connected and comes off in a few days.
 - **First try, 13:15:52-13:16:36 UTC, failed and rolled itself back:** `switch_to_homies.py --apply --app-is-published --manychat-is-off` saved inbox 1 on their number, then Chatwoot's `register_callback` subscribed their HOMIES app to their account, and Meta refused the phone-level override: "(#100) Before override the current callback uri, your app must be subscribed to receive messages". The script put inbox 1 back on the test number. Left behind: HOMIES subscribed to their account, no override. For about 3 minutes no bot answered the number (ManyChat's replies were off).
