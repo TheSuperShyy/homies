@@ -16,6 +16,7 @@ conversation that produced it.
 - **Given:** 10 done bullets and 5 Will lines.
   - **Done:** the bot on Homies' own number in place of ManyChat; price quotes asked about, passed to Management and emailed; the company line and "what is Homies?" on WhatsApp and the phone line; the old urgent ticket kept out of a new conversation; the Dialer's first real call and its failed free text; the office email in the debt call; the recordings and the two pages removed; the two staff openers; Gila and the workspace's name; the video guide.
   - **Will:** the card on their WhatsApp account; ManyChat's plan and the two Make scenarios; the noise test and tomorrow's watch; the old opener deleted by hand; the AI wallet's top-up (HANDOVER: "top up before real traffic", and real tenants write since 14:10 UTC).
+- **Simplified on the owner's ask ("simplify that"):** the same report in shorter, plainer bullets, 10 done and 4 Will lines; the old opener's deletion was dropped as too small for the report (still owed, HANDOVER).
 - **Before the report:** `homies_hi_he` read APPROVED on their account (`wa_templates.py --account homies list`), while inbox 1 still held it as PENDING. POST `/inboxes/1/sync_templates` answered 200, and `wa_templates.py chatwoot` now lists both new openers APPROVED (the step promised with the templates). The old `homies_hello_he` is still on their account and in inbox 1.
 
 ### A Grok brief for danger v11 (the owner: "give me grok instructions for it"), written, not run
