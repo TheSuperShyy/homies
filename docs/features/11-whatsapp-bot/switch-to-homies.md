@@ -3,6 +3,40 @@
 Prepared 23 Nov 2026. The owner: *"so right now just prepare everything but dont disconnect everything"*. Only the
 read-only checks below have run. ManyChat still answers on Homies' number, and our bot is still on the test number.
 
+## Re-checked 26 Nov, about 13:30 UTC (the owner: "lets now prepare to migrate and remove the manychat"; Yariv in the group: "סגרתי את כל השיחות במאני צ'אט", "אנחנו מוכנים למעבר")
+
+- **Preflight green:** their token (CLIX, never expires), their number CONNECTED, GREEN, name APPROVED; `validates: True`;
+  the only NOTE is ManyChat, still connected. The app's published state is still by eye.
+- **The number is on the Cloud API only** (`is_on_biz_app` false), so nothing on a phone app is affected. Subscribed
+  apps on their account: ManyChat only. Their business is not verified (141010): at most 250 people a day for
+  messages we start; replies are not limited.
+- **Templates on their account, all APPROVED:** the four, plus `receipt_email_he` (homie-db, 26 Nov) and one of
+  Homies' own (MARKETING).
+- **Step 3's gate on today's live bot (epoch 118):** 740/740, the replay unchanged.
+- **The AI wallet:** $29.96 (about 270 turns with a tool). Top it up before real traffic.
+- **Closing ManyChat's conversations does not stop it answering.** Its Default Reply and any keyword triggers must be
+  off at step 1, or both bots answer.
+
+## ManyChat comes off later, not on the night
+
+1. **Who pays for WhatsApp on their account,** in their WhatsApp Manager's payment settings: Homies' own card, or a
+   credit line from ManyChat. Meta does not show the funding to our app. If it is ManyChat's, Homies adds its own
+   card first. Otherwise, once ManyChat is cancelled, the messages we start stop (closed-ticket notices, payment
+   links, staff openers). Replies to tenants cost nothing.
+2. **Remove WhatsApp in ManyChat** (Settings, WhatsApp, remove the account), then check Meta Business Suite no longer
+   lists ManyChat as a partner. Community threads report a number left "linked to Manychat" and a credit line still
+   "Allocated from: Manychat" after offboarding; ManyChat support clears those.
+3. **Cancel the ManyChat plan** (Yariv asked the owner for help with this, 26 Nov).
+
+## What stops with ManyChat (their Make, read 26 Nov)
+
+| Make scenario (ON) | What it did | After the switch |
+|---|---|---|
+| 887568 | a ManyChat call became a task on a Monday board | every tenant's ticket goes into OXS (since 24 Nov) |
+| 898283 | a Monday status change sent the tenant a WhatsApp message through ManyChat | closing the call in OXS resolves our ticket and sends `ticket_resolved_he` (`oxs_requests_sync.py`, 5 Nov). Old Monday items get no message |
+| 887490 | a ManyChat quote request became a lead on a Monday board (name, phone, address, floors, tenants) | a note to Management in Chatwoot and an email (epoch 118). **Monday gets nothing: Homies to decide** |
+| 881814 | a ManyChat lift call emailed one address ("מעלית תקועה בכתובת ...") | the call is in OXS; **nobody is emailed: Homies to decide** |
+
 ## Where things stand (read 23 Nov, about 10:50 UTC)
 
 | | |

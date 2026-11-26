@@ -11,6 +11,14 @@ conversation that produced it.
 
 ## 2026-11-26
 
+### The switch to Homies' number re-checked, read only (the owner: "ok lets now prepare to migrate and remove the manychat and put our own chatbot in"), 13:30 UTC
+- **Yariv, in the group (the owner's screenshot):** he closed all the conversations in ManyChat, "אנחנו מוכנים למעבר", and asked the owner to help him cancel ManyChat's subscription afterwards.
+- **Green on our side:** `switch_to_homies.py` validates (their token, their number CONNECTED and GREEN, the four templates APPROVED; the only NOTE is ManyChat); `n8n_whatsapp_tohomies.py --dump` gated on today's live bot, 740/740, the replay unchanged. Their account holds six APPROVED templates. The number is Cloud-API-only (`is_on_biz_app` false). Subscribed apps: ManyChat only. The business is not verified (141010).
+- **Not readable by us:** who funds their WhatsApp account (`primary_funding_id` needs a Business Solution Provider), and the app's published state. Both are checks by eye in their Meta.
+- **What stops with ManyChat (their Make):** 887568 (calls to Monday tasks) and 898283 (Monday status to a WhatsApp message) have replacements (OXS, and the OXS close sending `ticket_resolved_he`). 887490 (quote requests to Monday leads) and 881814 (the lift-call email to one address) have none: Homies to decide.
+- **ManyChat's removal order** (runbook): replies off on the night (`--manychat-is-off`); days later, the payment check, then remove WhatsApp in ManyChat and check Meta's partner list, then cancel. Searched: ManyChat's help center on removing the integration, and community threads on leftover partner links and credit lines.
+- **Nothing written anywhere.** The switch waits on the owner's go and a time.
+
 ### LIVE 13:0x UTC: the phone line gets "what is Homies?" answered too (PR #32, `main` 673b5f1; the owner: "apply the overview fix to the phone line as well")
 - **The change:** `get_service_info` hands `OVERVIEW` to an unmatched question from the incoming agent as well as from WhatsApp (`channel(ctx) === "whatsapp" || isIntake(ctx)`). The debt agent has no `get_service_info`. A probe with no assistant id keeps found:false, which is `check_tools.py`'s "not in the catalogue" case. The phone's tool text needs no change, because found:true with topics is its ordinary case. No Vapi sync.
 - **Checked:** syntax ok, `check_knowledge.py` 29/29, CI green, deployed from `main`. Probed live, read-only: as the incoming agent (`10ae859a`) "מה הומי'ז עושה" gets the overview; a probe with no agent gets found:false; WhatsApp gets the overview; the phone's "הדברה" gets pest control, as before. `index.ts` on feature/chatbot equals main's.
