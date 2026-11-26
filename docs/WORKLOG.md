@@ -11,6 +11,15 @@ conversation that produced it.
 
 ## 2026-11-26
 
+### LIVE 12:1x UTC: on WhatsApp, "what is Homies?" gets Homies in general (PR #30, `main` 99c40b9; the owner pasted the Grok quote run's report)
+- **The run (11:34-11:48 UTC, conversation 108), read against the executions:** Grok's copy is right; its double space in Q1.1 is a 🙂 it dropped.
+  - Q1 passed. 210508: `notify_team` reason `quote`, department `management`, "הצעת מחיר להתקנת מצלמות אבטחה בלובי בבר כוכבא 23". The note in #108 tags @הנהלה ("סיבה: הדייר מבקש הצעת מחיר"), so Yariv, עדן ממן and Assaf Clix were tagged. Its notes are left: "anything else?" in Q1.2, and "רשומה ומעודכנת" in Q1.3 with no tool that turn (staff read the details in the same chat).
+  - Q2 failed Q8. 210570: `get_service_info` with "מה הומי'ז עושה" matched no topic, and found:false's note ("Say you do not have that detail and offer the office") was obeyed word for word.
+- **The fix, in debt-tools only:** `OVERVIEW` (built from `SERVICES`): "הומי'ז היא חברה לניהול ואחזקת בניינים", the 14 service names, the areas line. On WhatsApp an unmatched question gets it as found:true, with a note that anything it does not cover is still not guessed. Voice keeps found:false (chatbot first; the phone line's twin is owed).
+- **Checked:** syntax ok, `check_knowledge.py` 29/29, CI green, deployed from `main` by `deploy-function`. Probed live, read-only: WhatsApp "מה הומי'ז עושה" -> the overview; voice -> found:false; WhatsApp "הדברה" -> pest control, as before. `index.ts` on feature/chatbot equals main's again.
+- **Found, not fixed:** the WhatsApp tools post to the n8n router "Homies — debt tools (Vapi)" (lXofknAbE5wu5nwQ, unchanged since 16 Sep). Its REASONS list lacks payment, billing, move, contract, quote, other and bank_transfer, so every WhatsApp note is stored as `caller_request` (210508's result says so). The Chatwoot note is right, since it takes the model's reason. So the earlier "no quote has ever come in" held for the phone only.
+- **Who ships what (with homie-db):** that session takes MEMORY_EPOCH 118 (the owner's new quote wording, "management will get back to you", plus an email summary to Management) and the debt agent's email item. My key-only bump to 118, meant to clear the owner's buffer of the failed Q2, was dropped: theirs clears it. The owner's rerun of "what is Homies" waits for their 118.
+
 ### 11:32 UTC: the owner's four open test chats resolved in Chatwoot (the owner: "ok go resolve them")
 - #102, #104, #105 and #106 (contact #1, inbox 1, each checked to be the test contact's before the write) went from `pending` to `resolved`, read back. The contact has no unresolved chat in the WhatsApp inbox, so its next message opens a fresh conversation, assigned to the agent bot, which Michael answers.
 - **Owed:** the owner's Grok quote run again, from the start.

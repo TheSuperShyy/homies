@@ -3745,7 +3745,7 @@ on "hello good afternoon" twice, then on the owner's goodbye (*"wth is this"*).
 - **It mirrors the live prompt and the tester checklist.** A change to what Michael should do changes the brief in the same commit. Epoch 100 (9 Nov) missed this, and the brief caught up the next day; check the brief whenever an epoch moves.
 - **C8 depends on the hour since epoch 100.** An urgent fault outside office hours (Sun-Thu 09:00-17:00 Israel) also gets Homies' emergency line, so the brief has the tester note the Israel time and judges C8 by it. A weekday run between 15:00 and 23:00 PH only ever sees the in-hours answer.
 - **A person assigned to a chat silences Michael in it, and a chat sent from Chatwoot's "New conversation" form is self-assigned to the sender (26 Nov).** Sort keeps quiet whenever the assignee is a User. A contact's new message goes to their newest unresolved conversation (`lock_to_single_conversation` is off). So a staff opener keeps Michael out of that tenant's chat until it is unassigned or resolved, by design, and a tester's stacked chats must be resolved before a run (26 Nov: the Grok quote run got no reply in #106, self-assigned on 22 Nov).
-- **A quote request has never run, real or test (26 Nov):** no `quote` row in `call_outcomes`. Its brief is `grok-quote-test.md`. A team tag reaches that team's members (as administrators or inbox members), never every administrator: a quote tags Management (Yariv, עדן ממן, our Assaf Clix login), and Ido Clix ADMIN, an administrator outside the team, is not tagged.
+- **A quote request ran end to end on 26 Nov** (the Grok run, conversation 108): the note tagged Management. `call_outcomes` cannot count WhatsApp quotes: the n8n router stores every WhatsApp note as `caller_request`. Its brief is `grok-quote-test.md`. A team tag reaches that team's members (as administrators or inbox members), never every administrator: a quote tags Management (Yariv, עדן ממן, our Assaf Clix login), and Ido Clix ADMIN, an administrator outside the team, is not tagged.
 - **It costs real money, unlike `wa_qa.py`:** real model calls, about 4 cents a reply. It also opens real test tickets, and they stay.
 - **Every ticket it opens is also an open call in Homies' OXS.** It writes from the owner's +63, the one
   number the OXS mirror copies, so each ticket lands as a service call in בר כוכבא 23: about five a full
@@ -5337,6 +5337,14 @@ office, so anything we are unsure of is better left out of the catalogue than
 guessed into it. Left out on purpose: opening hours (unresolved, and the
 agents already state them), prices (quoted per building — that is
 `notify_team` reason `quote`), and every marketing claim.
+
+**A question that names no one service gets Homies in general on WhatsApp
+(26 Nov, PR #30).** "What is Homies, what do you do?" matched no topic, and
+found:false sent a tenant to the office for the most basic question there is.
+On WhatsApp an unmatched question now gets `OVERVIEW`: the company in Homies'
+own words, the service names from `SERVICES`, and the areas. found:false is
+still the answer on the phone line and for anything specific the catalogue
+lacks.
 
 **Hebrew matching needs the definite article dropped and short words bounded
 (16 Sep).** Hebrew puts ה INSIDE a phrase — אב בית is said אב הבית — so a

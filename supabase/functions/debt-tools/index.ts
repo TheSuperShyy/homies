@@ -1749,6 +1749,28 @@ const SERVICES: Topic[] = [
 ];
 
 /**
+ * Homies in general, for a WhatsApp question that names no one service (26 Nov).
+ *
+ * The owner's Grok run asked "אני די חדש בבניין, מה זה בעצם הומי'ז? מה אתם
+ * עושים בדיוק?". The model looked up "מה הומי'ז עושה", no topic matched, and
+ * found:false sent the tenant to the office for the most basic question there
+ * is. This is the answer instead: what Homies is, in Homies' own words (the
+ * prompts' first line since 26 Nov), and its services by name, built from
+ * SERVICES so the list cannot drift from the catalogue. Never matched by
+ * findTopics; get_service_info hands it over when nothing else matched.
+ */
+const OVERVIEW: Topic = {
+  id: "overview",
+  title: "הומי'ז",
+  words: [],
+  facts: [
+    "הומי'ז היא חברה לניהול ואחזקת בניינים.",
+    "השירותים שלה: " + SERVICES.filter((t) => t.id !== "areas").map((t) => t.title).join(", ") + ".",
+    ...(SERVICES.find((t) => t.id === "areas")?.facts.slice(0, 1) ?? []),
+  ],
+};
+
+/**
  * Which topics a question is about.
  *
  * Substring matching, not token equality, and that is the whole trick: Hebrew
@@ -4571,9 +4593,24 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
    * one: say they do not know and offer the office, rather than guess. Prices
    * and opening hours deliberately return nothing; see the SERVICES comment.
    */
-  async get_service_info(args, _ctx) {
+  async get_service_info(args, ctx) {
     const topics = findTopics(args?.topic ?? args?.question ?? "");
     if (!topics.length) {
+      // 26 Nov: on WhatsApp a question that names no one service gets Homies in
+      // general (OVERVIEW), found true, so "what is Homies, what do you do?" is
+      // answered rather than sent to the office. Anything the overview does not
+      // cover is still not guessed. The phone line keeps found:false until the
+      // owner asks for its twin (chatbot first).
+      if (channel(ctx) === "whatsapp") {
+        return {
+          ok: true,
+          found: true,
+          topics: [{ title: OVERVIEW.title, facts: OVERVIEW.facts }],
+          note: "No single service matched, so this is Homies in general. A question about what Homies is or " +
+            "does is answered from it. Anything it does not cover you do not have: say so and offer the " +
+            "office; do not guess.",
+        };
+      }
       return {
         ok: true,
         found: false,
