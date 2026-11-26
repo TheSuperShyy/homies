@@ -1,6 +1,7 @@
 import { serverClient } from '@/lib/supabase-server';
 import { getLocale, translator } from '@/lib/i18n';
 import Link from 'next/link';
+import { recordingOf } from '@/lib/recording';
 
 /**
  * Split a Vapi transcript into turns.
@@ -53,6 +54,8 @@ export default async function Call({ params }: { params: { id: string } }) {
   if (error || !c) return <div className="empty">{error?.message ?? 'Call not found.'}</div>;
 
   const spoken = c.transcript ? turns(c.transcript) : [];
+  // A voice call's recording, fresh from Vapi each time the page opens (lib/recording.ts).
+  const rec = c.channel === 'voice' && c.external_call_id ? await recordingOf(c.external_call_id) : null;
 
   // Compact key/value rows, not the big number cards the overview uses. These
   // are reference details you glance at once — sizing them like headline
@@ -114,6 +117,20 @@ export default async function Call({ params }: { params: { id: string } }) {
         </div>
 
         <aside className="side">
+          {rec && (rec.state === 'ready' || c.audio_url) && (
+            <div className="panel">
+              <div className="panelhead"><span>{t('call.recording')}</span></div>
+              <div style={{ padding: 12 }}>
+                {rec.state === 'ready' ? (
+                  <audio controls preload="metadata" src={rec.url} style={{ width: '100%' }} />
+                ) : (
+                  <div className="muted" style={{ fontSize: 13 }}>
+                    {t(rec.state === 'gone' ? 'call.recordingGone' : 'call.recordingDown')}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
           {c.summary && (
             <div className="panel">
               <div className="panelhead"><span>{t('call.summary')}</span></div>
@@ -121,22 +138,6 @@ export default async function Call({ params }: { params: { id: string } }) {
             </div>
           )}
 
-          {c.audio_url && (
-            <div className="panel">
-              <div className="panelhead"><span>{t('call.recording')}</span></div>
-              <div style={{ padding: 12 }}>
-                <audio controls src={c.audio_url} style={{ width: '100%' }} />
-                {/* Recording was switched off on 25 Aug — transcript only,
-                    the owner's decision — so only calls before that date have
-                    audio, and Vapi deletes even those after 14 days. A dead
-                    player looks like a broken page; say which it is. */}
-                <div className="muted" style={{ fontSize: 12, marginTop: 8 }}>
-                  Audio exists only for calls before 25 Aug 2026 (recording is off since;
-                  transcripts are kept). Vapi deletes recordings after 14 days.
-                </div>
-              </div>
-            </div>
-          )}
 
           <div className="panel">
             <div className="panelhead"><span>{t('call.details')}</span></div>
