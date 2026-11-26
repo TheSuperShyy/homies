@@ -179,6 +179,8 @@ variable, which Meta's reviewers read).
   `check_paylink.test.ts` holds to this body's shape).
 - **Accounts:** both WABAs: `.env`'s (`…632`, Chatwoot's template list) and
   "hadas 1" (`…050`, where the number's sends are looked up). Then Chatwoot's sync.
+  Also on Homies' own account (`--account homies`, `…527`), on the owner's go (26 Nov:
+  "submit that template as well on yariv meta"), so it is there at the switch.
 - **category:** UTILITY
 - **language:** he
 - **body:**

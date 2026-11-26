@@ -230,7 +230,10 @@ TEMPERATURE = 1.0
 # was minted for, and check_memory_epoch() refuses the deploy when the live text
 # has moved and the epoch has not. Same shape as check_greeting(), for the same
 # reason -- two things that must move together, asserted rather than trusted.
-MEMORY_EPOCH = 117
+MEMORY_EPOCH = 118
+# 117 -> 118, 26 Nov (n8n_whatsapp_quote.py): the owner, after the Grok quote run: a price quote is asked about first
+# (what it is for, which items), then recorded, then "passed to the management team, who will get back to you";
+# Send keeps that call-back in a quote turn (promise v9). The email to Management is Hand to a person's.
 # 116 -> 117, 26 Nov (n8n_whatsapp_company.py): Homies, forwarded by the owner: Michael calls Homies "חברה לניהול
 # ואחזקת בניינים" (he had told a wrong number "חברה לניהול ועד בית", 24 Nov); the prompt's first line carries the words.
 # 115 -> 116, 19 Nov, later (n8n_whatsapp_cardwords.py): the owner's Grok run of 115; cheques' "will write to you here"
@@ -850,8 +853,9 @@ MEMORY_TURNS = 12
 # sha256[:12] of the two texts a buffer can contradict. Update BOTH the epoch
 # and the hash it covers, together; check_memory_epoch prints the new value.
 EPOCH_COVERS = {
-    "prompt": "a70004f02b0e",   # docs/features/11-whatsapp-bot/prompt.md (26 Nov, epoch 117: Homies is "חברה לניהול
-    # ואחזקת בניינים", Homies' own words, in the first line). Before: 89c2cc1bd0cd (19 Nov, later, epoch 116: cheques' "will
+    "prompt": "5736a83e9646",   # docs/features/11-whatsapp-bot/prompt.md (26 Nov, later, epoch 118: a price quote is asked
+    # about first, then recorded and passed to the management team, who will get back). Before: a70004f02b0e (26 Nov,
+    # epoch 117: Homies is "חברה לניהול ואחזקת בניינים", Homies' own words, in the first line). Before: 89c2cc1bd0cd (19 Nov, later, epoch 116: cheques' "will
     # write to you here", which Send keeps). Before: 6eceba0a40ef (19 Nov, epoch 115, the link is for paying
     # by credit card only, and another way goes to collections only when asked; Yariv). Before: 7960ab31d1a1
     # (18 Nov, epoch 111, a bank transfer goes to
@@ -885,7 +889,9 @@ EPOCH_COVERS = {
     # empty note (n8n_whatsapp_procedure.py).
     # 19 Oct: get_request_status is called first, with nothing; the number they
     # write from finds their tickets (n8n_whatsapp_norepeat.py).
-    "tools": "75209bb26f32",  # 19 Nov, later, epoch 116 (n8n_whatsapp_cardwords.py): notify_team's cheques line says
+    "tools": "37d512e861f8",  # 26 Nov, later, epoch 118 (n8n_whatsapp_quote.py): notify_team asks about a quote first,
+    # records it with a summary, and says the management team will get back; the quote leaves the at-once list.
+    # Before: 75209bb26f32, 19 Nov, later, epoch 116 (n8n_whatsapp_cardwords.py): notify_team's cheques line says
     # "will write to them here"; request_standing_order gives the number also when already recorded.
     # Before: 5f1ff18896a1, 19 Nov, epoch 115 (n8n_whatsapp_cardonly.py): get_payment_link is card only and
     # offers no other way; request_standing_order also for a standing order from the bank; notify_team hands cheques,

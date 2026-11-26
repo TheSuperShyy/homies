@@ -275,7 +275,12 @@ PINS = {
     # "חברה לניהול ואחזקת בניינים", Homies' own words. Checked by the cases (the line goes out whole through Send
     # and every Reply usable? guard) and the replay (nothing changed); no Claude round, as on 19 Nov: one phrase,
     # and Gemini's choice of words is the handset's to show.
-    'Answer the resident / system': 'a70004f02b0e',
+    # 26 Nov, later (n8n_whatsapp_quote.py, epoch 118): the owner, after the Grok quote run. A price quote is asked
+    # about first (what it is for, which items, about how many, where), then recorded with all of it, then "passed
+    # to the management team, who will get back to you", never when; Send keeps that call-back in a quote turn
+    # (promise v9). Checked by the cases (10 new: the call-back stays only after a quote note, "soon" is still
+    # cut) and the replay (nothing changed); no Claude round: Gemini's questions are the owner's Grok rerun to show.
+    'Answer the resident / system': '5736a83e9646',
     'Could not answer / input': 'd9c06797ffa6',
     'Could not answer / system': '88ff96885ec3',
     # 5 Oct evening: the note's words are unchanged; HAY_ALT inside it gained
@@ -304,7 +309,7 @@ PINS = {
     # tickets; a reference or a building only when it found nothing (norepeat.py).
     'get_request_status / tool': 'd9a90bd9c2c0',   # 6 Nov, epoch 98: names each ticket by its reference
     'get_service_info / tool': '18ca3d507731',
-    'notify_team / tool': '3340ffc0f974',     # 19 Nov, later, epoch 116 (cardwords.py): cheques' representative "will write to them here". 19 Nov, epoch 115 (cardonly.py): cheques, cash or another way to collections, told like a bank transfer. 18 Nov, later still, epoch 113 (bankwhen.py): asked only when, no new call and no second hand-over sentence (moved on the owner's "push it live"; the Claude-played check of wa_qa_bankwhen.json then came back 8/8, no guard, no flag). 18 Nov, later, epoch 112 (bankagain.py): the bank-transfer hand-over is called every time it is asked, and a request for a person gets the same words (moved on the owner's "push it live"; the Claude-played check of wa_qa_bankagain.json then came back 15/15, no guard, no flag). 18 Nov, epoch 111 (banktransfer.py): a bank transfer is the one note the resident hears about. 18 Oct, late: the reason, never an empty note; 29 Oct, night: and
+    'notify_team / tool': '0a24c1d6e120',     # 26 Nov, later, epoch 118 (quote.py): a quote is asked about first, recorded with a summary the email carries, and passed to the management team, who will get back; the other note the resident hears about. 19 Nov, later, epoch 116 (cardwords.py): cheques' representative "will write to them here". 19 Nov, epoch 115 (cardonly.py): cheques, cash or another way to collections, told like a bank transfer. 18 Nov, later still, epoch 113 (bankwhen.py): asked only when, no new call and no second hand-over sentence (moved on the owner's "push it live"; the Claude-played check of wa_qa_bankwhen.json then came back 8/8, no guard, no flag). 18 Nov, later, epoch 112 (bankagain.py): the bank-transfer hand-over is called every time it is asked, and a request for a person gets the same words (moved on the owner's "push it live"; the Claude-played check of wa_qa_bankagain.json then came back 15/15, no guard, no flag). 18 Nov, epoch 111 (banktransfer.py): a bank transfer is the one note the resident hears about. 18 Oct, late: the reason, never an empty note; 29 Oct, night: and
     # something new about an open ticket is add_request_detail's; 5 Nov (gas.py): never for gas; 11 Nov, night
     # (lineonly.py, epoch 105): never for an emergency either, and reason has no `emergency`; later that night
     # (confirm.py, epoch 106): nor for anything else urgent, like a big leak

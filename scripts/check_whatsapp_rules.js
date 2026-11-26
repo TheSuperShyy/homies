@@ -2055,6 +2055,37 @@ function cases(E) {
     expect('a standing order turn does not let "we will call you" through',
       () => content(E, { reply: CBK.replace('ומישהו מצוות הגבייה ייצור איתך קשר', 'וניצור איתך קשר'), said: 'אפשר לעשות הוראת קבע?', steps: [SOREC] }).indexOf('ניצור איתך קשר') === -1, true);
   }
+  // 26 Nov (scripts/n8n_whatsapp_quote.py), the owner: a price quote is "passed to the management team, who will get
+  // back to you". Send keeps that call-back in a turn where notify_team recorded a quote (promise v9), the way it does
+  // after a recorded standing order. Try again keeps no tool input, so after a retry the call-back is cut as before.
+  if (promiseV(SB9) >= 9) {
+    console.log(NL + '--- Send: a quote\'s "the management team will get back to you" is no promise (26 Nov, the owner) ---');
+    const QNOTE = { action: { tool: 'notify_team', toolInput: { reason: 'quote', department: 'management',
+      description: 'הצעת מחיר ל-4 מצלמות אבטחה בלובי ובחניה, בר כוכבא 23 דירה 2' } }, observation: ob9({ ok: true, reason: 'caller_request' }) };
+    const QSTR = { action: { tool: 'notify_team', toolInput: JSON.stringify({ reason: 'quote', description: 'x' }) }, observation: ob9({ ok: true }) };
+    const QIN = { action: { tool: 'notify_team', toolInput: { input: { reason: 'quote', description: 'x' } } }, observation: ob9({ ok: true }) };
+    const QBACK = 'רשמתי את הבקשה שלך להצעת מחיר על 4 מצלמות בלובי ובחניה, והעברתי אותה לצוות ההנהלה, שיחזור אליך לגבי ההצעה. יש עוד משהו שאוכל לעזור בו?';
+    const QTHEY = 'רשמתי את הבקשה והעברתי אותה לצוות ההנהלה. הם יחזרו אליך לגבי ההצעה. יש עוד משהו שאוכל לעזור בו?';
+    expect('a quote recorded this turn: "who will get back to you" stays', () => content(E, { reply: QBACK, said: 'בכניסה ובחניה, בערך 4 מצלמות', steps: [QNOTE] }), QBACK);
+    expect('"they will get back to you" stays the same way', () => content(E, { reply: QTHEY, said: 'בכניסה ובחניה', steps: [QNOTE] }), QTHEY);
+    expect('the tool input as a JSON string: the same', () => content(E, { reply: QBACK, said: 'x', steps: [QSTR] }), QBACK);
+    expect('the tool input wrapped in `input`: the same', () => content(E, { reply: QBACK, said: 'x', steps: [QIN] }), QBACK);
+    expect('a note for another reason: the call-back is still cut',
+      () => content(E, { reply: QBACK, said: 'x', steps: [{ action: { tool: 'notify_team', toolInput: { reason: 'contract', description: 'x' } }, observation: ob9({ ok: true }) }] }).indexOf('יחזור אליך') === -1, true);
+    expect('no note this turn: the call-back is still cut', () => content(E, { reply: QBACK, said: 'x', steps: [] }).indexOf('יחזור אליך') === -1, true);
+    expect('after a retry (no tool input kept): the call-back is cut, the hand-over stays', () => {
+      const m = turn({ reply: QBACK, said: 'x', steps: [] });
+      const $ = (nm) => (nm === 'Try again'
+        ? { first: () => ({ json: { first_steps: [{ tool: 'notify_team', observation: ob9({ ok: true }) }] } }) }
+        : m.$(nm));
+      const out = JSON.parse(E.send(m.$json, $)).content;
+      return out.indexOf('יחזור אליך') === -1 && out.indexOf('והעברתי אותה לצוות ההנהלה') !== -1;
+    }, true);
+    expect('a quote turn does not let "soon" through',
+      () => content(E, { reply: QBACK.replace('לגבי ההצעה', 'בהקדם'), said: 'x', steps: [QNOTE] }).indexOf('בהקדם') === -1, true);
+    expect('a quote turn does not let "we will call you" through',
+      () => content(E, { reply: QBACK.replace('שיחזור אליך', 'וניצור איתך קשר'), said: 'x', steps: [QNOTE] }).indexOf('ניצור איתך קשר') === -1, true);
+  }
   // 10 Nov (scripts/n8n_whatsapp_retest7.py): the tester's seventh run, C3.3 (170031). A main-pipe ticket
   // went out with "נשלח איש מקצוע מטעמנו לבדוק ולטפל בזה": the list knew "נשלח מישהו / טכנאי" only.
   if (promiseV(SB9) >= 7) {
