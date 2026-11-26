@@ -60,6 +60,8 @@ SSH = ["ssh", "-i", os.path.join(os.path.expanduser("~"), ".ssh", "homies_vps"),
        "-o", "ConnectTimeout=15", "root@186.240.147.235"]
 GRAPH = "https://graph.facebook.com/v21.0"
 INBOX_ID = 1
+# The address Chatwoot's register_callback gives a number (read off the test number's override, 26 Nov).
+CW_BASE = "https://chat.srv1879140.hstgr.cloud"
 TEMPLATES = ("ticket_resolved_he", "payment_link_he", "homies_hello_he", "homies_message_he")
 APP_OBJECT = "whatsapp_business_account"
 
@@ -114,7 +116,7 @@ def state(ch)
     'templates' => (ch.message_templates || []).map { |t| [t['name'], t['status']] } }
 end
 out = { 'mode' => P['mode'], 'before' => state(ch) }
-if %w[check apply].include?(P['mode'])
+if %w[check apply move].include?(P['mode'])
   t = P['target']
   old_phone, old_pc = ch.phone_number, ch.provider_config.dup
   ch.phone_number = t['phone_number']
@@ -124,6 +126,21 @@ if %w[check apply].include?(P['mode'])
     out['valid'] = ch.valid?
     out['errors'] = ch.errors.full_messages
     ch.reload
+  elsif P['mode'] == 'move'
+    # 26 Nov: the number only, no register_callback. Meta refuses a phone-level override until the app is
+    # subscribed to `messages` at app level, and that subscription is verified against Chatwoot, which answers
+    # only for a number an inbox already has. So: move, then the app's webhook (Python), then 'hook'.
+    begin
+      ch.save!
+      out['after'] = state(ch.reload)
+    rescue StandardError => e
+      out['error'] = "save: #{e.message}"[0, 400]
+      ch.reload
+      ch.phone_number = old_phone
+      ch.provider_config = old_pc
+      ch.save!(validate: false)
+      out['reverted'] = state(ch.reload)
+    end
   else
     step = 'save'
     begin
@@ -141,6 +158,14 @@ if %w[check apply].include?(P['mode'])
       ch.save!(validate: false)
       out['reverted'] = state(ch.reload)
     end
+  end
+elsif P['mode'] == 'hook'
+  begin
+    Whatsapp::WebhookSetupService.new(ch).register_callback
+    ch.sync_templates
+    out['after'] = state(ch.reload)
+  rescue StandardError => e
+    out['error'] = "register_callback: #{e.message}"[0, 600]
   end
 elsif P['mode'] == 'restore'
   t = P['target']
@@ -320,26 +345,34 @@ def main():
                                                  "fields": s.get("fields", [])} for s in app["before"]]
         json.dump(snap, open(SNAPSHOT, "w", encoding="utf-8"), indent=1)
         print("snapshot    : %s" % os.path.relpath(SNAPSHOT, ROOT))
-    res = rails({"mode": "apply", "inbox_id": INBOX_ID, "target": target})
+    # 26 Nov: the order Meta needs (the first --apply failed at register_callback with "(#100) Before override the
+    # current callback uri, your app must be subscribed to receive messages", and rolled back). 1. inbox 1 takes the
+    # number, so Chatwoot can answer Meta's check of the callback; 2. their app's own webhook (messages) on that
+    # callback; 3. register_callback (the WABA subscription and the phone-level override) and the template sync.
+    callback = "%s/webhooks/whatsapp/%s" % (CW_BASE, h["e164"])
+    res = rails({"mode": "move", "inbox_id": INBOX_ID, "target": target})
     if res.get("error"):
         show_channel("put back", res.get("reverted") or {})
         sys.exit("FAILED at %s. Inbox %d is back on the test number." % (res["error"], INBOX_ID))
     show_channel("inbox %d now" % INBOX_ID, res["after"])
-    apps = graph(h["token"], "GET", "/%s/subscribed_apps" % h["waba"])
-    wc = graph(h["token"], "GET", "/%s" % h["phone_id"], fields="webhook_configuration").get("webhook_configuration", {})
-    print("connected   : %s" % ", ".join(a.get("whatsapp_business_api_data", {}).get("name") or "?" for a in apps.get("data", [])))
-    callback = wc.get("phone_number") or ""
-    print("their number's messages go to: %s" % urllib.parse.urlparse(callback).netloc)
     if app and vt_ok:
-        if not callback:
-            sys.exit("FAILED: no phone-level override to copy, so their app's own webhook was not set. "
-                     "Set it by hand, or roll back now: --restore, then ManyChat's replies on.")
         res2 = graph(app["token"], "POST", "/%s/subscriptions" % app["id"], object=APP_OBJECT,
                      callback_url=callback, verify_token=vt, fields="messages")
         if res2.get("_http") or not res2.get("success"):
-            sys.exit("FAILED: their app's own webhook: %s. Messages may not reach Chatwoot. Set it by hand (their app -> "
-                     "WhatsApp -> Configuration: the callback above, inbox 1's verify token, the messages field), or roll "
-                     "back now: --restore, then ManyChat's replies on." % (res2.get("_error") or res2))
+            sys.exit("FAILED: their app's own webhook: %s. Inbox %d is on their number but nothing is pointed at it: "
+                     "roll back now, --restore, then ManyChat's replies on." % (res2.get("_error") or res2, INBOX_ID))
+        print("their app's own webhook: set (%s, messages)" % urllib.parse.urlparse(callback).netloc)
+    res3 = rails({"mode": "hook", "inbox_id": INBOX_ID})
+    if res3.get("error"):
+        sys.exit("FAILED at %s. Roll back now: --restore, then ManyChat's replies on." % res3["error"])
+    show_channel("inbox %d now" % INBOX_ID, res3["after"])
+    apps = graph(h["token"], "GET", "/%s/subscribed_apps" % h["waba"])
+    wc = graph(h["token"], "GET", "/%s" % h["phone_id"], fields="webhook_configuration").get("webhook_configuration", {})
+    print("connected   : %s" % ", ".join(a.get("whatsapp_business_api_data", {}).get("name") or "?" for a in apps.get("data", [])))
+    override = wc.get("phone_number") or ""
+    print("their number's messages go to: %s%s" % (urllib.parse.urlparse(override).netloc,
+                                                  "" if override == callback else "  (NOT the address set above)"))
+    if app and vt_ok:
         subs = graph(app["token"], "GET", "/%s/subscriptions" % app["id"])
         print("their app's own webhook: %s" % describe_subs([s for s in subs.get("data", []) if s.get("object") == APP_OBJECT]))
     else:

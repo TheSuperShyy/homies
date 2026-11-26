@@ -3,6 +3,10 @@
 Prepared 23 Nov 2026. The owner: *"so right now just prepare everything but dont disconnect everything"*. Only the
 read-only checks below have run. ManyChat still answers on Homies' number, and our bot is still on the test number.
 
+## DONE 26 Nov, 13:19 UTC: the bot answers on their number
+
+The first `--apply` failed at the phone-level override (Meta #100: the app must be subscribed to `messages` first) and rolled itself back. The script now moves inbox 1, then sets their app's own webhook, then runs `register_callback`; the second run was green. Then `n8n_whatsapp_tohomies.py` (740/740). ManyChat stays connected with its replies off until the removal below.
+
 ## Re-checked 26 Nov, about 13:30 UTC (the owner: "lets now prepare to migrate and remove the manychat"; Yariv in the group: "סגרתי את כל השיחות במאני צ'אט", "אנחנו מוכנים למעבר")
 
 - **Preflight green:** their token (CLIX, never expires), their number CONNECTED, GREEN, name APPROVED; `validates: True`;

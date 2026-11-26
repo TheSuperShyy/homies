@@ -25,6 +25,8 @@ The user is the builder. The client is Homies.
 
 ## Standing decisions. Do not relitigate these.
 
+**The WhatsApp bot runs on Homies' own number since 26 Nov, 13:19 UTC** (077-668-7949, inbox 1, their account and token). Tests write to the real number now. **Meta's order for pointing a number at Chatwoot:** the inbox takes the number first (so Chatwoot can answer Meta's check of the callback), then the app's own `messages` webhook, then the phone-level override (`register_callback`); the override before the app's subscription fails with #100 (`switch_to_homies.py`, first try).
+
 **ManyChat comes off Homies' number in two steps (26 Nov).** On the switch night only its replies go off (Default Reply and keyword triggers; closing its conversations does not stop it), and it stays connected (`--manychat-is-off`). Days later, after checking who pays for WhatsApp on their account (Homies' card or ManyChat's credit line, which only their Meta shows), WhatsApp is removed in ManyChat, Meta's partner list is checked, and the plan is cancelled. Their Make has four ManyChat scenarios; two have replacements (OXS), and two are Homies' to decide: quote leads to Monday (887490) and the lift-call email (881814).
 
 **The dashboard shows the dialer and the calls only (25 Nov; the owner: *"in the dashboard i want everything gone only the dialer and call related should be seen here"*).** PR #25, `main` `954fafe`.

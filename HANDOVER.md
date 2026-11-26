@@ -25,7 +25,14 @@ appended to.
 > - **Shipped by** `scripts/n8n_whatsapp_company.py` (prompt a70004f02b0e, tools unchanged, memory 116 -> 117). Gate 731/731 on live; the replay unchanged. **Owed:** the owner's handset (e.g. "מי אתם בעצם?") and `check_whatsapp_rules.py --watch 2026-11-26T10:08:02Z` tomorrow. **Rollback:** `--restore`, then the epoch back in the repo.
 > - **The phone line too, LIVE 10:16:12 UTC** (the owner: "apply it to the phone line as well"): `docs/assistant/demo-inbound.md`'s first line, by `vapi_sync.py inbound --keep-voice --apply`; read back equal to the repo, the voice untouched. Snapshot `local/vapi-inbound-live-26nov-before-company.json`. The debt agent still says "חברת ניהול בתים משותפים בישראל", and changes only on the owner's word.
 >
-> **26 Nov, 13:30 UTC: THE SWITCH TO HOMIES' NUMBER IS RE-CHECKED AND READY; IT WAITS ON THE OWNER'S GO** (Yariv: ManyChat's conversations closed, "אנחנו מוכנים למעבר"; runbook `docs/features/11-whatsapp-bot/switch-to-homies.md`, "Re-checked 26 Nov").
+> **LIVE 26 Nov, 13:19 UTC: THE WHATSAPP BOT ANSWERS ON HOMIES' OWN NUMBER, 077-668-7949** (the owner's go, with ManyChat's auto-replies off; WORKLOG 26 Nov).
+> - **Where it runs:** Chatwoot inbox 1 on their number (id …8637, WABA …0527, their CLIX token, never expires), with six templates. Their HOMIES app's own webhook (messages) and the number's override both point at Chatwoot. Typing goes from their number (n8n credential 6JX0FzF9cGPbEYj6). Gate on live 740/740.
+> - **ManyChat is still connected** (subscribed apps: HOMIES and ManyChat), with its replies off. It comes off in a few days, in the order in the runbook: who pays for WhatsApp, then remove it in ManyChat and check Meta's partners, then cancel (Yariv asked the owner to help).
+> - **Every test now writes to the real number.** "hadas 1" no longer feeds inbox 1. The number watch still watches "hadas 1" and must never register their number: there is no PIN for it.
+> - **Rollback:** `n8n_whatsapp_tohomies.py --restore`, then `switch_to_homies.py --restore`, then ManyChat's replies on.
+> - **Still open:** Homies' two decisions (quote leads to Monday, the lift-call email), the AI wallet ($29.96), business verification (250 people a day for messages we start).
+>
+> **26 Nov, 13:30 UTC: THE SWITCH TO HOMIES' NUMBER WAS RE-CHECKED (13:30 UTC, before it ran)** (Yariv: ManyChat's conversations closed, "אנחנו מוכנים למעבר"; runbook `docs/features/11-whatsapp-bot/switch-to-homies.md`, "Re-checked 26 Nov").
 > - **Green:** the preflight, the typing move's gate on epoch 118 (740/740), six APPROVED templates on their account; the number is Cloud-API-only.
 > - **On the night:** ManyChat's Default Reply and keyword triggers off (closing conversations is not enough), the app's "unpublished" box gone (by eye), then `switch_to_homies.py --apply --app-is-published --manychat-is-off`, then `n8n_whatsapp_tohomies.py`, then the phone proof.
 > - **ManyChat comes off days later:** first who pays for WhatsApp on their account (their card, or ManyChat's credit line), then remove WhatsApp in ManyChat and check Meta's partners, then cancel (Yariv asked the owner to help).

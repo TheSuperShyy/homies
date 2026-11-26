@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-11-26
 
+### LIVE 13:19 UTC: the WhatsApp bot answers on Homies' own number, 077-668-7949 (the owner: "ok go switch it now", then "its off now go")
+- **Before:** the owner confirmed ManyChat's WhatsApp auto-replies were off (Yariv). ManyChat stays connected and comes off in a few days.
+- **First try, 13:15:52-13:16:36 UTC, failed and rolled itself back:** `switch_to_homies.py --apply --app-is-published --manychat-is-off` saved inbox 1 on their number, then Chatwoot's `register_callback` subscribed their HOMIES app to their account, and Meta refused the phone-level override: "(#100) Before override the current callback uri, your app must be subscribed to receive messages". The script put inbox 1 back on the test number. Left behind: HOMIES subscribed to their account, no override. For about 3 minutes no bot answered the number (ManyChat's replies were off).
+- **The cause:** the app-level `messages` subscription has to exist before the override, and the script set it after. It can't go first either, because Meta checks the callback against Chatwoot at once, and Chatwoot answers only for a number an inbox already has.
+- **The fix, in the script:** a `move` mode (inbox 1 takes the number), then their app's own webhook on `https://chat.../webhooks/whatsapp/<their number>` with inbox 1's verify token and `messages`, then a `hook` mode (`register_callback` and the template sync).
+- **Second try, 13:18:23-13:19:19 UTC, green:** inbox 1 on +97277…949 (id …8637, account …0527, their key), 6 templates; their app's own webhook active (messages); the number's override set to Chatwoot; subscribed apps HOMIES and ManyChat.
+- **The typing dots:** `n8n_whatsapp_tohomies.py`, gated on the would-be workflow (740/740, the replay unchanged) and applied 13:19:56 UTC. The re-run says nothing to do; the gate on live is 740/740.
+- **Rollback, if needed:** `n8n_whatsapp_tohomies.py --restore`, then `switch_to_homies.py --restore` (snapshot `local/switch-homies-snapshot.json`), then ManyChat's replies back on.
+- **Told homie-db.** The test number no longer feeds inbox 1, so every test now writes to the real number.
+
 ### The switch to Homies' number re-checked, read only (the owner: "ok lets now prepare to migrate and remove the manychat and put our own chatbot in"), 13:30 UTC
 - **Yariv, in the group (the owner's screenshot):** he closed all the conversations in ManyChat, "אנחנו מוכנים למעבר", and asked the owner to help him cancel ManyChat's subscription afterwards.
 - **Green on our side:** `switch_to_homies.py` validates (their token, their number CONNECTED and GREEN, the four templates APPROVED; the only NOTE is ManyChat); `n8n_whatsapp_tohomies.py --dump` gated on today's live bot, 740/740, the replay unchanged. Their account holds six APPROVED templates. The number is Cloud-API-only (`is_on_biz_app` false). Subscribed apps: ManyChat only. The business is not verified (141010).
