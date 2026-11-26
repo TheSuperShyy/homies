@@ -81,7 +81,7 @@ appended to.
 > **The dialer dashboard's video guide (26 Nov, local, gitignored):** `local/dialer-video/homies-dialer-guide-he.mp4` (3:21, Hebrew, Ayala on the Ronit guides' Cartesia key; invented data only; the menu as of PR #28, Dialer and Phone calls). It covers why the dashboard is needed and how to use it, including where the amounts come from (OXS, special payments) and the "חיוג למספר" box. The 25 Nov Hila cut is beside it, outdated. To rebuild after a page change: `python local/dialer-video/build.py` against a throwaway worktree of `main` with `demo-preview.patch` and `demo-db.ts` (port 3124, `DEMO=1`); WORKLOG 26 Nov.
 >
 > **LIVE 25 Nov: THE DASHBOARD SHOWS ONLY THE DIALER AND THE CALLS** (the owner: "in the dashboard i want everything gone only the dialer and call related should be seen here"; PR #25, `main` `954fafe`; CONTEXT, Standing decisions; WORKLOG 25 Nov).
-> - **Menu:** Dialer (with Test calls), Phone calls. It opens on the Dialer, and so does the sign-in. (Voice agent call left it on 26 Nov, PR #28.)
+> - **Menu:** Dialer, Phone calls. It opens on the Dialer, and so does the sign-in. (Voice agent call left it on 26 Nov, PR #28; the Dialer's "Test calls" tab left the same day, PR #33, `main` c45bf50, and `/dialer/test` sends to the Dialer.)
 > - **Everything else** (overview, tickets, debts, WhatsApp conversations, search, import) sends a signed-in visitor to the Dialer. One list, `dashboard/lib/sections.ts`, is read by the menu and the middleware; the pages are in the code, untouched.
 > - **Chrome:** the top bar's search box and the phone's search, dialer and import icons are gone; Settings stays behind the gear.
 >

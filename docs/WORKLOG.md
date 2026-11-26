@@ -11,6 +11,10 @@ conversation that produced it.
 
 ## 2026-11-26
 
+### The Dialer drops its "Test calls" tab (PR #33, `main` c45bf50, LIVE; the owner: "remove the test calls its not relevant")
+- The Dialer page has no tab bar now (one tab was left), and its loading skeleton loses the tabs' placeholder. `/dialer/test` is hidden although it sits under the shown `/dialer` (`HIDDEN` in `lib/sections.ts`), so a signed-in visitor lands on the Dialer. The page's code stays (feature 20).
+- Checked: `check_sections.test.ts` 3/3, `check_dialer.test.ts` 10/10, `tsc` clean, CI green, Vercel's production deploy of c45bf50 completed.
+
 ### 14:10 UTC: switched again after the owner removed ManyChat as a partner, and our sends now pass
 - **The fix was ManyChat.** Grok's list (the owner pasted it) had one step we had not done: remove ManyChat's access. The owner removed ManyChat as a partner of their WhatsApp account at about 14:00 UTC ("ok i removed manychat").
   - At 14:02 and 14:03 the send test was still refused, and Meta still listed ManyChat's app on the account; its old bot still answered the owner's "hi".
