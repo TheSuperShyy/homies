@@ -20,7 +20,7 @@ Some rules look strange from outside, such as never saying that someone will get
 
 - **Michael's memory was reset on 26 Nov,** so he does not remember earlier chats.
 - **Write to the WhatsApp number the owner gives you.** It isn't written here because this file is public.
-- **Best in Israel office hours** (Sunday to Thursday, 09:00 to 17:00). Write the Israel time at the start of each conversation.
+- **Best in Israel office hours** (Sunday to Thursday, 09:00 to 17:00), so the management team is told at once. Write the Israel time at the start of each conversation.
 - **Wait for each reply before you write.**
   - Michael can take up to about 90 seconds. Wait the full 2 minutes before you send the next line, and read every bubble that comes in that time.
   - If nothing comes within 2 minutes, write "no reply" in the report and stop that conversation. Don't resend.
