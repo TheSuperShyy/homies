@@ -26,7 +26,7 @@ appended to.
 >
 > **26 Nov: Chatwoot's workspace (account 2) is named "Homies", was "CLIX"**, so invites read "join Homies". The inviter still shows as "Assaf Clix", from testclix46@gmail.com. WORKLOG 26 Nov.
 >
-> **The dialer dashboard's video guide (25 Nov, local, gitignored):** `local/dialer-video/homies-dialer-guide-he-hila.mp4` (3:26, Hebrew, why it is needed and how to use it; invented data only). Voiced by Hila (free) because Clix's Cartesia key has 26 credits; Ayala, like the Chatwoot videos, is `build.py --voice ayala` after a top-up of about 2,600 credits. The recording kit (`demo-preview.patch`, `demo-db.ts`) is beside it; WORKLOG 25 Nov.
+> **The dialer dashboard's video guide (26 Nov, local, gitignored):** `local/dialer-video/homies-dialer-guide-he.mp4` (3:29, Hebrew, Ayala on the Ronit guides' Cartesia key; invented data only). It covers why the dashboard is needed and how to use it, including where the amounts come from (OXS, special payments) and the "חיוג למספר" box. The 25 Nov Hila cut is beside it, outdated. To rebuild after a page change: `python local/dialer-video/build.py` against a throwaway worktree of `main` with `demo-preview.patch` and `demo-db.ts` (port 3124, `DEMO=1`); WORKLOG 26 Nov.
 >
 > **LIVE 25 Nov: THE DASHBOARD SHOWS ONLY THE DIALER AND THE CALLS** (the owner: "in the dashboard i want everything gone only the dialer and call related should be seen here"; PR #25, `main` `954fafe`; CONTEXT, Standing decisions; WORKLOG 25 Nov).
 > - **Menu:** Dialer (with Test calls), Phone calls, Voice agent call. It opens on the Dialer, and so does the sign-in.

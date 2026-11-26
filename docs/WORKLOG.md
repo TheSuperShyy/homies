@@ -17,6 +17,17 @@ conversation that produced it.
 - **Still CLIX-looking in invites:** the inviter's name (the admin profile "Assaf Clix") and the Gmail sender. Not changed.
 - **Seen:** a new login #26 גילה (agent, not accepted), not from Yariv's list.
 
+## 2026-11-26
+
+### The dialer video guide again, voiced in Ayala on the Ronit key (the owner: "create a video tutorial with voice over use the cartesia key i use in the ronit on how to use the dialer"): `local/dialer-video/homies-dialer-guide-he.mp4`
+- **The key:** the Ronit guides' own Cartesia account (RONIT-AUTOMATION's `.env` `CARTESIA_API_KEY`, opened 26 Nov), read in the process and never printed. Not Homies' key. Voice Ayala (`ebc02c0d`), sonic-3.6, as in every tutorial.
+- **What changed from 25 Nov's Hila cut:**
+  - two beats on today's Dialer: where the amounts come from (OXS, every 10 minutes, special payments and earlier years), and the "חיוג למספר" box (a number typed, its debt checked in OXS, queued; no debt, no call);
+  - the rules gain the re-check in OXS just before each call;
+  - the search click now targets the search form, since the number box is a `form.search` too.
+- **Recorded from** a throwaway worktree of `main` `ec2e19f` (port 3124, `DEMO=1`). `demo-db.ts` gained special payments, an earlier-year month and the OXS note's state. `demo-preview.patch` gained a local-only line so the number box never reaches OXS. The worktree was removed after.
+- **Checked:** frames from the new beats, and the whole voice track transcribed locally (ivrit-ai Whisper). "או-אקס-אס" is heard as OXS. One slip: "לוחצים על עצור" was heard as "על הצור"; it was reworded to "לוחצים על הכפתור עֲצוֹר" and voiced again, and this time it was heard right. Final: 3:29, 1920x1080, 20 lines.
+
 ## 2026-11-25
 
 ### LIVE about 16:55 UTC: Gila invited to the staff inbox (the owner: "invite her to the staff inbox")
