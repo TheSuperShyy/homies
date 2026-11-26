@@ -11,6 +11,21 @@ conversation that produced it.
 
 ## 2026-11-26
 
+### The owner's Dialer call to Ido, read (the owner: "check the recent call i made with ido"), read only, 10:0x UTC
+- **The Dialer's first real press, end to end.** Pressed 09:38:46 UTC by the office login; sent to Omni 09:38:56 ("200: inserted 1"); answered 09:39:24; the router gave the debt agent (`4bc03b57`); done 09:40:40 with `authorized`. 70 s, $0.15, ended by the agent.
+- **What Michael did:**
+  - greeted Ido by name and stated the debt (₪2,000, January to August, flat 1, בר כוכבא 23);
+  - offered the WhatsApp link and sent it on Ido's yes; `send_payment_link` answered in 1.3 s, against 8 s on 16 Nov;
+  - logged `authorized`, said one goodbye and hung up himself. This is the 17 Nov hang-up fix, proven on a real call.
+- **The rest of the record:** the payment request 255-1450-26 opened and resolved. Replies took about 2.0 to 2.6 s each (model 1.0 to 1.3 s); the last was 3.5 s.
+- **WhatsApp:** in Chatwoot conversation 94, the free-text try failed (msg 3642), and the approved template followed 3 s later as delivered (msg 3643). So the link arrived, but staff see a failed message above it.
+- **Heard in the recording** (Michael's side, transcribed locally):
+  - permission was asked twice: "תפסתי אותך בזמן נוח לשנייה?", then after Ido's "מה צריך?" again "יש לך דקה קטנה?";
+  - one wrong word, "או שאולי פשוט יתפספס?" (the text has "תתפספס"; meant "התפספס");
+  - the written transcript's "חכה 2º" before the link line was not spoken.
+- **The amount is test data:** ₪2,000 is the `agent` demo charges on Ido's number (8 months at ₪250). OXS has flat 1 at ₪2,500 (January to October) on an older number (the `oxs` row, …3457, not handed over).
+- **Ido is now at 4 of 4 tries,** so he is off the call list until `bk_reset_attempts.py --apply` (test building only).
+
 ### LIVE about 09:2x UTC: each call's page plays its recording (PR #27, `main` `e14fa7c`; the owner: "in the dashboard of the calls can we add the recording on that?")
 - **Why the old player never played:** calls are recorded since 26 Oct, and Vapi keeps recordings in a private bucket (`hipaa-recordings` on R2). The `recordingUrl` the end-of-call report gives, saved as `interactions.audio_url`, answers 400 (`InvalidArgument: Authorization`) to anyone without Vapi's credentials. Every saved link read 26 Nov answered 400.
 - **What works:** `GET /call/{id}` with the private key returns `artifact.presignedMonoUrl` / `presignedStereoUrl`, signed for about half an hour. Every recorded call since 15 Nov played (206, audio/wav).
