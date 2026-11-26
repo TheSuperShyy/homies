@@ -11,6 +11,10 @@ conversation that produced it.
 
 ## 2026-11-26
 
+### Their WhatsApp account has no payment method since ManyChat left; `homies_hello_he_v2` approved and synced (the owner's screenshot of their WhatsApp Manager)
+- **The banner on their WhatsApp Manager:** "No valid payment method specified ... You won't be able to send messages to customers until you add a payment method." ManyChat's billing went with ManyChat. Replies to tenants who wrote in went out (14:12, read). Messages we start (templates) need the card: their Visa ••2143 sits on the business, and the banner's "Adding a payment method" button attaches it.
+- **Templates (their WhatsApp Manager and `wa_templates.py chatwoot`):** `homies_hello_he_v2` is APPROVED and in inbox 1 (synced by POST `/inboxes/1/sync_templates`, 200). `homies_hi_he` is still in review. The old `homies_hello_he` is still active until someone deletes it there.
+
 ### Two new staff openers on Homies' account, and the old one to delete (the owner, passing on Homies' review: "1- היי מה קורה ? 2-שלום כאן צוות השירות של הומי׳ז,רצינו ליצור איתך קשר ,נוח לך שנדבר כאן? ... delete what needs to be deleted")
 - **Submitted to their WABA, PENDING at Meta:** `homies_hello_he_v2` ("שלום, כאן צוות השירות של הומי'ז. רצינו ליצור איתך קשר, נוח לך שנדבר כאן?", without "חברה לניהול בתים משותפים") and `homies_hi_he` ("היי, מה קורה?"). Both MARKETING, he, no variables; `templates.md` holds both.
 - **My first reading was wrong:** I took "You didn't add 'Hi'" as "open every template with היי". Homies wanted a separate "היי מה קורה" template.
