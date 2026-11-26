@@ -44,13 +44,13 @@ appended to.
 > - **Where it runs:** Chatwoot inbox 1 on their number (id …8637, WABA …0527, their CLIX token, never expires), with six templates. Their HOMIES app's own webhook (messages) and the number's override both point at Chatwoot. Typing goes from their number (n8n credential 6JX0FzF9cGPbEYj6). Gate on live 740/740.
 > - **ManyChat is still connected** (subscribed apps: HOMIES and ManyChat), with its replies off. It comes off in a few days, in the order in the runbook: who pays for WhatsApp, then remove it in ManyChat and check Meta's partners, then cancel (Yariv asked the owner to help).
 > - **Every test now writes to the real number.** "hadas 1" no longer feeds inbox 1. The number watch still watches "hadas 1" and must never register their number: there is no PIN for it.
-> - **Rollback:** `n8n_whatsapp_tohomies.py --restore`, then `switch_to_homies.py --restore`, then ManyChat's replies on.
+> - **Rollback:** `n8n_whatsapp_tohomies.py --restore`, then `switch_to_homies.py --restore`. ManyChat is cancelled (26 Nov), so nothing answers the number after a rollback.
 > - **Still open:** Homies' two decisions (quote leads to Monday, the lift-call email), the AI wallet ($29.96), business verification (250 people a day for messages we start).
 >
 > **26 Nov, 13:30 UTC: THE SWITCH TO HOMIES' NUMBER WAS RE-CHECKED (13:30 UTC, before it ran)** (Yariv: ManyChat's conversations closed, "אנחנו מוכנים למעבר"; runbook `docs/features/11-whatsapp-bot/switch-to-homies.md`, "Re-checked 26 Nov").
 > - **Green:** the preflight, the typing move's gate on epoch 118 (740/740), six APPROVED templates on their account; the number is Cloud-API-only.
 > - **On the night:** ManyChat's Default Reply and keyword triggers off (closing conversations is not enough), the app's "unpublished" box gone (by eye), then `switch_to_homies.py --apply --app-is-published --manychat-is-off`, then `n8n_whatsapp_tohomies.py`, then the phone proof.
-> - **ManyChat comes off days later:** first who pays for WhatsApp on their account (their card, or ManyChat's credit line), then remove WhatsApp in ManyChat and check Meta's partners, then cancel (Yariv asked the owner to help).
+> - **ManyChat comes off days later:** first who pays for WhatsApp on their account (their card, or ManyChat's credit line), then remove WhatsApp in ManyChat and check Meta's partners, then cancel (Yariv asked the owner to help). **All done on 26 Nov, partner first:** see the payment-method line at the top.
 > - **Homies to decide:** quote requests no longer reach their Monday leads board (Make 887490), and the lift-call email (881814) stops.
 > - **The AI wallet:** $29.96; top up before real traffic.
 >

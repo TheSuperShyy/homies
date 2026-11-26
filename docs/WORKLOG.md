@@ -15,6 +15,7 @@ conversation that produced it.
 - **Meta's health check** (`health_status` on their WABA and number): the WABA AVAILABLE, with no 141006, the error Meta gives a WhatsApp account without a working payment method (our test account, 3 Nov). The overall LIMITED is the business only (141010, not verified: 250 people a day for messages we start).
 - **The number after the cancellation:** CONNECTED, GREEN, Cloud API; subscribed apps HOMIES only.
 - **Since the 14:10:48 UTC move:** inbox 1 has 4 active conversations and 11 replies out, all delivered or read. No template has gone yet, so the first ticket-closed notice or payment link is the proof; `failed` on it in Chatwoot would mean the card is not taken.
+- **Briefing:** CONTEXT's ManyChat paragraph rewritten to what happened (partner first, then the card, then the plan; no rollback to ManyChat now), and its stale "our bot is on hadas 1 until then" corrected; HANDOVER's two rollback lines no longer turn ManyChat's replies back on.
 - **The report updated in chat:** the card and the cancellation became done bullets (Gila and the two openers share one), 10 done and 3 Will lines.
 - **Still open:** Homies' two Make scenarios (887490 quote leads to Monday, 881814 the lift-call email), which now receive nothing for good; the old `homies_hello_he` deleted by hand; the AI wallet; business verification.
 
