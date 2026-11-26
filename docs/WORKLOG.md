@@ -11,6 +11,9 @@ conversation that produced it.
 
 ## 2026-11-25
 
+### Was gila@homies-management.co.il invited? No (the owner asked), read only, about 16:50 UTC
+- Not one of the 12 agents on the Chatwoot account, and not in Yariv's staff list (`local/golive/homies-staff-2026-11-15.csv`) or the logins file, so it was never invited. No other agent has a similar name or address.
+
 ### The 11/25 report (in chat, `/reporter`, about 00:40 Philippine time on 26 Nov), 16:40 UTC
 - **Span:** 25 Nov in the owner's clock: from Yonatan's question (morning) to the Dialer's OXS amounts and number box (live 16:27 UTC), one sitting into 26 Nov.
 - **Given:** 10 done bullets and 3 Will lines.
