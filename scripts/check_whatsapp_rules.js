@@ -2281,6 +2281,30 @@ function cases(E) {
         () => E.reply[id]({ output: COB, intermediateSteps: [] }, 0, turn({ steps: [], said: WHO }).$), true);
     }
   }
+  // 26 Nov (scripts/n8n_whatsapp_dangerage.py, danger v11). Run 211121, Yariv on Homies' number: an ordinary noise
+  // question got "הקריאה הדחופה שלך פתוחה, מספר 255-1445-26." added, and its "מאיפה נשמע שהוא מגיע?" cut, because
+  // his chat's outbound rows still held the urgent ticket of 11 Nov. An urgent ticket now counts only inside the
+  // current conversation: back to the latest "כאן מיכאל מהומי'ז", or none when the reply itself introduces him.
+  if (String((P.code || {}).send_body || '').indexOf('danger v11') !== -1 || process.env.DANGERAGE_FORCE) {
+    console.log(NL + '--- 26 Nov: an urgent ticket from an earlier conversation is no emergency now (211121) ---');
+    const HELLO = "היי, ערב טוב 👋 כאן מיכאל מהומי'ז. במה אוכל לעזור לך היום?";
+    const OLD = 'בשמחה יריב, פתחתי עכשיו קריאה דחופה על הנזילה בבניין (מספר 255-1445-26), ורשמתי אותה על הדירה שלך. איפה בדיוק בבניין הנזילה?';
+    const NOISE = 'יש לי בעיה יש כאן רעש בבניין מה ניתן לעשות?';
+    const R = 'אוי, רעש זה באמת מפריע. מאיפה נשמע שהוא מגיע? זה משהו מהמערכות של הבניין או ממקור אחר?';
+    const ROWS = [{ direction: 'inbound', body: NOISE }, { direction: 'outbound', body: HELLO }, { direction: 'inbound', body: 'היי' },
+                  { direction: 'outbound', body: OLD }, { direction: 'inbound', body: 'מה עושים' }];
+    expect('211121 exactly: the reply goes out whole, no urgent ticket added', say({ reply: R, said: NOISE, S: { last_bot: HELLO }, rows: ROWS }), R);
+    const R2 = "ערב טוב יריב, כאן מיכאל מהומי'ז. " + R;
+    const got2 = content(E, { reply: R2, said: NOISE, S: { last_bot: OLD }, rows: [{ direction: 'inbound', body: NOISE }, { direction: 'outbound', body: OLD }] });
+    expect('a reply that introduces Michael starts a conversation: an old urgent last_bot adds no ticket', () => got2.indexOf('255-1445-26') === -1, true);
+    expect('... and the question with "מגיע" stays', () => got2.indexOf('מאיפה נשמע') !== -1, true);
+    const CUR = 'פתחתי לך קריאה דחופה על הנזילה, מספר 255-1500-26. איפה בדיוק בבניין?';
+    // Advice, which only the danger step cuts (the promise filter runs before it and takes "בדרך" on its own).
+    const got3 = content(E, { reply: 'הבנתי, תודה. אל תיגע בשום דבר חשמלי ותתרחק מהמים.', said: 'בקומה 2', S: { last_bot: CUR },
+      rows: [{ direction: 'inbound', body: 'בקומה 2' }, { direction: 'outbound', body: CUR }, { direction: 'inbound', body: 'נזילה בבניין' }, { direction: 'outbound', body: HELLO }] });
+    expect('inside the conversation an urgent ticket still counts: the advice goes', () => got3.indexOf('תתרחק') === -1, true);
+    expect('... and the added line names the current ticket', () => got3.indexOf('255-1500-26') !== -1, true);
+  }
   console.log(NL + (fails ? fails + ' of ' + n + ' FAILED' : 'all ' + n + ' cases pass'));
   return fails;
 }

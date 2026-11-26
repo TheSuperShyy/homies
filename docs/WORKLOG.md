@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-11-26
 
+### LIVE 15:21:25 UTC: an urgent ticket from an earlier conversation no longer puts Send into emergency mode (danger v11; the owner, on Yariv's chat: "wtf is this why is there no like elaboration?")
+- **What Yariv got (run 211121, 15:09 UTC, conversation 54, on Homies' number):** "יש לי בעיה יש כאן רעש בבניין מה ניתן לעשות?" got "אוי, רעש זה באמת מפריע. זה משהו מהמערכות של הבניין או ממקור אחר? הקריאה הדחופה שלך פתוחה, מספר 255-1445-26."
+- **What the model wrote:** "אוי, רעש זה באמת מפריע. מאיפה נשמע שהוא מגיע? זה משהו מהמערכות של הבניין או ממקור אחר?", with no tool.
+- **The cause, in Send's danger step (v10):** it counts the chat as an emergency when last_bot or the last three outbound rows mention an urgent ticket. Yariv's second-newest outbound row was the bot's 11 Nov line about urgent ticket 255-1445-26 (his leak test, still open). The rows carry no time. Its arrival filter then read "מגיע" in the question as "someone is on the way", cut it, and added the ticket line.
+- **The fix, `scripts/n8n_whatsapp_dangerage.py`:** an urgent ticket counts only inside the current conversation, up to the latest "כאן מיכאל מהומי'ז" (the menu after a hello, or the first beat after 8 quiet hours). None counts when the reply itself introduces him. The ticket number is looked up in the same window.
+- **Gate:**
+  - 5 new cases; on live danger v10 (forced) exactly the three 211121 cases failed, and the harness reproduced Yariv's text word for word;
+  - the candidate 745/745; the replay unchanged (1,604 messages, 1,650 replies);
+  - the idle check differs from live only in dangerage itself;
+  - applied 15:21:25 UTC, the re-run says nothing to do, and the gate on live is 745/745.
+- **Left on purpose (one cause at a time):** inside a real emergency the arrival filter can still cut a question with "מגיע". Yariv's ticket 255-1445-26 stays open (a test ticket, never deleted; OXS is theirs).
+- **Watch:** `check_whatsapp_rules.py --watch 2026-11-26T15:21:25Z` tomorrow.
+
 ### Their WhatsApp account has no payment method since ManyChat left; `homies_hello_he_v2` approved and synced (the owner's screenshot of their WhatsApp Manager)
 - **The banner on their WhatsApp Manager:** "No valid payment method specified ... You won't be able to send messages to customers until you add a payment method." ManyChat's billing went with ManyChat. Replies to tenants who wrote in went out (14:12, read). Messages we start (templates) need the card: their Visa ••2143 sits on the business, and the banner's "Adding a payment method" button attaches it.
 - **Templates (their WhatsApp Manager and `wa_templates.py chatwoot`):** `homies_hello_he_v2` is APPROVED and in inbox 1 (synced by POST `/inboxes/1/sync_templates`, 200). `homies_hi_he` is still in review. The old `homies_hello_he` is still active until someone deletes it there.
