@@ -613,7 +613,7 @@ next to one resident on the Debts page; the agent rings that resident, once.
 Nothing auto-dials. The press is the `handed_over` decision. A PIN is typed
 with it because the page has no login wall. **Calls are recorded again since
 26 Oct** (the owner's word), on both agents, and `vapi_sync.py` keeps it on.
-From 25 Aug it was transcript only, by the client's instruction.
+From 25 Aug it was transcript only, by the client's instruction. **A recording plays only through a signed link (26 Nov):** Vapi keeps them in a private bucket, so the saved `recordingUrl` (`interactions.audio_url`) answers 400. The call's page asks `GET /call/{id}` for `artifact.presignedMonoUrl` (about 30 minutes) each time it opens (`dashboard/lib/recording.ts`).
 
 **Targets the owner has set aside, 25 Aug.** Voice latency ~1.2 s is
 accepted; do not spend time chasing the PRD's 0.8 s. Ten simultaneous calls

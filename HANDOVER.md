@@ -8,6 +8,8 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 26 Nov: EACH CALL'S PAGE PLAYS ITS RECORDING** (PR #27, `main` `e14fa7c`; WORKLOG 26 Nov). The saved `audio_url` never plays (Vapi's private bucket), so `dashboard/lib/recording.ts` asks Vapi for a signed link (`presignedMonoUrl`, about 30 minutes) each time the page opens. Only what Vapi still keeps plays; nothing of ours stores a copy.
+>
 > **LIVE 25 Nov, 16:27 UTC: THE DIALER'S AMOUNTS ARE OXS'S OWN DEBT, AND A NUMBER CAN BE TYPED AND CALLED** (the owner: "i need it to be accurate and has an option to manually call the input number"; feature 24, `docs/features/24-oxs-live-debts/`; PR #26, `main` `ec2e19f`; WORKLOG and CONTEXT 25 Nov).
 > - **What is owed:** OXS's `totalDebt`, i.e. overdue without this month, every year, plus open special payments (60% of it). `charges` hold it month by month. A special payment is a row with no month (`kind` 'special', `label`).
 > - **How it stays right:**

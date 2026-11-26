@@ -11,6 +11,16 @@ conversation that produced it.
 
 ## 2026-11-26
 
+### LIVE about 09:2x UTC: each call's page plays its recording (PR #27, `main` `e14fa7c`; the owner: "in the dashboard of the calls can we add the recording on that?")
+- **Why the old player never played:** calls are recorded since 26 Oct, and Vapi keeps recordings in a private bucket (`hipaa-recordings` on R2). The `recordingUrl` the end-of-call report gives, saved as `interactions.audio_url`, answers 400 (`InvalidArgument: Authorization`) to anyone without Vapi's credentials. Every saved link read 26 Nov answered 400.
+- **What works:** `GET /call/{id}` with the private key returns `artifact.presignedMonoUrl` / `presignedStereoUrl`, signed for about half an hour. Every recorded call since 15 Nov played (206, audio/wav).
+- **Built:** `dashboard/lib/recording.ts` asks Vapi for that link, server side, each time a call's page opens (6 s timeout). The player is at the top of the side column.
+  - A recorded call Vapi no longer has says the recording is no longer available.
+  - Vapi not answering says to refresh.
+  - The stale "recording is off since 25 Aug" note is gone.
+- **Checked:** the helper on real calls (25 Nov: a link that plays; 19 Nov and 26 Oct: gone), `tsc`, a production build, CI green, both Vercel previews; production READY on `e14fa7c`. The same commit is on `feature/chatbot` as `e64bfc9`.
+- **Limit:** only what Vapi still keeps can play. Nothing of ours stores a copy.
+
 ### Chatwoot's workspace renamed from "CLIX" to "Homies" (the owner: "rename the workspace to Homies")
 - **Why:** Homies' staff asked whether the invite in their service mailbox was "a password change request". The invite read "You're invited to join CLIX", from Assaf Clix, sent from testclix46@gmail.com. It was the 24 Nov invite for #24 מחלקת גבייה כללי, the shared collections & service login on Yariv's list, which uses the service mailbox; still not accepted.
 - **Done:** `PATCH /api/v1/accounts/2` `{"name": "Homies"}`, HTTP 200, read back "Homies" (locale `en` unchanged). The bot reads no Chatwoot wording, so nothing else moves; `check_sandbox_fingerprint.py`'s "CLIX" is test data only.
