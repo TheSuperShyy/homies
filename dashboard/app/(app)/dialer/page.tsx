@@ -14,7 +14,6 @@ import { SelectAll } from '@/components/select-all';
 import { CallSelected } from '@/components/call-selected';
 import { AutoRefresh } from '@/components/auto-refresh';
 import { IconAlert, IconCheck, IconInbox, IconInfo, IconOpenLink, IconPhoneOut } from '@/components/icons';
-import { DialerTabs } from './tabs';
 
 // Feature 23 (25 Nov), the dialer. The owner: "in the dashboard we need to have an actual dialer
 // section there not just the dialer test".
@@ -30,7 +29,8 @@ import { DialerTabs } from './tabs';
 // you call from), then today's calls. Each list row is four facts and a button, two short lines
 // at most, so a page of fifty reads at a glance (the owner, 25 Nov: "the design is not good").
 //
-// The test calls page (feature 20) is at /dialer/test, the second tab.
+// 26 Nov: the "Test calls" tab is gone (the owner: "remove the test calls its not relevant"). Its page
+// (feature 20) is still in the code at /dialer/test, and lib/sections.ts sends a visitor there to the Dialer.
 
 type Q = Partial<Record<'month' | 'q' | 'page' | 'per' | 'r' | 'n' | 'k' | 'w' | 'b' | 'p', string>>;
 
@@ -326,7 +326,6 @@ export default async function Dialer({ searchParams }: { searchParams?: Q }) {
         <h1>{t('dial.title')}</h1>
         <p>{t('dial.blurb')}</p>
       </div>
-      <DialerTabs t={t} here="tenants" />
 
       <Outcome t={t} q={q} />
       {error && (
