@@ -1755,7 +1755,9 @@ const SERVICES: Topic[] = [
 ];
 
 /**
- * Homies in general, for a WhatsApp question that names no one service (26 Nov).
+ * Homies in general, for a question that names no one service (26 Nov; WhatsApp,
+ * then the phone line the same day on the owner's "apply the overview fix to the
+ * phone line as well").
  *
  * The owner's Grok run asked "אני די חדש בבניין, מה זה בעצם הומי'ז? מה אתם
  * עושים בדיוק?". The model looked up "מה הומי'ז עושה", no topic matched, and
@@ -4670,9 +4672,10 @@ const tools: Record<string, (args: any, ctx: CallContext) => Promise<unknown>> =
       // 26 Nov: on WhatsApp a question that names no one service gets Homies in
       // general (OVERVIEW), found true, so "what is Homies, what do you do?" is
       // answered rather than sent to the office. Anything the overview does not
-      // cover is still not guessed. The phone line keeps found:false until the
-      // owner asks for its twin (chatbot first).
-      if (channel(ctx) === "whatsapp") {
+      // cover is still not guessed. The same day the phone line got it too, on
+      // the owner's word: the incoming agent by its id (isIntake). A probe with no
+      // assistant id keeps found:false, as check_tools.py expects.
+      if (channel(ctx) === "whatsapp" || isIntake(ctx)) {
         return {
           ok: true,
           found: true,
