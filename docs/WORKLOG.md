@@ -11,6 +11,12 @@ conversation that produced it.
 
 ## 2026-11-26
 
+### Why the bot did not answer the Grok quote run (the owner: "why is the bot not responding"), read only, 11:20 UTC
+- **What arrived:** Grok's three messages reached Chatwoot and the bot's workflow (11:03:10 the quote ask, 11:10:13 "אני די חדש בבניין", 11:13:44 "hey"), all in conversation #106. Sort answered each with `_handedOver: true`, so nothing was said (executions 210439, 210452, 210460).
+- **Why:** #106 is assigned to Assaf Clix, a User, and Sort keeps quiet when a person has the chat. #104, #105 and #106 were opened on 22 Nov by the owner's template tests from Chatwoot's "New conversation" form; each send opens a new conversation self-assigned to the sender. With `lock_to_single_conversation` off, a contact's new message goes to their newest unresolved conversation, #106.
+- **Ruled out:** today's epoch 117 (the runs stop at Sort, before any model); inbox auto-assignment (off on both inboxes); the live senders (the payment link and the ticket notices post with the bot token, so they assign nobody).
+- **The fix, waiting on the owner's go** (Chatwoot is Homies' live desk now): resolve the owner's four open test chats (#102, #104, #105, #106), so the next message opens a fresh conversation the bot answers; then rerun the Grok brief from the start. CSAT and the greeting are off on inbox 1, so a resolve sends the number nothing.
+
 ### A Grok brief for a quote request (the owner: "give me instructions to grok"), written, not run
 - **Why:** the owner asked how Michael handles a quotation, then for a sample of how he talks. No `quote` note exists in `call_outcomes` on either channel, real or test, so the path has never run; a live run is the honest sample.
 - **The brief:** `docs/features/11-whatsapp-bot/grok-quote-test.md`, two conversations, six messages: a quote for lobby cameras (no price, "recorded" in his words, one missing detail at a time, only "I", no time or call-back, no service call), then "what is Homies?" for epoch 117's "חברה לניהול ואחזקת בניינים" (the handset check that change owes).
