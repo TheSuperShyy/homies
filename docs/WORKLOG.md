@@ -25,6 +25,9 @@ conversation that produced it.
   - the written transcript's "חכה 2º" before the link line was not spoken.
 - **The amount is test data:** ₪2,000 is the `agent` demo charges on Ido's number (8 months at ₪250). OXS has flat 1 at ₪2,500 (January to October) on an older number (the `oxs` row, …3457, not handed over).
 - **Ido is now at 4 of 4 tries,** so he is off the call list until `bk_reset_attempts.py --apply` (test building only).
+- **The failed free text, traced one step:** Ido last wrote 14 days before the call, so the 24-hour window was shut, yet the free text went first. Meta: "24-hour customer service window is closed". The window check judged it open; the cause is not traced yet (HANDOVER, open).
+- **Briefing:** HANDOVER's "the first press is owed" and "not proven by a real call" lines were corrected, and the call's three defects and Ido's 4 of 4 tries added. CONTEXT gains the observation under the payment link's window paragraph.
+- **Not this session's:** the uncommitted WhatsApp change in the checkout (`n8n_whatsapp_company.py`, epoch 117, Homies as "חברה לניהול ואחזקת בניינים") is another session's work in progress, whose `prompt.md` edit the 18:07 auto-commit took. It is left uncommitted for that session.
 
 ### LIVE about 09:2x UTC: each call's page plays its recording (PR #27, `main` `e14fa7c`; the owner: "in the dashboard of the calls can we add the recording on that?")
 - **Why the old player never played:** calls are recorded since 26 Oct, and Vapi keeps recordings in a private bucket (`hipaa-recordings` on R2). The `recordingUrl` the end-of-call report gives, saved as `interactions.audio_url`, answers 400 (`InvalidArgument: Authorization`) to anyone without Vapi's credentials. Every saved link read 26 Nov answered 400.

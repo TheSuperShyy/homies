@@ -22,7 +22,7 @@ appended to.
 >   - a note says the figures are OXS's and when they were read;
 >   - the "חיוג למספר" box reads the number's debt from OXS at the press and queues it, or says it has nothing overdue in OXS.
 > - **Also changed:** the debt agent hears the year of an older month and the special payments' names (prompt unchanged). Balance answers on WhatsApp and the phone line list special payments by name.
-> - **Not proven yet:** a staff press or a typed number through the signed-in page, and a debt call naming a special payment.
+> - **A staff press worked on 26 Nov** (Ido, test data). **Not proven yet:** a typed number through the signed-in page, and a debt call naming a special payment.
 > - **Tools:** `python scripts/oxs_debts_setup.py` (state), `--check` (the Dialer against OXS), `--run`, `--off` (the kill switch: unschedule the sync; charges keep the last copy).
 > - **Rollback:** `--off`, then `git revert` ec2e19f through a PR. 044 can stay: it is additive.
 >
@@ -39,8 +39,13 @@ appended to.
 > - **What staff see** (the layout redone the same evening, PR #24 `c5196c1`, after the owner's "the design is not good"): the line now (Stop), today's counts, then everyone who owes, one row per phone in five columns (the tenant with a tick box, the building and flats, the amount with "8 months · Jan–Oct 2026", where they stand, Call only when callable), then today's calls. "חייג למסומנים" shows how many are ticked. "חייגן" is in the main menu next to Debts; the test page is the second tab, `/dialer/test`.
 > - **What happens:** debt-tools sends one tenant at a time to Omni's dialer on a 15 s pg_cron tick, only in calling hours and only while 208 is quiet on Vapi. The router marks the lead answered, the end-of-call report marks it done with the agent's outcome. No pickup in 2 minutes is "no answer" and one try. Five in a row that reached nobody, or a Tokomni-side refusal, pause it until Resume.
 > - **Where:** PR #23, `main` `6cb70ec` (Vercel and the function deploy from it). Migration 043 applied by hand; the function's `TOKOMNI_TOKEN` / `TOKOMNI_CAMPAIGN_ID` set and read back by digest (`scripts/dialer_setup.py`).
-> - **Checked:** 88 node tests (13 new), tsc, a production build, and every database path in one rolled-back transaction on the live data. **Not proven by a real call.** Nothing rings until someone presses Call.
-> - **Owed:** the first press, on Ido in calling hours (he is on try 3 of 4: one call left before he leaves the debt call list; `bk_reset_attempts.py --apply` resets the test building). The legal calling hours are Homies' to confirm before real tenants (PRD §13 #6).
+> - **Checked:** 88 node tests (13 new), tsc, a production build, and every database path in one rolled-back transaction on the live data. **Proven by a real call on 26 Nov** (WORKLOG 26 Nov). The owner pressed Call on Ido at 09:38:46 UTC: Omni rang, Michael stated the debt, sent the link (delivered), logged `authorized`, said one goodbye and hung up himself. 70 s.
+> - **Ido is now at 4 of 4 tries**, so he is off the call list. Run `bk_reset_attempts.py --apply` (test building only) before calling him again. His ₪2,000 is test data (`agent` rows); OXS has flat 1 at ₪2,500 on an older number.
+> - **Seen on that call, open:**
+>   - Michael asked permission twice ("בזמן נוח?", then "יש לך דקה קטנה?" after "מה צריך?").
+>   - One wrong word: "יתפספס", meant "התפספס".
+>   - The link's free text was tried first and failed (Ido last wrote 14 days earlier, so the 24-hour window was closed) before the template delivered 3 s later. It leaves a failed message in the conversation; the window check's cause is not traced yet.
+> - **Owed:** the legal calling hours, Homies' to confirm before real tenants (PRD §13 #6).
 > - **Kill switch:** `python scripts/dialer_setup.py --off`. **Rollback:** `git revert` 6cb70ec through a PR, then `--off`.
 >
 > **LIVE 24 Nov 16:37 UTC: Chatwoot invites sent to Yariv's staff list** (WORKLOG 24 Nov).

@@ -6215,6 +6215,12 @@ tool returned `sent: false, reason: "outside_window"` for this send, which reads
 as "the template never ran". It did run — the tool reports the *first* attempt's
 reason and the retry's outcome only changes `note` when it succeeds. The two
 messages in the conversation are the real record.
+**The free text is tried even with the window shut (26 Nov, the first Dialer call).**
+- Ido last wrote to the number 14 days before the call, yet the link went first as free text.
+- Meta refused it: "the WhatsApp 24-hour customer service window is closed" (Chatwoot msg 3642, `failed`).
+- The template followed 3 s later and was delivered (msg 3643), and the tool answered `sent: true`.
+- So the window check judged it open. Until that is traced, a failed message above the delivered one is expected
+  on a link to anyone who has not written in a day, and it is not a lost link.
 
 **A tenant's phone in OXS is not necessarily their WhatsApp (24 Sep).** The
 mobile on Ido's OXS tenant record resolved to a Chatwoot contact named "Clix
