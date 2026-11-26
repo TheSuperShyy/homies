@@ -438,6 +438,19 @@ DEBT_TOOLS = [
         "`unit` so only that apartment is disputed.",
         dict(UNIT_ON_CALL),
     ),
+    _fn(
+        "send_email_address",
+        # 26 Nov, the owner, after the call to Ido: "say it in one go and if asked say it again spell it
+        # slowly and if you want i can send it via whatsapp". On that call the tenant could not catch the
+        # address, asked for it on WhatsApp, and was told it could not be sent: there was no tool for it.
+        # No arguments, so nothing can be said aloud by mistake; the function writes the address (PR #31).
+        "Call once per call, when the resident wants the email for the payment receipt sent to them on "
+        "WhatsApp. It goes to the number Homies has on file for them, written out so they can copy it. The "
+        "result says whether it is on its way (sent true) or not (sent false). On its way: tell them in your "
+        "own words that it is on its way to their WhatsApp. Not sent: say the email once more, slowly and "
+        "spelled, without saying why, and do not offer WhatsApp again.",
+        wait=True,
+    ),
     _open_request(location="unit"),
     # `flag_not_handed_over` was here until 11 Aug and is retired, the same way
     # open_payment_ticket was on 4 Aug and for the same reason: a tool the agent

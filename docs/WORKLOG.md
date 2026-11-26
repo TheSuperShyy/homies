@@ -11,6 +11,19 @@ conversation that produced it.
 
 ## 2026-11-26
 
+### LIVE 12:22 UTC: the debt call says the office email in one go, spells it when asked again, and can send it on WhatsApp (PR #31, `main` f40b204; Vapi 12:22)
+- **The ask (the owner, after the call to Ido, `84e3a558`, 10:59 UTC):** *"spelling correction on the email its being said like al not il. say it in one go and if asked say it again spell it slowly and if you want i can send it via whatsapp"*.
+- **What the call shows:** the address came in commas (`... נקודה, סי, או, נקודה, איי, אל`) and the model dropped pieces of it twice ("נקודה, נקודה"). Ido said he could not catch it and asked for it on WhatsApp; the agent said it could not send it, because no tool did, and offered the payment link instead.
+- **The two spoken forms (`route.ts` FIXED_DEFAULTS = the Call button's FIXED, compared by `check_route.test.ts`):**
+  - `{{verification_email}}`, in one go: `אופיס שטרודל הומיז מקף מנג'מנט נקודה קו נקודה אִיל`. ".co.il" is said the Israeli way, and "il" is one pointed word.
+  - `{{verification_email_spelled}}` (new), slowly: the same pieces in commas, with הומיז spelled in pointed letter names (`אֵייץ', אוֹ, אֶם, אַיי, אִי, אֶס`).
+  - Neither is set in Vercel or the function's secrets (read: names only), so the defaults are what calls get.
+- **`send_email_address` (new debt tool, no arguments):** sends `Office@homies-management.co.il`, written out, to the number on file. Inside the 24-hour window it goes as free text; otherwise the new `receipt_email_he` template goes into the same conversation (the payment link's way). It answers "on its way" only when it can go: no number, a test number, or a shut window with the template not yet synced answer `sent: false` at once, and the agent says the address again slowly. The send runs after the answer.
+- **The prompt (fence, 7206 -> 7607 characters):** the facts line carries both forms; the tools line names the new one; after the receipt request comes one passage: in one go; whoever asks again hears it slowly and spelled, with the WhatsApp offer in the same turn; a yes calls the tool, then "on its way"; if it was not sent, slowly once more and no second offer.
+- **Checked:** `check_paylink.test.ts` 13/13 (two new: the template's one blank, the "on its way" note); `check_route.test.ts` green with LF (the 3 known CRLF failures on this PC only); syntax ok; CI green; `deploy-function` success. The live function answers the tool (probe, no resident: `sent: false, no_resident`, nothing left behind). Before the sync, live equalled the repo (0 differences, numbers normalised); after it, 0 again, and the voice is untouched (`--keep-voice`). Snapshot `local/vapi-debt-live-26nov-before-email.json`.
+- **The template:** `receipt_email_he` (UTILITY), submitted on both WABAs (ASTDX `…632` id 1681327543645568, "hadas 1" `…050` id 2411988249624467), PENDING at 12:23 UTC. Until Meta approves it and Chatwoot syncs it, only a tenant whose window is open can get the address on WhatsApp.
+- **Owed:** Meta's approval, then Chatwoot's sync (`ch.sync_templates`, as in `switch_to_homies.py`) and `wa_templates.py chatwoot`; then the owner's own call from the Dialer (an "I already paid", "which email?", "again?", "send it on WhatsApp").
+
 ### LIVE 12:1x UTC: on WhatsApp, "what is Homies?" gets Homies in general (PR #30, `main` 99c40b9; the owner pasted the Grok quote run's report)
 - **The run (11:34-11:48 UTC, conversation 108), read against the executions:** Grok's copy is right; its double space in Q1.1 is a 🙂 it dropped.
   - Q1 passed. 210508: `notify_team` reason `quote`, department `management`, "הצעת מחיר להתקנת מצלמות אבטחה בלובי בבר כוכבא 23". The note in #108 tags @הנהלה ("סיבה: הדייר מבקש הצעת מחיר"), so Yariv, עדן ממן and Assaf Clix were tagged. Its notes are left: "anything else?" in Q1.2, and "רשומה ומעודכנת" in Q1.3 with no tool that turn (staff read the details in the same chat).

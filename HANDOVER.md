@@ -8,6 +8,12 @@ was decided — it is the chronology with full reasoning, newest first.
 Rewrite this file after every piece of work. Present tense only, never
 appended to.
 
+> **LIVE 26 Nov, 12:22 UTC: THE DEBT CALL SAYS THE OFFICE EMAIL IN ONE GO, SPELLS IT WHEN ASKED AGAIN, AND CAN SEND IT ON WHATSAPP** (the owner, after the call to Ido; PR #31, `main` f40b204; Vapi synced from feature/chatbot; WORKLOG 26 Nov).
+> - **Said:** `{{verification_email}}` in one go, "אופיס שטרודל הומיז מקף מנג'מנט נקודה קו נקודה אִיל" (".il" was the letters "איי, אל", heard as "al"); `{{verification_email_spelled}}` (new) slowly, with הומיז spelled. Both come from `route.ts` FIXED_DEFAULTS and the Call button's FIXED, which `check_route.test.ts` keeps equal; nothing overrides them in Vercel or the function's secrets.
+> - **Sent:** `send_email_address` (new debt tool, no arguments) writes Office@homies-management.co.il to the number on file: free text inside the window, else the `receipt_email_he` template. "On its way" only when it can go; otherwise the address again, slowly.
+> - **Waiting on Meta:** `receipt_email_he` (UTILITY) is PENDING on both WABAs (submitted 12:2x UTC). After approval: Chatwoot's sync (`ch.sync_templates`, see `switch_to_homies.py`), `wa_templates.py chatwoot` to see it in inbox 1, then the owner's call from the Dialer. Until then a tenant whose window is shut hears the address again instead.
+> - **Rollback:** `local/vapi-debt-live-26nov-before-email.json` (the agent as it was); the function and the Call button by reverting PR #31.
+>
 > **LIVE 26 Nov, 10:08:02 UTC: WHATSAPP EPOCH 117: MICHAEL CALLS HOMIES "חברה לניהול ואחזקת בניינים"** (Homies, forwarded by the owner: not "אנחנו חברה לניהול ועד בית"; WORKLOG 26 Nov).
 > - **Why:** on 24 Nov he told a massage clinic's bot "אנחנו חברה לניהול ועד בית". No text said it; the prompt's first line ("חברת ניהול בתים משותפים") was put in the model's own words. That line now carries Homies' words, and nothing else changed.
 > - **Shipped by** `scripts/n8n_whatsapp_company.py` (prompt a70004f02b0e, tools unchanged, memory 116 -> 117). Gate 731/731 on live; the replay unchanged. **Owed:** the owner's handset (e.g. "מי אתם בעצם?") and `check_whatsapp_rules.py --watch 2026-11-26T10:08:02Z` tomorrow. **Rollback:** `--restore`, then the epoch back in the repo.

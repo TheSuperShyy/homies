@@ -1784,7 +1784,11 @@ language really uses.
 
 **A fact the agent reads aloud is stored in its spoken form, not its written
 one.** A phone number goes in the prompt as `אפס שבע שבע, שש שש שמונה, ...`,
-never as `077-6687949`; an email as `אופיס, שטרודל, ...`, never as an address.
+never as `077-6687949`; an email as `אופיס שטרודל ...`, never as an address.
+**The office email has two spoken forms (26 Nov, the owner):** in one go (`... נקודה קו נקודה אִיל`), and
+slowly with the name spelled for whoever asks again, then an offer to send it on WhatsApp
+(`send_email_address`). A Latin letter written as its Hebrew name is guessed by the voice: "איי, אל" for
+".il" came out as "al". A word the language really uses (קו, אִיל), pointed, is safer than letter names.
 The model is told to hand these over verbatim, so whatever form the prompt uses
 is the form that reaches the voice — and a numeral does not reach it intact.
 Vapi's formatter cuts any number above `numberToDigitsCutoff` (default 2025)

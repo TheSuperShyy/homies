@@ -161,3 +161,32 @@ variable, which Meta's reviewers read).
 - **variables:**
   - `{{1}}` — the staff member's message, one paragraph
 - **examples:** `רצינו לעדכן שביום שלישי תהיה הפסקת מים בבניין בין 10:00 ל-12:00.`
+
+---
+
+## receipt_email_he
+
+- **What:** the office email for a payment receipt, written out, sent during a debt
+  call to a tenant who asks for it on WhatsApp. The call is outbound, so the
+  24-hour window is usually shut and free text is refused; this template carries
+  the address across it, as `payment_link_he` carries the link.
+- **Decided:** the owner, 26 Nov 2026, after the call to Ido: *"say it in one go
+  and if asked say it again spell it slowly and if you want i can send it via
+  whatsapp"*. The wording follows `payment_link_he` (the callback to the call, so
+  it does not read as spam), and the end addresses no one, singular or plural.
+- **Sender:** `send_email_address` in the Edge Function (PR #31). Inside the
+  window the same words go as free text (`EMAIL_BODY` in `paylink.ts`, which
+  `check_paylink.test.ts` holds to this body's shape).
+- **Accounts:** both WABAs: `.env`'s (`…632`, Chatwoot's template list) and
+  "hadas 1" (`…050`, where the number's sends are looked up). Then Chatwoot's sync.
+- **category:** UTILITY
+- **language:** he
+- **body:**
+
+```
+שלום, כאן מיכאל מהומי'ז. כמו שסיכמנו בשיחה, זאת כתובת המייל לשליחת אסמכתא על התשלום: {{1}} תודה, ואם משהו לא ברור אפשר לכתוב לנו כאן.
+```
+
+- **variables:**
+  - `{{1}}` — the office email, `Office@homies-management.co.il` (`HOMIES_VERIFICATION_EMAIL` overrides it)
+- **examples:** `Office@homies-management.co.il`
