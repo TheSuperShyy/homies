@@ -11,6 +11,11 @@ conversation that produced it.
 
 ## 2026-11-25
 
+### LIVE about 16:55 UTC: Gila invited to the staff inbox (the owner: "invite her to the staff inbox")
+- **Login #26 "גילה", agent**, created through Chatwoot's API (`POST /agents`, which sends the invite). Seated in inboxes 1 and 2 (`POST /inbox_members`, adds only): now 12 and 11 members.
+- **The invite mail:** sidekiq performed the `MailDeliveryJob` for User/26 with no error, through Gmail, so it may land in spam like the others.
+- **No department team:** her department is not known, so a department mention does not reach her yet. Add her with `chatwoot_teams.py --add` once it is.
+
 ### Was gila@homies-management.co.il invited? No (the owner asked), read only, about 16:50 UTC
 - Not one of the 12 agents on the Chatwoot account, and not in Yariv's staff list (`local/golive/homies-staff-2026-11-15.csv`) or the logins file, so it was never invited. No other agent has a similar name or address.
 
