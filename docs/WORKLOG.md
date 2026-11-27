@@ -9,6 +9,22 @@ conversation that produced it.
 
 ---
 
+## 2026-11-27
+
+### The 11/27 report (in chat, `/reporter`, about 17:50 Philippine time), 09:50 UTC
+- **Span:** 27 Nov in the owner's clock. The 00:04-00:11 commits (the 11/26 report simplified, the card and ManyChat's cancellation) belong to 26 Nov's sitting and are in its report. After them came the health check below and the Chatwoot staff video, shown in File Explorer (06:13 UTC). No commit on any branch since 00:11; the other session's last entry is 15:23 UTC on 26 Nov.
+- **Given:** 2 done bullets and 4 Will lines.
+  - **Done:** the health check (the WhatsApp assistant on Homies' number, the phone line, the debt calls, the staff inbox, OXS and the dashboard, all up); no WhatsApp message since late Thursday, with the number and its connection fine.
+  - **Will:** a test message to Homies' number; the two Make automations that used ManyChat; the noise test and the first real chats' review; the AI account's top-up.
+- **Read for it, 09:51 UTC:** Rails still has no POST from Meta since 15:52:14 UTC on 26 Nov (7 since 15:50, all in that minute), so 18 hours. HANDOVER carries it.
+
+### The health check (the owner: "do a health check dont do anything"), read only, 05:52-05:57 UTC
+- **WhatsApp on Homies' number:** CONNECTED and GREEN; the phone override and the app subscription (active, `messages`) both on our host; subscribed apps HOMIES only. The WABA is AVAILABLE with no 141006; the only limit is 141010, the unverified business. The bot is on, with no error since the move, and the rules check is 745/745.
+- **The quiet stretch:** Meta's last POST to Rails was at 15:52:14 UTC on 26 Nov, with none since, receipts included. The number isn't dropped (a dropped one shows PENDING), the certificate is good until 6 Jan and the server answers. Most likely nobody wrote; the owner's "היי" settles it.
+- **No template has gone out since the move,** so no send has proven the card yet.
+- **Chatwoot inbox 1:** no chat held by a person. **Vapi:** in credit; 3 calls on 26 Nov (2 debt, 1 incoming), all ended normally. **AI wallet:** $28.92. **OXS:** debts every 10 minutes (last 05:50 UTC, nothing waiting); the residents and tickets syncs succeed, the tickets one only every few hours (GitHub's `*/15` cron, known). **Dashboard:** up.
+- Nothing was written or sent at the time; this entry was written with the 11/27 report.
+
 ## 2026-11-26
 
 ### Their card is on their WhatsApp account and ManyChat's plan is cancelled (the owner: "the payment method has been added", "we also cancelled manychat subscription"), read only, 16:07 UTC
